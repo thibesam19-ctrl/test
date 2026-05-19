@@ -1,7 +1,11 @@
 package com.axiom.aicoach.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import com.axiom.aicoach.BuildConfig
 import com.axiom.aicoach.data.local.database.AxiomDatabase
 import com.axiom.aicoach.data.repository.*
 import dagger.Binds
@@ -10,7 +14,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "axiom_prefs")
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -42,6 +52,40 @@ object DatabaseModule {
     @Provides fun provideStreakDao(db: AxiomDatabase) = db.streakDao()
     @Provides fun provideCoachMessageDao(db: AxiomDatabase) = db.coachMessageDao()
     @Provides fun provideNotificationPreferenceDao(db: AxiomDatabase) = db.notificationPreferenceDao()
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("openai_api_key")
+    fun provideOpenAiApiKey(): String = BuildConfig.OPENAI_API_KEY
+
+    @Provides
+    @Singleton
+    @Named("claude_api_key")
+    fun provideClaudeApiKey(): String = BuildConfig.CLAUDE_API_KEY
+
+    @Provides
+    @Singleton
+    @Named("gemini_api_key")
+    fun provideGeminiApiKey(): String = BuildConfig.GEMINI_API_KEY
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+        context.dataStore
 }
 
 @Module

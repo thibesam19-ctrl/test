@@ -2,6 +2,10 @@ package com.axiom.aicoach.ui.screens.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.axiom.aicoach.ai.analytics.InsightsEngine
+import com.axiom.aicoach.ai.analytics.Recommendation
+import com.axiom.aicoach.ai.analytics.RecommendationEngine
+import com.axiom.aicoach.ai.analytics.WeeklyInsight
 import com.axiom.aicoach.data.local.dao.FoodItemDao
 import com.axiom.aicoach.data.local.dao.FoodLogDao
 import com.axiom.aicoach.data.local.dao.StreakDao
@@ -9,9 +13,13 @@ import com.axiom.aicoach.data.local.dao.UserProfileDao
 import com.axiom.aicoach.data.local.dao.WaterLogDao
 import com.axiom.aicoach.util.toDbString
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -29,6 +37,8 @@ data class DashboardUiState(
     val waterGoalMl: Int = 2400,
     val streakDays: Int = 0,
     val isLoading: Boolean = true,
+    val insights: List<WeeklyInsight> = emptyList(),
+    val recommendations: List<Recommendation> = emptyList(),
 )
 
 @HiltViewModel
@@ -38,11 +48,27 @@ class DashboardViewModel @Inject constructor(
     private val foodItemDao: FoodItemDao,
     private val waterLogDao: WaterLogDao,
     private val streakDao: StreakDao,
+    private val insightsEngine: InsightsEngine,
+    private val recommendationEngine: RecommendationEngine,
 ) : ViewModel() {
 
     // The local user ID used until proper auth is wired up.
     private val userId = "local_user"
     private val today: String = LocalDate.now().toDbString()
+
+    private val _insights = MutableStateFlow<List<WeeklyInsight>>(emptyList())
+    val insights: StateFlow<List<WeeklyInsight>> = _insights.asStateFlow()
+
+    private val _recommendations = MutableStateFlow<List<Recommendation>>(emptyList())
+    val recommendations: StateFlow<List<Recommendation>> = _recommendations.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            val insightUserId = "default_user"
+            _insights.value = insightsEngine.generateInsights(insightUserId)
+            _recommendations.value = recommendationEngine.getRecommendations(insightUserId)
+        }
+    }
 
     // Observe the user profile (nullable — may not exist yet).
     private val profileFlow: Flow<UserProfileEntity?> =
