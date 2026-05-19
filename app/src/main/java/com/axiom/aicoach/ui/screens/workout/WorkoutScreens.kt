@@ -403,110 +403,92 @@ private fun ExerciseSetCard(
     onInfo: () -> Unit,
 ) {
     val colors = AxiomTheme.colors
-    AxiomCard(
+    Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = Radius.lg,
+        colors = CardDefaults.cardColors(
+            containerColor = if (isActive) colors.primaryLight.copy(alpha = 0.3f) else colors.card,
+        ),
+        border = if (isActive) BorderStroke(1.5.dp, colors.primary) else null,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        // Re-apply border and background tint for active state via a wrapping Box
-        val cardBg = if (isActive) colors.primaryLight.copy(alpha = 0.3f) else Color.Transparent
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (isActive) Modifier.background(cardBg)
-                    else Modifier
-                )
-                .then(
-                    if (isActive) Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                    else Modifier
-                )
-        ) {
-            // Border overlay for active
-            if (isActive) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                        .background(Color.Transparent)
-                )
-            }
-            Column(modifier = Modifier.padding(Spacing.xl)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            exercise.name,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = colors.textPrimary,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            "${exercise.sets} sets × ${exercise.repsMin}–${exercise.repsMax} reps · ${exercise.muscleGroup}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = colors.textMuted,
-                        )
-                    }
-                    IconButton(onClick = onInfo, modifier = Modifier.size(36.dp)) {
-                        Icon(
-                            Icons.Default.Info,
-                            null,
-                            tint = colors.textMuted,
-                            modifier = Modifier.size(18.dp),
-                        )
-                    }
+        Column(modifier = Modifier.padding(Spacing.xl)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        exercise.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colors.textPrimary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        "${exercise.sets} sets × ${exercise.repsMin}–${exercise.repsMax} reps · ${exercise.muscleGroup}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.textMuted,
+                    )
                 }
+                IconButton(onClick = onInfo, modifier = Modifier.size(36.dp)) {
+                    Icon(
+                        Icons.Default.Info,
+                        null,
+                        tint = colors.textMuted,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
 
-                if (isActive) {
-                    Spacer(Modifier.height(Spacing.lg))
-                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                        repeat(exercise.sets) { i ->
-                            val done = i < setsCompleted
-                            Box(
-                                Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(if (done) colors.success else colors.borderSubtle),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                if (done) {
-                                    Icon(
-                                        Icons.Default.Check,
-                                        null,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(16.dp),
-                                    )
-                                } else {
-                                    Text(
-                                        "${i + 1}",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = colors.textMuted,
-                                    )
-                                }
+            if (isActive) {
+                Spacer(Modifier.height(Spacing.lg))
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    repeat(exercise.sets) { i ->
+                        val done = i < setsCompleted
+                        Box(
+                            Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(if (done) colors.success else colors.borderSubtle),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (done) {
+                                Icon(
+                                    Icons.Default.Check,
+                                    null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            } else {
+                                Text(
+                                    "${i + 1}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = colors.textMuted,
+                                )
                             }
                         }
                     }
-                    if (setsCompleted < exercise.sets) {
-                        Spacer(Modifier.height(Spacing.lg))
-                        AxiomPrimaryButton(
-                            text = "Log Set ${setsCompleted + 1}",
-                            onClick = onSetComplete,
-                            modifier = Modifier.fillMaxWidth(),
+                }
+                if (setsCompleted < exercise.sets) {
+                    Spacer(Modifier.height(Spacing.lg))
+                    AxiomPrimaryButton(
+                        text = "Log Set ${setsCompleted + 1}",
+                        onClick = onSetComplete,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            } else {
+                Spacer(Modifier.height(Spacing.md))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    repeat(exercise.sets) { i ->
+                        val done = i < setsCompleted
+                        Box(
+                            Modifier
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(if (done) colors.success else colors.borderSubtle)
                         )
-                    }
-                } else {
-                    Spacer(Modifier.height(Spacing.md))
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        repeat(exercise.sets) { i ->
-                            val done = i < setsCompleted
-                            Box(
-                                Modifier
-                                    .size(10.dp)
-                                    .clip(CircleShape)
-                                    .background(if (done) colors.success else colors.borderSubtle)
-                            )
-                        }
                     }
                 }
             }

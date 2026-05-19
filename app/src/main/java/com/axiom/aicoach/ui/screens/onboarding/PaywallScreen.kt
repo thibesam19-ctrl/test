@@ -3,21 +3,40 @@ package com.axiom.aicoach.ui.screens.onboarding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.axiom.aicoach.ui.components.AxiomCard
+import com.axiom.aicoach.ui.components.AxiomGhostButton
 import com.axiom.aicoach.ui.components.AxiomPrimaryButton
+import com.axiom.aicoach.ui.components.PillBadge
 import com.axiom.aicoach.ui.theme.AxiomTheme
 import com.axiom.aicoach.ui.theme.Radius
 import com.axiom.aicoach.ui.theme.Spacing
@@ -44,90 +63,125 @@ fun PaywallScreen(onContinue: () -> Unit) {
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.xl)
                 .systemBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(Spacing.s48))
-
-            Text("✨", style = MaterialTheme.typography.displayLarge)
-            Spacer(Modifier.height(Spacing.xl))
-            Text(
-                "Unlock Your Full Potential",
-                style = MaterialTheme.typography.headlineLarge,
-                color = colors.textPrimary,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(Spacing.md))
-            Text(
-                "Try Axiom Premium free for 7 days",
-                style = MaterialTheme.typography.bodyLarge,
-                color = colors.textSecondary,
-                textAlign = TextAlign.Center,
-            )
-
-            Spacer(Modifier.height(Spacing.s32))
-
-            // Plan cards
-            PlanCard(
-                label = "Annual",
-                badge = "Most Popular · 50% off",
-                price = "$59.99",
-                perPeriod = "/year",
-                equivalent = "Only $5/month",
-                selected = selectedPlan == "annual",
-                onClick = { selectedPlan = "annual" },
-            )
-            Spacer(Modifier.height(Spacing.lg))
-            PlanCard(
-                label = "Monthly",
-                price = "$9.99",
-                perPeriod = "/month",
-                selected = selectedPlan == "monthly",
-                onClick = { selectedPlan = "monthly" },
-            )
-            Spacer(Modifier.height(Spacing.lg))
-            PlanCard(
-                label = "Lifetime",
-                badge = "Limited Time",
-                price = "$199.99",
-                perPeriod = " once",
-                equivalent = "Pay once, keep forever",
-                selected = selectedPlan == "lifetime",
-                onClick = { selectedPlan = "lifetime" },
-            )
+            // ── Hero gradient box ─────────────────────────────────────────────
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(140.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(colors.primaryDark, colors.primary),
+                        ),
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "✨ Axiom Premium",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
+            }
 
             Spacer(Modifier.height(Spacing.s32))
 
-            // Features
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                premiumFeatures.forEach { feature ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Check, null, tint = colors.success, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(12.dp))
-                        Text(feature, style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+            Column(modifier = Modifier.padding(horizontal = Spacing.xl)) {
+                // ── Plan cards ────────────────────────────────────────────────
+                PlanCard(
+                    label = "Annual",
+                    badge = "Most Popular · 50% off",
+                    price = "$59.99",
+                    perPeriod = "/year",
+                    equivalent = "Only $5/month",
+                    selected = selectedPlan == "annual",
+                    onClick = { selectedPlan = "annual" },
+                )
+                Spacer(Modifier.height(Spacing.lg))
+                PlanCard(
+                    label = "Monthly",
+                    price = "$9.99",
+                    perPeriod = "/month",
+                    selected = selectedPlan == "monthly",
+                    onClick = { selectedPlan = "monthly" },
+                )
+                Spacer(Modifier.height(Spacing.lg))
+                PlanCard(
+                    label = "Lifetime",
+                    badge = "Limited Time",
+                    price = "$199.99",
+                    perPeriod = " once",
+                    equivalent = "Pay once, keep forever",
+                    selected = selectedPlan == "lifetime",
+                    onClick = { selectedPlan = "lifetime" },
+                )
+
+                Spacer(Modifier.height(Spacing.s32))
+
+                // ── Features list ─────────────────────────────────────────────
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    premiumFeatures.forEach { feature ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "✓",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.success,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Text(
+                                text = feature,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.textPrimary,
+                            )
+                        }
                     }
                 }
-            }
 
-            Spacer(Modifier.height(Spacing.s40))
-            AxiomPrimaryButton("Start Free Trial", onContinue, Modifier.fillMaxWidth())
-            Spacer(Modifier.height(Spacing.xl))
-            TextButton(onClick = onContinue) {
-                Text("Continue with free plan", color = colors.textMuted)
+                Spacer(Modifier.height(Spacing.s40))
+
+                // ── Footer CTA ────────────────────────────────────────────────
+                AxiomPrimaryButton(
+                    text = "Start 7-Day Free Trial",
+                    onClick = onContinue,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(Spacing.lg))
+                AxiomGhostButton(
+                    text = "Continue with free plan",
+                    onClick = onContinue,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(Spacing.md))
+                Text(
+                    text = "Cancel anytime. No commitment.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(Spacing.xl))
+                TextButton(
+                    onClick = { /* restore purchases */ },
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                ) {
+                    Text(
+                        text = "Restore Purchases",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colors.textMuted,
+                    )
+                }
+
+                Spacer(Modifier.height(Spacing.xxxl))
             }
-            Spacer(Modifier.height(Spacing.md))
-            Text(
-                "Cancel anytime. No commitment. Restore purchases button in Settings.",
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.textMuted,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(Spacing.xxxl))
         }
     }
 }
+
+// ── PlanCard ──────────────────────────────────────────────────────────────────
 
 @Composable
 private fun PlanCard(
@@ -140,49 +194,70 @@ private fun PlanCard(
     equivalent: String? = null,
 ) {
     val colors = AxiomTheme.colors
-    Box(
+    AxiomCard(
         modifier = Modifier
             .fillMaxWidth()
+            .border(
+                width = if (selected) 2.dp else 1.dp,
+                color = if (selected) colors.primary else colors.borderSubtle,
+                shape = Radius.lg,
+            )
+            .background(
+                color = if (selected) colors.primaryLight else colors.card,
+                shape = Radius.lg,
+            )
             .clip(Radius.lg)
-            .background(if (selected) colors.primaryLight else colors.card)
-            .border(2.dp, if (selected) colors.primary else colors.borderSubtle, Radius.lg)
-            .clickable(onClick = onClick)
-            .padding(Spacing.xl),
+            .clickable(onClick = onClick),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(if (selected) colors.primaryLight else colors.card)
+                .padding(Spacing.xl),
         ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(label, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary, fontWeight = FontWeight.Bold)
-                    if (badge != null) {
-                        Spacer(Modifier.width(8.dp))
-                        Box(
-                            Modifier
-                                .clip(Radius.pill)
-                                .background(colors.accent)
-                                .padding(horizontal = 8.dp, vertical = 2.dp)
-                        ) {
-                            Text(badge, style = MaterialTheme.typography.labelSmall, color = colors.textOnPrimary)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = if (selected) colors.primary else colors.textPrimary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        if (badge != null) {
+                            Spacer(Modifier.width(8.dp))
+                            PillBadge(text = badge, color = colors.accent)
                         }
                     }
+                    if (equivalent != null) {
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = equivalent,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.textMuted,
+                        )
+                    }
                 }
-                if (equivalent != null) {
-                    Text(equivalent, style = MaterialTheme.typography.bodySmall, color = colors.textMuted)
+                Spacer(Modifier.width(Spacing.xl))
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = price,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = if (selected) colors.primary else colors.textPrimary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = perPeriod,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.textMuted,
+                        modifier = Modifier.padding(bottom = 4.dp),
+                    )
                 }
-            }
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(price, style = MaterialTheme.typography.headlineMedium, color = if (selected) colors.primary else colors.textPrimary, fontWeight = FontWeight.Bold)
-                Text(perPeriod, style = MaterialTheme.typography.bodySmall, color = colors.textMuted, modifier = Modifier.padding(bottom = 4.dp))
             }
         }
-        RadioButton(
-            selected = selected,
-            onClick = onClick,
-            modifier = Modifier.align(Alignment.TopEnd).size(0.dp), // hidden, visual handled by border
-            colors = RadioButtonDefaults.colors(selectedColor = colors.primary),
-        )
     }
 }

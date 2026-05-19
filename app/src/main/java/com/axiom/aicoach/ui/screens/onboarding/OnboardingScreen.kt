@@ -10,6 +10,8 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -52,6 +55,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.axiom.aicoach.domain.model.ActivityLevel
 import com.axiom.aicoach.domain.model.DietaryPreference
@@ -516,11 +520,11 @@ private fun SelectionCard(
     onClick: () -> Unit,
     emoji: String = "",
     wide: Boolean = false,
-    minHeight: androidx.compose.ui.unit.Dp = if (wide) 0.dp else 72.dp,
+    minHeight: Dp = if (wide) 0.dp else 72.dp,
 ) {
     val colors = AxiomTheme.colors
 
-    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.98f else 1f,
@@ -582,5 +586,3 @@ private fun SelectionCard(
     }
 }
 
-private val androidx.compose.foundation.interaction.MutableInteractionSource.collectIsPressedAsState
-    @Composable get() = androidx.compose.foundation.interaction.collectIsPressedAsState()
