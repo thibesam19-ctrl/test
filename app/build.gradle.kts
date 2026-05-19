@@ -22,6 +22,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        buildConfigField("String", "OPENAI_API_KEY", "\"${project.findProperty("OPENAI_API_KEY") ?: ""}\"")
+        buildConfigField("String", "CLAUDE_API_KEY", "\"${project.findProperty("CLAUDE_API_KEY") ?: ""}\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"${project.findProperty("GEMINI_API_KEY") ?: ""}\"")
     }
 
     buildTypes {
@@ -54,9 +57,15 @@ android {
         buildConfig = true
     }
 
+    aaptOptions {
+        noCompress += "tflite"
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
         }
     }
 }
@@ -119,6 +128,14 @@ dependencies {
     implementation(libs.vico.compose)
     implementation(libs.vico.compose.m3)
     implementation(libs.vico.core)
+
+    // AI / ML
+    implementation(libs.generativeai)
+    implementation(libs.mlkit.image.labeling)
+    implementation(libs.mlkit.image.labeling.custom)
+    implementation(libs.okhttp.sse)
+    implementation(libs.tflite.core)
+    implementation(libs.tflite.support)
 
     // ML Kit
     implementation(libs.mlkit.pose)
