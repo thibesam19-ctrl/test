@@ -3,6 +3,7 @@ package com.axiom.aicoach.ui.screens.progress
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -17,15 +18,41 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.axiom.aicoach.ui.components.*
 import com.axiom.aicoach.ui.theme.AxiomTheme
 import com.axiom.aicoach.ui.theme.Radius
 import com.axiom.aicoach.ui.theme.Spacing
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
+// ── Demo data ─────────────────────────────────────────────────────────────────
+
+data class WeightEntry(val date: LocalDate, val kg: Float)
+
+val demoWeightHistory = listOf(
+    WeightEntry(LocalDate.now().minusDays(30), 82.4f),
+    WeightEntry(LocalDate.now().minusDays(23), 81.8f),
+    WeightEntry(LocalDate.now().minusDays(16), 81.1f),
+    WeightEntry(LocalDate.now().minusDays(9), 79.8f),
+    WeightEntry(LocalDate.now().minusDays(2), 78.2f),
+)
+
+data class AchievementBadgeData(val emoji: String, val label: String, val earned: Boolean)
+
+val achievements = listOf(
+    AchievementBadgeData("🔥", "7-Day Streak", true),
+    AchievementBadgeData("💪", "First Workout", true),
+    AchievementBadgeData("🥗", "Food Logger", true),
+    AchievementBadgeData("⚖️", "5kg Lost", true),
+    AchievementBadgeData("💧", "Hydration Hero", false),
+    AchievementBadgeData("🏋️", "10 Workouts", false),
+)
 
 // ── Progress Overview ─────────────────────────────────────────────────────────
 
@@ -47,53 +74,120 @@ fun ProgressOverviewScreen(
                 .padding(padding)
                 .padding(horizontal = Spacing.xl),
         ) {
+            // ── Stat row ──────────────────────────────────────────────────────
             item {
-                Spacer(Modifier.height(Spacing.md))
-                // Summary cards
+                Spacer(Modifier.height(Spacing.lg))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
                 ) {
-                    StatCard("Start Weight", "82.4 kg", modifier = Modifier.weight(1f))
-                    StatCard("Current", "78.2 kg", color = colors.success, modifier = Modifier.weight(1f))
-                    StatCard("Lost", "4.2 kg", color = colors.primary, modifier = Modifier.weight(1f))
+                    StatCard(
+                        label = "Start Weight",
+                        value = "82.4 kg",
+                        color = colors.textPrimary,
+                        modifier = Modifier.weight(1f),
+                    )
+                    StatCard(
+                        label = "Current",
+                        value = "78.2 kg",
+                        color = colors.success,
+                        modifier = Modifier.weight(1f),
+                    )
+                    StatCard(
+                        label = "Lost",
+                        value = "4.2 kg",
+                        color = colors.primary,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
                 Spacer(Modifier.height(Spacing.xl))
             }
 
+            // ── Transformation summary card ───────────────────────────────────
             item {
-                ProgressNavCard("⚖️ Weight History", "Track your weight over time", onWeightHistory)
-                Spacer(Modifier.height(Spacing.lg))
-                ProgressNavCard("📏 Body Measurements", "Chest, waist, hip & more", onBodyMeasurements)
-                Spacer(Modifier.height(Spacing.lg))
-                ProgressNavCard("📸 Progress Photos", "Visual transformation timeline", onPhotoGallery)
+                AxiomCard(modifier = Modifier.fillMaxWidth()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(colors.success, Color(0xFF16A34A))
+                                )
+                            )
+                            .padding(Spacing.xl),
+                    ) {
+                        Column {
+                            Text(
+                                text = "🎯 4.2 kg lost in 30 days",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                            )
+                            Spacer(Modifier.height(Spacing.sm))
+                            Text(
+                                text = "On track for your goal",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White.copy(alpha = 0.9f),
+                            )
+                        }
+                    }
+                }
                 Spacer(Modifier.height(Spacing.xl))
             }
 
+            // ── Navigation cards ──────────────────────────────────────────────
             item {
-                Text("Achievements", style = MaterialTheme.typography.titleLarge, color = colors.textPrimary, fontWeight = FontWeight.Bold)
+                ProgressNavCard(
+                    emoji = "⚖️",
+                    title = "Weight History",
+                    subtitle = "Track your weight over time",
+                    onClick = onWeightHistory,
+                )
                 Spacer(Modifier.height(Spacing.lg))
+                ProgressNavCard(
+                    emoji = "📏",
+                    title = "Body Measurements",
+                    subtitle = "Chest, waist, hip & more",
+                    onClick = onBodyMeasurements,
+                )
+                Spacer(Modifier.height(Spacing.lg))
+                ProgressNavCard(
+                    emoji = "📸",
+                    title = "Progress Photos",
+                    subtitle = "Visual transformation timeline",
+                    onClick = onPhotoGallery,
+                )
+                Spacer(Modifier.height(Spacing.xl))
+            }
+
+            // ── Achievements section ──────────────────────────────────────────
+            item {
+                SectionHeader(title = "Achievements")
+                Spacer(Modifier.height(Spacing.md))
             }
 
             item {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
-                    modifier = Modifier.height(200.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+                    userScrollEnabled = false,
                 ) {
                     items(achievements.take(6)) { badge ->
                         AchievementBadge(badge)
                     }
                 }
-                Spacer(Modifier.height(80.dp))
+                Spacer(Modifier.height(Spacing.s80))
             }
         }
     }
 }
 
 @Composable
-private fun ProgressNavCard(emoji: String, subtitle: String, onClick: () -> Unit) {
+private fun ProgressNavCard(emoji: String, title: String, subtitle: String, onClick: () -> Unit) {
     val colors = AxiomTheme.colors
     AxiomCard(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Row(
@@ -101,38 +195,40 @@ private fun ProgressNavCard(emoji: String, subtitle: String, onClick: () -> Unit
                 .fillMaxWidth()
                 .padding(Spacing.xl),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(emoji, style = MaterialTheme.typography.headlineSmall)
-                Spacer(Modifier.width(Spacing.lg))
-                Column {
-                    Text(emoji.substringAfter(" "), style = MaterialTheme.typography.titleMedium, color = colors.textPrimary, fontWeight = FontWeight.SemiBold)
-                    Text(subtitle, style = MaterialTheme.typography.bodySmall, color = colors.textMuted)
-                }
+            Text(
+                text = emoji,
+                fontSize = 24.sp,
+            )
+            Spacer(Modifier.width(Spacing.lg))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colors.textPrimary,
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textMuted,
+                )
             }
-            Icon(Icons.Default.ChevronRight, null, tint = colors.textMuted)
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = colors.textMuted,
+            )
         }
     }
 }
-
-data class AchievementBadgeData(val emoji: String, val label: String, val earned: Boolean)
-
-val achievements = listOf(
-    AchievementBadgeData("🔥", "7-Day Streak", true),
-    AchievementBadgeData("💪", "First Workout", true),
-    AchievementBadgeData("🥗", "Food Logger", true),
-    AchievementBadgeData("⚖️", "5kg Lost", true),
-    AchievementBadgeData("💧", "Hydration Hero", false),
-    AchievementBadgeData("🏋️", "10 Workouts", false),
-)
 
 @Composable
 private fun AchievementBadge(badge: AchievementBadgeData) {
     val colors = AxiomTheme.colors
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(4.dp),
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Box(
             Modifier
@@ -142,16 +238,15 @@ private fun AchievementBadge(badge: AchievementBadgeData) {
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                badge.emoji,
+                text = badge.emoji,
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.then(if (!badge.earned) Modifier.then(Modifier) else Modifier),
             )
         }
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(Spacing.sm))
         Text(
-            badge.label,
+            text = badge.label,
             style = MaterialTheme.typography.labelSmall,
-            color = if (badge.earned) colors.textPrimary else colors.disabledText,
+            color = if (badge.earned) colors.textPrimary else colors.textMuted,
             textAlign = TextAlign.Center,
             maxLines = 2,
         )
@@ -159,16 +254,6 @@ private fun AchievementBadge(badge: AchievementBadgeData) {
 }
 
 // ── Weight History ────────────────────────────────────────────────────────────
-
-data class WeightEntry(val date: LocalDate, val kg: Float)
-
-val demoWeightHistory = listOf(
-    WeightEntry(LocalDate.now().minusDays(30), 82.4f),
-    WeightEntry(LocalDate.now().minusDays(23), 81.8f),
-    WeightEntry(LocalDate.now().minusDays(16), 81.1f),
-    WeightEntry(LocalDate.now().minusDays(9), 79.8f),
-    WeightEntry(LocalDate.now().minusDays(2), 78.2f),
-)
 
 @Composable
 fun WeightHistoryScreen(onBack: () -> Unit) {
@@ -186,9 +271,9 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
                 containerColor = colors.primary,
                 contentColor = colors.textOnPrimary,
             ) {
-                Icon(Icons.Default.Add, "Log weight")
+                Icon(Icons.Default.Add, contentDescription = "Log weight")
             }
-        }
+        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -196,22 +281,59 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
                 .padding(padding)
                 .padding(horizontal = Spacing.xl),
         ) {
-            Spacer(Modifier.height(Spacing.md))
+            Spacer(Modifier.height(Spacing.lg))
+
+            // ── Stats row with trend indicator ────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
             ) {
-                StatCard("Start", "82.4 kg", modifier = Modifier.weight(1f))
-                StatCard("Current", "78.2 kg", color = colors.success, modifier = Modifier.weight(1f))
-                StatCard("Change", "-4.2 kg", color = colors.success, modifier = Modifier.weight(1f))
+                StatCard(
+                    label = "Start",
+                    value = "82.4 kg",
+                    color = colors.textPrimary,
+                    modifier = Modifier.weight(1f),
+                )
+                // Current weight stat with trend arrow overlay
+                Box(modifier = Modifier.weight(1f)) {
+                    StatCard(
+                        label = "Current",
+                        value = "78.2 kg",
+                        color = colors.success,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    // Trend down arrow in top-right of card
+                    Text(
+                        text = "↓",
+                        color = colors.success,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(Spacing.md),
+                    )
+                }
+                StatCard(
+                    label = "Change",
+                    value = "-4.2 kg",
+                    color = colors.success,
+                    modifier = Modifier.weight(1f),
+                )
             }
+
             Spacer(Modifier.height(Spacing.xl))
-            Text("Log History", style = MaterialTheme.typography.titleMedium, color = colors.textPrimary, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = "Log History",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = colors.textPrimary,
+            )
             Spacer(Modifier.height(Spacing.lg))
+
             LazyColumn {
                 items(demoWeightHistory.reversed()) { entry ->
                     WeightEntryRow(entry, formatter)
-                    Divider(color = colors.borderSubtle)
+                    HorizontalDivider(color = colors.borderSubtle)
                 }
             }
         }
@@ -229,14 +351,20 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
                     singleLine = true,
                     suffix = { Text("kg") },
                     shape = Radius.md,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
-                TextButton(onClick = { showDialog = false }) { Text("Save") }
+                TextButton(onClick = { showDialog = false; newWeight = "" }) {
+                    Text("Save", color = colors.primary)
+                }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showDialog = false; newWeight = "" }) {
+                    Text("Cancel", color = colors.textMuted)
+                }
             },
+            containerColor = colors.card,
         )
     }
 }
@@ -251,8 +379,17 @@ private fun WeightEntryRow(entry: WeightEntry, formatter: DateTimeFormatter) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(entry.date.format(formatter), style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
-        Text("${entry.kg} kg", style = MaterialTheme.typography.titleMedium, color = colors.textPrimary, fontWeight = FontWeight.SemiBold)
+        Text(
+            text = entry.date.format(formatter),
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.textSecondary,
+        )
+        Text(
+            text = "${entry.kg} kg",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = colors.textPrimary,
+        )
     }
 }
 
@@ -262,16 +399,18 @@ private fun WeightEntryRow(entry: WeightEntry, formatter: DateTimeFormatter) {
 fun BodyMeasurementsScreen(onBack: () -> Unit) {
     val colors = AxiomTheme.colors
     var measurements by remember {
-        mutableStateOf(mapOf(
-            "Chest" to "98.0",
-            "Waist" to "84.0",
-            "Hips" to "96.0",
-            "Left Arm" to "35.0",
-            "Right Arm" to "35.5",
-            "Left Thigh" to "56.0",
-            "Right Thigh" to "56.5",
-            "Neck" to "38.0",
-        ))
+        mutableStateOf(
+            mapOf(
+                "Chest" to "98.0",
+                "Waist" to "84.0",
+                "Hips" to "96.0",
+                "Left Arm" to "35.0",
+                "Right Arm" to "35.5",
+                "Left Thigh" to "56.0",
+                "Right Thigh" to "56.5",
+                "Neck" to "38.0",
+            )
+        )
     }
 
     Scaffold(
@@ -284,15 +423,33 @@ fun BodyMeasurementsScreen(onBack: () -> Unit) {
                 .padding(padding)
                 .padding(horizontal = Spacing.xl),
         ) {
-            item { Spacer(Modifier.height(Spacing.md)) }
-            items(measurements.entries.toList()) { (label, value) ->
-                MeasurementRow(label, value, onUpdate = { measurements = measurements + (label to it) })
-                Divider(color = colors.borderSubtle)
+            item {
+                Spacer(Modifier.height(Spacing.lg))
+                Text(
+                    text = "Last measured: Apr 15",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textMuted,
+                )
+                Spacer(Modifier.height(Spacing.lg))
             }
+
+            items(measurements.entries.toList()) { (label, value) ->
+                MeasurementRow(
+                    label = label,
+                    value = value,
+                    onUpdate = { measurements = measurements + (label to it) },
+                )
+                HorizontalDivider(color = colors.borderSubtle)
+            }
+
             item {
                 Spacer(Modifier.height(Spacing.xxxl))
-                AxiomPrimaryButton("Save Measurements", onClick = {}, modifier = Modifier.fillMaxWidth())
-                Spacer(Modifier.height(80.dp))
+                AxiomPrimaryButton(
+                    text = "Save Measurements",
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(Spacing.s80))
             }
         }
     }
@@ -302,31 +459,47 @@ fun BodyMeasurementsScreen(onBack: () -> Unit) {
 private fun MeasurementRow(label: String, value: String, onUpdate: (String) -> Unit) {
     val colors = AxiomTheme.colors
     var editing by remember { mutableStateOf(false) }
+    var editText by remember(value) { mutableStateOf(value) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = Spacing.lg),
+            .padding(vertical = Spacing.md),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary, modifier = Modifier.weight(1f))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.textSecondary,
+            modifier = Modifier.weight(1f),
+        )
         if (editing) {
-            var text by remember { mutableStateOf(value) }
             OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier.width(100.dp),
+                value = editText,
+                onValueChange = { editText = it },
+                modifier = Modifier.width(110.dp),
                 singleLine = true,
                 suffix = { Text("cm") },
                 shape = Radius.md,
             )
-            IconButton(onClick = { onUpdate(text); editing = false }) {
-                Icon(Icons.Default.Check, null, tint = colors.success)
+            IconButton(onClick = { onUpdate(editText); editing = false }) {
+                Icon(Icons.Default.Check, contentDescription = "Save", tint = colors.success)
             }
         } else {
-            Text("${value} cm", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = "$value cm",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = colors.textPrimary,
+            )
             IconButton(onClick = { editing = true }) {
-                Icon(Icons.Default.Edit, null, tint = colors.textMuted, modifier = Modifier.size(18.dp))
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit",
+                    tint = colors.textMuted,
+                    modifier = Modifier.size(18.dp),
+                )
             }
         }
     }
@@ -337,10 +510,10 @@ private fun MeasurementRow(label: String, value: String, onUpdate: (String) -> U
 @Composable
 fun PhotoGalleryScreen(onBack: () -> Unit) {
     val colors = AxiomTheme.colors
-    var photos by remember { mutableStateOf(listOf("📸 Week 1", "📸 Week 2", "📸 Week 3", "📸 Week 4")) }
+    var photos by remember { mutableStateOf(listOf("Week 1", "Week 2", "Week 3", "Week 4")) }
 
     val photoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) photos = photos + "📸 Week ${photos.size + 1}"
+        if (uri != null) photos = photos + "Week ${photos.size + 1}"
     }
 
     Scaffold(
@@ -352,39 +525,78 @@ fun PhotoGalleryScreen(onBack: () -> Unit) {
                 containerColor = colors.primary,
                 contentColor = colors.textOnPrimary,
             ) {
-                Icon(Icons.Default.AddAPhoto, "Add photo")
+                Icon(Icons.Default.AddAPhoto, contentDescription = "Add photo")
             }
-        }
+        },
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = Spacing.xl),
         ) {
-            Spacer(Modifier.height(Spacing.md))
-            Text("Privacy note: photos are stored locally on your device and never uploaded without your permission.",
-                style = MaterialTheme.typography.bodySmall, color = colors.textMuted, modifier = Modifier.padding(bottom = Spacing.xl))
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(photos) { photo ->
-                    Box(
-                        Modifier
-                            .aspectRatio(0.75f)
-                            .clip(Radius.lg)
-                            .background(colors.primaryLight),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("📷", style = MaterialTheme.typography.displaySmall)
-                            Spacer(Modifier.height(8.dp))
-                            Text(photo, style = MaterialTheme.typography.labelSmall, color = colors.primary)
+            // ── Privacy banner ────────────────────────────────────────────────
+            item {
+                Spacer(Modifier.height(Spacing.lg))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(Radius.lg)
+                        .border(
+                            width = 4.dp,
+                            color = colors.info,
+                            shape = Radius.lg,
+                        )
+                        .background(colors.card)
+                        .padding(Spacing.xl),
+                ) {
+                    Text(
+                        text = "🔒 Photos stored locally. Never uploaded without permission.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.textSecondary,
+                    )
+                }
+                Spacer(Modifier.height(Spacing.xl))
+            }
+
+            // ── Photo grid ────────────────────────────────────────────────────
+            item {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+                    userScrollEnabled = false,
+                ) {
+                    items(photos) { weekLabel ->
+                        Box(
+                            modifier = Modifier
+                                .aspectRatio(0.75f)
+                                .clip(Radius.lg)
+                                .background(
+                                    Brush.linearGradient(
+                                        listOf(
+                                            colors.primaryLight,
+                                            colors.primary.copy(alpha = 0.3f),
+                                        )
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("📷", fontSize = 32.sp)
+                                Spacer(Modifier.height(Spacing.md))
+                                Text(
+                                    text = weekLabel,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            }
                         }
                     }
                 }
+                Spacer(Modifier.height(Spacing.s80))
             }
         }
     }
