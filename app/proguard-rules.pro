@@ -31,3 +31,29 @@
 # Retrofit
 -keep class retrofit2.** { *; }
 -keepclasseswithmembers class * { @retrofit2.http.* <methods>; }
+
+# TensorFlow Lite
+-keep class org.tensorflow.** { *; }
+-keep class org.tensorflow.lite.** { *; }
+-dontwarn org.tensorflow.**
+
+# Google Generative AI (Gemini)
+-keep class com.google.ai.client.** { *; }
+-keep class com.google.generativeai.** { *; }
+-dontwarn com.google.ai.client.**
+
+# OkHttp SSE
+-keep class okhttp3.sse.** { *; }
+-dontwarn okhttp3.sse.**
+
+# Axiom AI module — keep all interfaces and data classes
+-keep class com.axiom.aicoach.ai.** { *; }
+-keepclassmembers class com.axiom.aicoach.ai.** { *; }
+
+# Kotlinx Serialization (used by AI providers for JSON)
+-keep @kotlinx.serialization.Serializable class * { *; }
+-keepclassmembers class * { @kotlinx.serialization.* <fields>; }
+
+# OkHttp (general)
+-dontwarn okhttp3.**
+-dontwarn okio.**

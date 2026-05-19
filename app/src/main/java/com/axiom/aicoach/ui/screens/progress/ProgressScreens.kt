@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.axiom.aicoach.ai.vision.body.BodyAnalysisResult
+import com.axiom.aicoach.ai.vision.body.InsightSentiment
 import com.axiom.aicoach.ui.components.*
 import com.axiom.aicoach.ui.theme.AxiomTheme
 import com.axiom.aicoach.ui.theme.Radius
@@ -137,6 +139,14 @@ fun ProgressOverviewScreen(
                     }
                 }
                 Spacer(Modifier.height(Spacing.xl))
+            }
+
+            // ── AI Body Analysis card ─────────────────────────────────────────
+            item {
+                uiState.bodyAnalysis?.let { analysis ->
+                    BodyAnalysisCard(analysis)
+                    Spacer(Modifier.height(Spacing.xl))
+                }
             }
 
             // ── Navigation cards ──────────────────────────────────────────────
@@ -664,5 +674,84 @@ fun PhotoGalleryScreen(
                 Spacer(Modifier.height(Spacing.s80))
             }
         }
+    }
+}
+
+@Composable
+private fun BodyAnalysisCard(analysis: BodyAnalysisResult) {
+    val colors = AxiomTheme.colors
+    AxiomCard(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(Spacing.xl)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("🤖", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.width(Spacing.md))
+                Column {
+                    Text(
+                        "AI Body Analysis",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textPrimary,
+                    )
+                    Text(
+                        analysis.disclaimer,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.textMuted,
+                    )
+                }
+            }
+            Spacer(Modifier.height(Spacing.xl))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                AnalysisScorePill("Transformation", analysis.transformationScore, colors.primary)
+                AnalysisScorePill("Consistency", analysis.consistencyScore, colors.success)
+            }
+            if (analysis.insights.isNotEmpty()) {
+                Spacer(Modifier.height(Spacing.xl))
+                analysis.insights.take(3).forEach { insight ->
+                    val emoji = when (insight.sentiment) {
+                        InsightSentiment.POSITIVE    -> "✅"
+                        InsightSentiment.ENCOURAGING -> "💪"
+                        InsightSentiment.NEUTRAL     -> "ℹ️"
+                    }
+                    Row(
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        Text(emoji, style = MaterialTheme.typography.bodyMedium)
+                        Spacer(Modifier.width(Spacing.md))
+                        Text(
+                            insight.message,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.textSecondary,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnalysisScorePill(label: String, score: Int, color: androidx.compose.ui.graphics.Color) {
+    val colors = AxiomTheme.colors
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            "$score",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = color,
+        )
+        Text(
+            "/100",
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.textMuted,
+        )
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            color = colors.textSecondary,
+        )
     }
 }

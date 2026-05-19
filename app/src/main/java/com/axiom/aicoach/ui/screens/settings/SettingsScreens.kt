@@ -44,6 +44,7 @@ fun SettingsScreen(
     onSubscription: () -> Unit,
     onNotifications: () -> Unit,
     onPrivacy: () -> Unit,
+    onAiConsent: () -> Unit = {},
     onBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -57,6 +58,7 @@ fun SettingsScreen(
         "Preferences" to listOf(
             SettingsItem(Icons.Default.Notifications, "Notifications", "Reminders & alerts", onNotifications),
             SettingsItem(Icons.Default.Lock, "Privacy & Data", "Data, export, deletion", onPrivacy),
+            SettingsItem(Icons.Default.Psychology, "AI Features & Privacy", "Consent, disclaimers, data usage", onAiConsent),
             SettingsItem(Icons.Default.FitnessCenter, "Units", "kg / lbs, cm / ft"),
             SettingsItem(Icons.Default.Palette, "Appearance", "Theme & display"),
         ),

@@ -2,9 +2,12 @@ package com.axiom.aicoach.ui.screens.progress
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.axiom.aicoach.ai.vision.body.BodyAnalysisResult
+import com.axiom.aicoach.ai.vision.body.LocalBodyAnalysisEngine
 import com.axiom.aicoach.data.local.dao.BodyMeasurementDao
 import com.axiom.aicoach.data.local.dao.ProgressPhotoDao
 import com.axiom.aicoach.data.local.dao.WeightLogDao
+import com.axiom.aicoach.data.local.dao.WorkoutSessionDao
 import com.axiom.aicoach.data.local.entities.BodyMeasurementEntity
 import com.axiom.aicoach.data.local.entities.WeightLogEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +31,7 @@ data class ProgressUiState(
     val totalWeightLost: Float = 0f,
     val weeklyChange: Float = 0f,
     val isLoading: Boolean = true,
+    val bodyAnalysis: BodyAnalysisResult? = null,
 )
 
 data class WeightLogUi(val id: String, val date: String, val weightKg: Float, val note: String)
@@ -47,6 +51,8 @@ class ProgressViewModel @Inject constructor(
     private val weightLogDao: WeightLogDao,
     private val bodyMeasurementDao: BodyMeasurementDao,
     private val progressPhotoDao: ProgressPhotoDao,
+    private val workoutSessionDao: WorkoutSessionDao,
+    private val bodyAnalysisEngine: LocalBodyAnalysisEngine,
 ) : ViewModel() {
 
     private val userId = "demo_user"
@@ -119,10 +125,26 @@ class ProgressViewModel @Inject constructor(
         initialValue = ProgressUiState(isLoading = true),
     )
 
+    private val _bodyAnalysis = kotlinx.coroutines.flow.MutableStateFlow<BodyAnalysisResult?>(null)
+
     init {
         viewModelScope.launch {
             seedWeightHistoryIfEmpty()
+            runBodyAnalysis()
         }
+    }
+
+    private suspend fun runBodyAnalysis() {
+        val weights = weightLogDao.getRecent(userId, 60)
+        val sessions = workoutSessionDao.getRecentSessions(userId, 30)
+        val photos = progressPhotoDao.observeAll(userId).stateIn(viewModelScope).value
+        val firstLog = weights.lastOrNull()
+        val daysSinceStart = if (firstLog != null) {
+            val start = runCatching { java.time.LocalDateTime.parse(firstLog.loggedAt) }.getOrNull()
+            if (start != null) java.time.temporal.ChronoUnit.DAYS.between(start, java.time.LocalDateTime.now()).toInt() else 0
+        } else 0
+        val result = bodyAnalysisEngine.analyze(weights, sessions, photos.size, daysSinceStart)
+        _bodyAnalysis.update { result }
     }
 
     private suspend fun seedWeightHistoryIfEmpty() {
