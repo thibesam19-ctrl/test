@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AxiomAICoach" parent="android:Theme.Material.NoActionBar" />
+    <style name="Theme.AxiomAICoach.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#0A0F1C</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_axiom_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.AxiomAICoach</item>
+    </style>
+</resources>
