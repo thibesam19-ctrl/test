@@ -11,15 +11,11 @@ import com.axiom.aicoach.data.local.entities.FoodLogEntity
 import com.axiom.aicoach.data.local.entities.WaterLogEntity
 import com.axiom.aicoach.domain.model.MealType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -160,7 +156,6 @@ class NutritionViewModel @Inject constructor(
     private val _searchResults = MutableStateFlow<List<FoodItemUi>>(emptyList())
     private val _isLoading = MutableStateFlow(false)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<NutritionUiState> = combine(
         foodLogDao.observeLogsForDate(userId, todayDate),
         waterLogDao.observeTotalForDate(userId, todayDate),
