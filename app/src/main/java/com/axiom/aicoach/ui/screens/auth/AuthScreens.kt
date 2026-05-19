@@ -24,7 +24,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -524,9 +524,9 @@ fun AxiomTextField(
 fun OrDivider() {
     val colors = AxiomTheme.colors
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Divider(Modifier.weight(1f), color = colors.border)
+        HorizontalDivider(Modifier.weight(1f), color = colors.border)
         Text("  or  ", style = MaterialTheme.typography.bodySmall, color = colors.textMuted)
-        Divider(Modifier.weight(1f), color = colors.border)
+        HorizontalDivider(Modifier.weight(1f), color = colors.border)
     }
 }
 

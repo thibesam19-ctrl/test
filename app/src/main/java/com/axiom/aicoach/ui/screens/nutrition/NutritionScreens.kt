@@ -125,7 +125,7 @@ fun NutritionDashboardScreen(
             }
             item {
                 MealSectionHeader(MealType.DINNER, onAdd = onLogFood)
-                EmptyState("No dinner logged", "Tap + to add your dinner", "Add Dinner", onLogFood)
+                EmptyState("No dinner logged", "Tap + to add your dinner", actionLabel = "Add Dinner", onAction = onLogFood)
             }
         }
     }
