@@ -37,6 +37,7 @@ import com.axiom.aicoach.ui.screens.settings.ProfileScreen
 import com.axiom.aicoach.ui.screens.settings.SettingsScreen
 import com.axiom.aicoach.ui.screens.settings.SubscriptionScreen
 import com.axiom.aicoach.ui.screens.workout.ExerciseDetailScreen
+import com.axiom.aicoach.ui.screens.workout.WorkoutFormScreen
 import com.axiom.aicoach.ui.screens.workout.WorkoutPlanScreen
 import com.axiom.aicoach.ui.screens.workout.WorkoutSessionScreen
 
@@ -72,6 +73,7 @@ sealed class Screen(val route: String) {
     object WeightHistory : Screen("weight_history")
     object BodyMeasurements : Screen("body_measurements")
     object PhotoGallery : Screen("photo_gallery")
+    object WorkoutForm : Screen("workout_form")
     object CoachChat : Screen("coach_chat")
     object Settings : Screen("settings")
     object Profile : Screen("profile")
@@ -157,8 +159,12 @@ fun AxiomNavGraph(
             WorkoutPlanScreen(
                 onStartWorkout = { planId -> navController.navigate(Screen.WorkoutSession.createRoute(planId)) },
                 onExerciseDetail = { exerciseId -> navController.navigate(Screen.ExerciseDetail.createRoute(exerciseId)) },
+                onFormAnalysis = { navController.navigate(Screen.WorkoutForm.route) },
                 onBack = { navController.popBackStack() },
             )
+        }
+        composable(Screen.WorkoutForm.route) {
+            WorkoutFormScreen(onBack = { navController.popBackStack() })
         }
         composable(
             Screen.WorkoutSession.route,

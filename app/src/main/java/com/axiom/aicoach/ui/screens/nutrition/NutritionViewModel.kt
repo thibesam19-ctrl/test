@@ -1,7 +1,10 @@
 package com.axiom.aicoach.ui.screens.nutrition
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.axiom.aicoach.ai.vision.food.FoodRecognitionRepository
+import com.axiom.aicoach.ai.vision.food.FoodRecognitionResult
 import com.axiom.aicoach.data.local.dao.FoodItemDao
 import com.axiom.aicoach.data.local.dao.FoodLogDao
 import com.axiom.aicoach.data.local.dao.UserProfileDao
@@ -14,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -146,6 +150,7 @@ class NutritionViewModel @Inject constructor(
     private val foodItemDao: FoodItemDao,
     private val waterLogDao: WaterLogDao,
     private val userProfileDao: UserProfileDao,
+    private val foodRecognitionRepository: FoodRecognitionRepository,
 ) : ViewModel() {
 
     // Hard-coded demo user id; swap for real auth when ready

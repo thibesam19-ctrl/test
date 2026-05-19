@@ -20,6 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.axiom.aicoach.ai.analytics.InsightPriority
+import com.axiom.aicoach.ai.analytics.RecommendationCategory
+import com.axiom.aicoach.ai.analytics.WeeklyInsight
+import com.axiom.aicoach.ai.analytics.Recommendation
 import com.axiom.aicoach.ui.components.*
 import com.axiom.aicoach.ui.theme.*
 import java.time.LocalDate
@@ -145,7 +149,35 @@ fun DashboardScreen(
 
         item { Spacer(Modifier.height(20.dp)) }
 
-        // ── 7. Coach Nudge card ─────────────────────────────────────────────
+        // ── 7. AI Insights ──────────────────────────────────────────────────
+        item {
+            val insights by viewModel.insights.collectAsStateWithLifecycle()
+            val recommendations by viewModel.recommendations.collectAsStateWithLifecycle()
+
+            if (insights.isNotEmpty()) {
+                SectionHeader("AI Insights", modifier = Modifier.padding(horizontal = 20.dp))
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+                ) {
+                    insights.forEach { insight -> InsightCard(insight) }
+                }
+                Spacer(Modifier.height(20.dp))
+            }
+
+            if (recommendations.isNotEmpty()) {
+                SectionHeader("Recommended", modifier = Modifier.padding(horizontal = 20.dp))
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
+                ) {
+                    items(recommendations) { rec -> RecommendationChip(rec) }
+                }
+                Spacer(Modifier.height(20.dp))
+            }
+        }
+
+        // ── 8. Coach Nudge card ─────────────────────────────────────────────
         item {
             CoachNudgeCard(
                 message = "You're 94% to your protein goal today. Add a Greek yogurt or a scoop of protein to finish strong!",
@@ -663,5 +695,71 @@ private fun buildGreeting(): String {
         in 12..16 -> "Good afternoon"
         in 17..20 -> "Good evening"
         else -> "Good night"
+    }
+}
+
+@Composable
+private fun InsightCard(insight: WeeklyInsight, modifier: Modifier = Modifier) {
+    val colors = AxiomTheme.colors
+    val (emoji, tint) = when (insight.priority) {
+        InsightPriority.HIGH   -> Pair("⚠️", colors.error)
+        InsightPriority.MEDIUM -> Pair("💡", colors.warning)
+        InsightPriority.LOW    -> Pair("✅", colors.success)
+    }
+    AxiomCard(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(Spacing.xl),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Text(emoji, style = MaterialTheme.typography.titleLarge)
+            Spacer(Modifier.width(Spacing.lg))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = insight.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.textPrimary,
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = insight.body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textSecondary,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecommendationChip(rec: Recommendation) {
+    val colors = AxiomTheme.colors
+    val emoji = when (rec.category) {
+        RecommendationCategory.NUTRITION  -> "🥗"
+        RecommendationCategory.WORKOUT   -> "💪"
+        RecommendationCategory.RECOVERY  -> "😴"
+        RecommendationCategory.HYDRATION -> "💧"
+        RecommendationCategory.MINDSET   -> "🧠"
+    }
+    Surface(
+        shape = Radius.lg,
+        color = colors.card,
+        border = androidx.compose.foundation.BorderStroke(1.dp, colors.borderSubtle),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+            Text(
+                text = "$emoji ${rec.title}",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = colors.textPrimary,
+            )
+            if (rec.actionValue.isNotBlank()) {
+                Text(
+                    text = rec.actionValue,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.textMuted,
+                )
+            }
+        }
     }
 }

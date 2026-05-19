@@ -86,7 +86,9 @@ class DashboardViewModel @Inject constructor(
     private val streakFlow: Flow<StreakEntity?> =
         streakDao.observe(userId)
 
-    val uiState = combine(
+    // Combine the 4 nutrition/activity flows into a base state, then merge with
+    // the AI insight/recommendation flows using a second combine.
+    private val baseStateFlow = combine(
         profileFlow,
         foodLogsFlow,
         waterTotalFlow,
@@ -155,6 +157,17 @@ class DashboardViewModel @Inject constructor(
             waterGoalMl = waterGoalMl,
             streakDays = streak?.currentStreak ?: 0,
             isLoading = false,
+        )
+    }
+
+    val uiState = combine(
+        baseStateFlow,
+        _insights,
+        _recommendations,
+    ) { base, insightsList, recommendationsList ->
+        base.copy(
+            insights = insightsList,
+            recommendations = recommendationsList,
         )
     }.stateIn(
         scope = viewModelScope,

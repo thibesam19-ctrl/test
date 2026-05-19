@@ -2,10 +2,12 @@ package com.axiom.aicoach.ui.screens.coach
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.axiom.aicoach.ai.coaching.CoachingEngine
+import com.axiom.aicoach.ai.provider.AiMessage
+import com.axiom.aicoach.ai.provider.AiRole
 import com.axiom.aicoach.data.local.dao.CoachMessageDao
 import com.axiom.aicoach.data.local.entities.CoachMessageEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,35 +37,6 @@ data class ChatMessageUi(
     val timestamp: Long = System.currentTimeMillis(),
 )
 
-private val coachResponses = mapOf(
-    "weight" to "Based on your 14-day trend, your weight is moving in the right direction — down about 0.4 kg/week. That's a healthy, sustainable rate. Keep it consistent! 💪",
-    "workout" to "You've completed 3 workouts this week — great job! I'd recommend not skipping your planned upper body session tomorrow. Consistency over perfection.",
-    "eat" to "Looking at your remaining macros for today, I'd suggest a meal with about 40g protein and 50g carbs. Something like grilled chicken with rice or a protein shake with banana would work perfectly.",
-    "sore" to "Muscle soreness means your body is adapting — that's a good sign! Make sure to get 7-8 hours of sleep tonight, stay hydrated, and consider a light walk or foam rolling for recovery.",
-    "tired" to "Fatigue can signal that your body needs rest. Take a full rest day today. Tomorrow, focus on quality sleep and nutrition. Overtraining is counterproductive.",
-    "plan" to "I can adjust your plan! Tell me what you'd like to change — more or fewer days, different split (PPL vs Upper/Lower), or different focus areas and I'll update it for you.",
-    "protein" to "For your goal, aim for 1.6–2.2g of protein per kg of bodyweight. At your current weight, that's roughly 128–175g per day. Your current intake is tracking well!",
-    "skip" to "Missing one workout isn't the end of the world — but consistency is where results come from. If you're not injured or sick, I'd encourage you to do at least a 20-minute version. Even half is better than none.",
-    "default" to "That's a great question! I'm here to help with your fitness journey. Whether it's nutrition, workouts, recovery, or motivation — just ask. I'm powered by Axiom's coaching engine. 🤖\n\n*Note: I'm an AI assistant, not a doctor or licensed trainer. Always consult a professional for medical advice.*",
-)
-
-private fun getRuleBasedResponse(message: String): String {
-    val lower = message.lowercase()
-    return when {
-        "weight" in lower || "scale" in lower || "fat" in lower -> coachResponses["weight"]!!
-        "workout" in lower || "exercise" in lower || "train" in lower -> coachResponses["workout"]!!
-        "eat" in lower || "food" in lower || "meal" in lower || "hungry" in lower -> coachResponses["eat"]!!
-        "sore" in lower || "ache" in lower || "pain" in lower -> coachResponses["sore"]!!
-        "tired" in lower || "fatigue" in lower || "exhausted" in lower -> coachResponses["tired"]!!
-        "plan" in lower || "adjust" in lower || "change" in lower -> coachResponses["plan"]!!
-        "protein" in lower || "macro" in lower -> coachResponses["protein"]!!
-        "skip" in lower || "miss" in lower || "lazy" in lower -> coachResponses["skip"]!!
-        "skinny" in lower || "hate my body" in lower || "not eaten" in lower ->
-            "I hear that you're struggling — those feelings are valid. Your worth has nothing to do with your body size. I'd encourage you to speak with a professional if these thoughts are weighing on you. You can reach a counselor at any time. 💙\n\nIn the meantime, let's focus on *feeling strong and healthy*, not a number. What would feel good to work on today?"
-        else -> coachResponses["default"]!!
-    }
-}
-
 // Hardcoded for now; replace with real session/auth source when available.
 private const val CURRENT_USER_ID = "local_user"
 private const val CONVERSATION_ID = "default_conversation"
@@ -71,6 +44,7 @@ private const val CONVERSATION_ID = "default_conversation"
 @HiltViewModel
 class CoachViewModel @Inject constructor(
     private val coachMessageDao: CoachMessageDao,
+    private val coachingEngine: CoachingEngine,
 ) : ViewModel() {
 
     private val introMessage = ChatMessageUi(
@@ -123,6 +97,7 @@ class CoachViewModel @Inject constructor(
 
     private fun dispatchMessage(text: String) {
         viewModelScope.launch {
+            // Persist the user message to Room
             val userEntity = CoachMessageEntity(
                 id = UUID.randomUUID().toString(),
                 conversationId = CONVERSATION_ID,
@@ -134,21 +109,71 @@ class CoachViewModel @Inject constructor(
             )
             coachMessageDao.insert(userEntity)
 
+            // Show typing indicator and prepare a streaming response message in the UI
             _uiState.update { it.copy(isTyping = true) }
-            delay(800L)
 
-            val response = getRuleBasedResponse(text)
-            val coachEntity = CoachMessageEntity(
-                id = UUID.randomUUID().toString(),
-                conversationId = CONVERSATION_ID,
-                userId = CURRENT_USER_ID,
-                role = "ASSISTANT",
-                content = response,
-                intent = null,
-                timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+            val streamingMessageId = UUID.randomUUID().toString()
+            val streamingMessage = ChatMessageUi(
+                id = streamingMessageId,
+                text = "",
+                isUser = false,
             )
-            coachMessageDao.insert(coachEntity)
-            _uiState.update { it.copy(isTyping = false) }
+            _uiState.update { state ->
+                state.copy(messages = state.messages + streamingMessage)
+            }
+
+            // Build history from the last 10 persisted messages (before the new user turn)
+            val history = buildHistory()
+
+            var fullResponse = ""
+
+            // Collect streaming chunks and update the in-progress message
+            coachingEngine.chatStream(text, history).collect { chunk ->
+                if (!chunk.isComplete) {
+                    fullResponse += chunk.delta
+                    val updatedMessage = streamingMessage.copy(text = fullResponse)
+                    _uiState.update { state ->
+                        state.copy(
+                            messages = state.messages.map { msg ->
+                                if (msg.id == streamingMessageId) updatedMessage else msg
+                            },
+                            isTyping = false,
+                        )
+                    }
+                } else {
+                    _uiState.update { it.copy(isTyping = false) }
+                }
+            }
+
+            // Persist the completed response to Room
+            if (fullResponse.isNotBlank()) {
+                val coachEntity = CoachMessageEntity(
+                    id = streamingMessageId,
+                    conversationId = CONVERSATION_ID,
+                    userId = CURRENT_USER_ID,
+                    role = "ASSISTANT",
+                    content = fullResponse,
+                    intent = null,
+                    timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                )
+                coachMessageDao.insert(coachEntity)
+            }
         }
+    }
+
+    /**
+     * Converts the most recent [ChatMessageUi] entries (up to 10) into [AiMessage] objects
+     * for use as conversation history in the AI provider request.
+     */
+    private fun buildHistory(): List<AiMessage> {
+        return _uiState.value.messages
+            .filter { it.id != "intro" }
+            .takeLast(10)
+            .map { msg ->
+                AiMessage(
+                    role = if (msg.isUser) AiRole.USER else AiRole.ASSISTANT,
+                    content = msg.text,
+                )
+            }
     }
 }

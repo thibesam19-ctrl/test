@@ -1,10 +1,13 @@
 package com.axiom.aicoach.ai.vision.pose
 
+import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -40,6 +43,10 @@ class WorkoutFormViewModel @Inject constructor(
 
     fun startAnalysis() {
         _uiState.update { it.copy(isAnalyzing = true) }
+    }
+
+    fun processFrame(imageProxy: ImageProxy) {
+        poseEngine.processFrame(imageProxy).launchIn(viewModelScope)
     }
 
     fun stopAnalysis() {

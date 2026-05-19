@@ -35,6 +35,7 @@ import kotlinx.coroutines.delay
 fun WorkoutPlanScreen(
     onStartWorkout: (String) -> Unit,
     onExerciseDetail: (String) -> Unit,
+    onFormAnalysis: () -> Unit = {},
     onBack: () -> Unit,
     viewModel: WorkoutViewModel = hiltViewModel(),
 ) {
@@ -57,6 +58,35 @@ fun WorkoutPlanScreen(
         ) {
             item {
                 PlanHeaderCard()
+                Spacer(Modifier.height(Spacing.lg))
+                // AI Form Analysis entry card
+                AxiomCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onFormAnalysis),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(Spacing.xl),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("🎯", style = MaterialTheme.typography.headlineSmall)
+                        Spacer(Modifier.width(Spacing.lg))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "AI Form Analysis",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.primary,
+                            )
+                            Text(
+                                "Real-time squat, push-up & curl detection",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.textSecondary,
+                            )
+                        }
+                        Text("→", style = MaterialTheme.typography.titleMedium, color = colors.primary)
+                    }
+                }
                 Spacer(Modifier.height(Spacing.xl))
                 Text(
                     "This Week",
