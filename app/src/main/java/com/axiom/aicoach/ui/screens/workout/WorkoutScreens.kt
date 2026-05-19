@@ -207,61 +207,43 @@ private fun RestDayCard() {
 
 // ── Active Workout Session ────────────────────────────────────────────────────
 
-data class ActiveExercise(
-    val id: String,
-    val name: String,
-    val sets: Int,
-    val repsMin: Int,
-    val repsMax: Int,
-    val restSeconds: Int,
-    val muscleGroup: String,
-)
-
-val demoExercises = listOf(
-    ActiveExercise("e1", "Bench Press", 4, 6, 10, 90, "Chest"),
-    ActiveExercise("e2", "Incline Dumbbell Press", 3, 8, 12, 75, "Chest"),
-    ActiveExercise("e3", "Overhead Press", 3, 8, 10, 90, "Shoulders"),
-    ActiveExercise("e4", "Lateral Raise", 3, 12, 15, 60, "Shoulders"),
-    ActiveExercise("e5", "Tricep Pushdown", 3, 10, 15, 60, "Triceps"),
-    ActiveExercise("e6", "Face Pull", 3, 15, 20, 60, "Rear Delts"),
-)
-
 @Composable
 fun WorkoutSessionScreen(
     planId: String,
     onFinish: () -> Unit,
     onExerciseDetail: (String) -> Unit,
+    viewModel: WorkoutViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
-    var currentExerciseIndex by remember { mutableIntStateOf(0) }
-    var completedSets by remember { mutableStateOf(mutableMapOf<String, Int>()) }
-    var restTimerActive by remember { mutableStateOf(false) }
-    var restSeconds by remember { mutableIntStateOf(0) }
+    val uiState by viewModel.sessionUiState.collectAsStateWithLifecycle()
+
     var elapsedSeconds by remember { mutableIntStateOf(0) }
-    var sessionFinished by remember { mutableStateOf(false) }
 
-    val currentExercise = demoExercises.getOrNull(currentExerciseIndex)
-    val totalSetsCompleted = completedSets.values.sum()
-    val totalSets = demoExercises.sumOf { it.sets }
-
-    LaunchedEffect(Unit) {
-        while (!sessionFinished) {
-            delay(1000)
-            elapsedSeconds++
+    // Start a session when the composable first enters composition, using the planId
+    // and the first workout in the plan if none is active yet.
+    val planUiState by viewModel.planUiState.collectAsStateWithLifecycle()
+    LaunchedEffect(planId, planUiState.workouts) {
+        if (uiState.exercises.isEmpty() && planUiState.workouts.isNotEmpty()) {
+            val firstWorkout = planUiState.workouts.first()
+            viewModel.startSession(planId, firstWorkout.id)
         }
     }
 
-    LaunchedEffect(restTimerActive, restSeconds) {
-        if (restTimerActive && restSeconds > 0) {
-            delay(1000)
-            restSeconds--
-            if (restSeconds == 0) restTimerActive = false
+    // Elapsed timer — counts up independently of ViewModel.
+    LaunchedEffect(uiState.isComplete) {
+        if (!uiState.isComplete) {
+            while (true) {
+                delay(1_000)
+                elapsedSeconds++
+            }
         }
     }
 
-    if (sessionFinished) {
+    // Rest timer is driven by the ViewModel; tick down is handled inside WorkoutViewModel.
+
+    if (uiState.isComplete) {
         WorkoutCompleteScreen(
-            totalSets = totalSets,
+            totalSets = uiState.totalSets,
             elapsedMin = elapsedSeconds / 60,
             onFinish = onFinish,
         )
@@ -276,15 +258,22 @@ fun WorkoutSessionScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            val workoutName = planUiState.workouts
+                .getOrNull(uiState.currentExerciseIndex)?.name
+                ?: "Workout"
+            val safeTotal = if (uiState.totalSets > 0) uiState.totalSets else 1
             SessionTopBar(
-                workoutName = "Upper Body Power",
+                workoutName = workoutName,
                 elapsedSeconds = elapsedSeconds,
-                progress = totalSetsCompleted.toFloat() / totalSets,
-                onFinish = { sessionFinished = true },
+                progress = uiState.completedSets.toFloat() / safeTotal,
+                onFinish = { viewModel.finishSession() },
             )
 
-            if (restTimerActive) {
-                RestTimerBanner(restSeconds) { restTimerActive = false }
+            if (uiState.isRestTimerActive) {
+                RestTimerBanner(
+                    secondsRemaining = uiState.restTimerSec,
+                    onSkip = { viewModel.skipRest() },
+                )
             }
 
             LazyColumn(
@@ -294,23 +283,20 @@ fun WorkoutSessionScreen(
                 verticalArrangement = Arrangement.spacedBy(Spacing.lg),
             ) {
                 item { Spacer(Modifier.height(Spacing.md)) }
-                itemsIndexed(demoExercises) { index, exercise ->
-                    val isActive = index == currentExerciseIndex
-                    val setsLogged = completedSets[exercise.id] ?: 0
+                itemsIndexed(uiState.exercises) { index, exercise ->
+                    val isActive = index == uiState.currentExerciseIndex
+                    val setsCompleted = exercise.completedSets.count { it }
                     ExerciseSetCard(
                         exercise = exercise,
-                        setsCompleted = setsLogged,
+                        setsCompleted = setsCompleted,
                         isActive = isActive,
                         onSetComplete = {
-                            val newCount = (completedSets[exercise.id] ?: 0) + 1
-                            completedSets = (completedSets + (exercise.id to newCount)).toMutableMap()
-                            if (newCount < exercise.sets) {
-                                restSeconds = exercise.restSeconds
-                                restTimerActive = true
-                            } else if (index < demoExercises.size - 1) {
-                                currentExerciseIndex = index + 1
-                                restSeconds = exercise.restSeconds
-                                restTimerActive = true
+                            viewModel.completeSet(index, setsCompleted)
+                            // Advance to next exercise when all sets are done.
+                            if (setsCompleted + 1 >= exercise.sets &&
+                                index < uiState.exercises.size - 1
+                            ) {
+                                viewModel.nextExercise()
                             }
                         },
                         onInfo = { onExerciseDetail(exercise.id) },
