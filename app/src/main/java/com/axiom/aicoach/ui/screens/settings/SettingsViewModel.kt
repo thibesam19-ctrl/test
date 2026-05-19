@@ -121,10 +121,6 @@ class SettingsViewModel @Inject constructor(
 
     fun toggleNotification(type: String, enabled: Boolean) {
         viewModelScope.launch {
-            val existing = notificationPreferenceDao.observe(CURRENT_USER_ID).let {
-                // Get a snapshot via a one-shot query isn't directly exposed; reconstruct from state.
-                null
-            }
             val current = _uiState.value
             val updated = when (type) {
                 "workout" -> current.copy(notifyWorkout = enabled)

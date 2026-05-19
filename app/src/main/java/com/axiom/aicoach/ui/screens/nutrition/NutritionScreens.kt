@@ -38,6 +38,8 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.Executors
 
+// ── Nutrition Dashboard ───────────────────────────────────────────────────────
+
 @Composable
 fun NutritionDashboardScreen(
     onLogFood: () -> Unit,
@@ -45,12 +47,10 @@ fun NutritionDashboardScreen(
     onWater: () -> Unit,
     onMealLog: () -> Unit,
     onBack: () -> Unit,
+    viewModel: NutritionViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
-    val totalCalories = demoMeals.flatMap { it.items }.sumOf { it.calories }
-    val totalProtein = demoMeals.flatMap { it.items }.sumOf { it.protein }
-    val totalCarbs = demoMeals.flatMap { it.items }.sumOf { it.carbs }
-    val totalFat = demoMeals.flatMap { it.items }.sumOf { it.fat }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = { AxiomTopBar("Nutrition", onBack = onBack) },
@@ -76,7 +76,13 @@ fun NutritionDashboardScreen(
             ),
         ) {
             item {
-                MacroSummaryCard(totalCalories, totalProtein, totalCarbs, totalFat)
+                MacroSummaryCard(
+                    calories = uiState.caloriesConsumed,
+                    caloriesGoal = uiState.caloriesGoal,
+                    protein = uiState.proteinG,
+                    carbs = uiState.carbsG,
+                    fat = uiState.fatG,
+                )
                 Spacer(Modifier.height(Spacing.xl))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
@@ -95,25 +101,41 @@ fun NutritionDashboardScreen(
                 }
                 Spacer(Modifier.height(Spacing.xl))
             }
-            demoMeals.forEach { section ->
+            if (uiState.mealSections.isEmpty()) {
                 item {
-                    MealSectionHeader(section.type, onAdd = onLogFood)
+                    EmptyState(
+                        title = "No food logged today",
+                        message = "Tap + to log your first meal",
+                        actionLabel = "Log Food",
+                        onAction = onLogFood,
+                    )
                 }
-                items(section.items) { item ->
-                    FoodEntryRow(item, onDelete = {})
+            } else {
+                uiState.mealSections.forEach { section ->
+                    item {
+                        MealSectionHeader(section.mealType, onAdd = onLogFood)
+                    }
+                    items(section.entries) { entry ->
+                        FoodLogEntryRow(
+                            entry = entry,
+                            onDelete = { viewModel.deleteLog(entry.logId) },
+                        )
+                    }
+                    item { Spacer(Modifier.height(Spacing.lg)) }
                 }
-                item { Spacer(Modifier.height(Spacing.lg)) }
-            }
-            item {
-                MealSectionHeader(MealType.DINNER, onAdd = onLogFood)
-                EmptyState("No dinner logged", "Tap + to add your dinner", actionLabel = "Add Dinner", onAction = onLogFood)
             }
         }
     }
 }
 
 @Composable
-private fun MacroSummaryCard(calories: Int, protein: Int, carbs: Int, fat: Int) {
+private fun MacroSummaryCard(
+    calories: Int,
+    caloriesGoal: Int,
+    protein: Int,
+    carbs: Int,
+    fat: Int,
+) {
     val colors = AxiomTheme.colors
     AxiomCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Spacing.xl)) {
@@ -122,21 +144,24 @@ private fun MacroSummaryCard(calories: Int, protein: Int, carbs: Int, fat: Int) 
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    "1,420 kcal",
+                    "$calories kcal",
                     style = MaterialTheme.typography.displaySmall,
                     color = colors.primary,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(Modifier.width(Spacing.md))
                 Text(
-                    "/ 2,100 goal",
+                    "/ $caloriesGoal goal",
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textMuted,
                     modifier = Modifier.padding(bottom = 4.dp),
                 )
             }
             Spacer(Modifier.height(Spacing.lg))
-            AxiomProgressBar(calories / 2100f, color = colors.primary)
+            AxiomProgressBar(
+                progress = (calories.toFloat() / caloriesGoal.toFloat()).coerceIn(0f, 1f),
+                color = colors.primary,
+            )
             Spacer(Modifier.height(Spacing.xl))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -173,7 +198,7 @@ private fun MealSectionHeader(mealType: MealType, onAdd: () -> Unit) {
 }
 
 @Composable
-private fun FoodEntryRow(entry: DemoFoodEntry, onDelete: () -> Unit) {
+private fun FoodLogEntryRow(entry: FoodLogUi, onDelete: () -> Unit) {
     val colors = AxiomTheme.colors
     Row(
         modifier = Modifier
@@ -189,7 +214,7 @@ private fun FoodEntryRow(entry: DemoFoodEntry, onDelete: () -> Unit) {
                 color = colors.textPrimary,
             )
             Text(
-                "P: ${entry.protein}g  C: ${entry.carbs}g  F: ${entry.fat}g",
+                "P: ${entry.proteinG}g  C: ${entry.carbsG}g  F: ${entry.fatG}g",
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.textMuted,
             )
@@ -209,35 +234,15 @@ private fun FoodEntryRow(entry: DemoFoodEntry, onDelete: () -> Unit) {
 
 // ── Food Search ───────────────────────────────────────────────────────────────
 
-val demoFoodDatabase = listOf(
-    DemoFoodEntry("Chicken Breast (100g)", 165, 31, 0, 4),
-    DemoFoodEntry("Brown Rice (100g)", 216, 5, 45, 2),
-    DemoFoodEntry("Whole Egg", 70, 6, 0, 5),
-    DemoFoodEntry("Oats (100g)", 389, 17, 66, 7),
-    DemoFoodEntry("Greek Yogurt (100g)", 59, 10, 3, 0),
-    DemoFoodEntry("Banana", 89, 1, 23, 0),
-    DemoFoodEntry("Almonds (30g)", 174, 6, 6, 15),
-    DemoFoodEntry("Salmon (100g)", 208, 20, 0, 13),
-    DemoFoodEntry("Sweet Potato (100g)", 86, 2, 20, 0),
-    DemoFoodEntry("Cottage Cheese (100g)", 98, 11, 3, 4),
-    DemoFoodEntry("Lentils (100g cooked)", 116, 9, 20, 0),
-    DemoFoodEntry("Dhal (100g)", 140, 8, 23, 3),
-    DemoFoodEntry("Rice & Curry (Sri Lankan, 1 plate)", 520, 18, 82, 10),
-    DemoFoodEntry("Roti (1 piece)", 95, 3, 17, 2),
-)
-
 @Composable
 fun FoodSearchScreen(
     onFoodSelected: (String) -> Unit,
     onBarcodeClick: () -> Unit,
     onBack: () -> Unit,
+    viewModel: NutritionViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
-    var query by remember { mutableStateOf("") }
-    val results = remember(query) {
-        if (query.isEmpty()) demoFoodDatabase
-        else demoFoodDatabase.filter { it.name.contains(query, ignoreCase = true) }
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = { AxiomTopBar("Search Food", onBack = onBack) },
@@ -251,14 +256,14 @@ fun FoodSearchScreen(
         ) {
             Spacer(Modifier.height(Spacing.md))
             OutlinedTextField(
-                value = query,
-                onValueChange = { query = it },
+                value = uiState.searchQuery,
+                onValueChange = { viewModel.searchFood(it) },
                 placeholder = { Text("Search 1M+ foods...") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = { Icon(Icons.Default.Search, null, tint = colors.textMuted) },
                 trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
+                    if (uiState.searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.searchFood("") }) {
                             Icon(Icons.Default.Close, null, tint = colors.textMuted)
                         }
                     } else {
@@ -286,8 +291,8 @@ fun FoodSearchScreen(
             }
             Spacer(Modifier.height(Spacing.lg))
             LazyColumn(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                items(results) { food ->
-                    SearchFoodRow(food, onClick = { onFoodSelected(food.name) })
+                items(uiState.searchResults) { food ->
+                    SearchFoodRow(food, onClick = { onFoodSelected(food.id) })
                     HorizontalDivider(color = colors.borderSubtle)
                 }
             }
@@ -296,7 +301,7 @@ fun FoodSearchScreen(
 }
 
 @Composable
-private fun SearchFoodRow(food: DemoFoodEntry, onClick: () -> Unit) {
+private fun SearchFoodRow(food: FoodItemUi, onClick: () -> Unit) {
     val colors = AxiomTheme.colors
     Row(
         modifier = Modifier
@@ -312,7 +317,7 @@ private fun SearchFoodRow(food: DemoFoodEntry, onClick: () -> Unit) {
                 color = colors.textPrimary,
             )
             Text(
-                "P: ${food.protein}g · C: ${food.carbs}g · F: ${food.fat}g",
+                "P: ${food.proteinG}g · C: ${food.carbsG}g · F: ${food.fatG}g",
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.textMuted,
             )
@@ -409,14 +414,29 @@ fun BarcodeScanScreen(onBarcodeDetected: (String) -> Unit, onBack: () -> Unit) {
 // ── Food Detail ───────────────────────────────────────────────────────────────
 
 @Composable
-fun FoodDetailScreen(foodId: String, onLogFood: () -> Unit, onBack: () -> Unit) {
+fun FoodDetailScreen(
+    foodId: String,
+    onLogFood: () -> Unit,
+    onBack: () -> Unit,
+    viewModel: NutritionViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
-    val food = demoFoodDatabase.firstOrNull { it.name == foodId } ?: demoFoodDatabase.first()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Find the food item from search results, falling back to a placeholder
+    val food = uiState.searchResults.firstOrNull { it.id == foodId }
+
     var servings by remember { mutableStateOf(1f) }
     var selectedMeal by remember { mutableStateOf(MealType.LUNCH) }
 
+    val displayName = food?.name ?: foodId
+    val displayCalories = food?.let { (it.calories * servings).toInt() } ?: 0
+    val displayProtein = food?.let { (it.proteinG * servings).toInt() } ?: 0
+    val displayCarbs = food?.let { (it.carbsG * servings).toInt() } ?: 0
+    val displayFat = food?.let { (it.fatG * servings).toInt() } ?: 0
+
     Scaffold(
-        topBar = { AxiomTopBar(food.name, onBack = onBack) },
+        topBar = { AxiomTopBar(displayName, onBack = onBack) },
         containerColor = colors.background,
     ) { padding ->
         LazyColumn(
@@ -439,7 +459,7 @@ fun FoodDetailScreen(foodId: String, onLogFood: () -> Unit, onBack: () -> Unit) 
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            "${(food.calories * servings).toInt()}",
+                            "$displayCalories",
                             style = MaterialTheme.typography.displaySmall,
                             color = colors.primary,
                             fontWeight = FontWeight.Bold,
@@ -454,9 +474,9 @@ fun FoodDetailScreen(foodId: String, onLogFood: () -> Unit, onBack: () -> Unit) 
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                         ) {
-                            MacroChip("Protein", "${(food.protein * servings).toInt()}g", colors.primary)
-                            MacroChip("Carbs", "${(food.carbs * servings).toInt()}g", colors.secondary)
-                            MacroChip("Fat", "${(food.fat * servings).toInt()}g", colors.accent)
+                            MacroChip("Protein", "${displayProtein}g", colors.primary)
+                            MacroChip("Carbs", "${displayCarbs}g", colors.secondary)
+                            MacroChip("Fat", "${displayFat}g", colors.accent)
                         }
                     }
                 }
@@ -534,7 +554,16 @@ fun FoodDetailScreen(foodId: String, onLogFood: () -> Unit, onBack: () -> Unit) 
                 }
             }
             item {
-                AxiomPrimaryButton("Log Food", onLogFood, Modifier.fillMaxWidth())
+                AxiomPrimaryButton(
+                    text = "Log Food",
+                    onClick = {
+                        if (food != null) {
+                            viewModel.logFood(food.id, selectedMeal, servings)
+                        }
+                        onLogFood()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         }
     }
@@ -543,8 +572,13 @@ fun FoodDetailScreen(foodId: String, onLogFood: () -> Unit, onBack: () -> Unit) 
 // ── Meal Log ──────────────────────────────────────────────────────────────────
 
 @Composable
-fun MealLogScreen(onBack: () -> Unit) {
+fun MealLogScreen(
+    onBack: () -> Unit,
+    viewModel: NutritionViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = { AxiomTopBar("Meal Log", onBack = onBack) },
         containerColor = colors.background,
@@ -558,29 +592,42 @@ fun MealLogScreen(onBack: () -> Unit) {
                 bottom = padding.calculateBottomPadding() + Spacing.xl,
             ),
         ) {
-            demoMeals.forEach { section ->
+            if (uiState.mealSections.isEmpty()) {
                 item {
-                    AxiomCard(modifier = Modifier.fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(Spacing.xl)) {
-                            Text(
-                                section.type.name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() },
-                                style = MaterialTheme.typography.titleMedium,
-                                color = colors.textPrimary,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                            Spacer(Modifier.height(Spacing.lg))
-                            section.items.forEachIndexed { index, item ->
-                                FoodEntryRow(item, onDelete = {})
-                                if (index < section.items.size - 1) {
-                                    HorizontalDivider(
-                                        color = colors.borderSubtle,
-                                        modifier = Modifier.padding(vertical = Spacing.sm),
+                    EmptyState(
+                        title = "Nothing logged today",
+                        message = "Use the Nutrition screen to log meals",
+                    )
+                }
+            } else {
+                uiState.mealSections.forEach { section ->
+                    item {
+                        AxiomCard(modifier = Modifier.fillMaxWidth()) {
+                            Column(modifier = Modifier.padding(Spacing.xl)) {
+                                Text(
+                                    section.mealType.name.replace("_", " ").lowercase()
+                                        .replaceFirstChar { it.uppercase() },
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = colors.textPrimary,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                                Spacer(Modifier.height(Spacing.lg))
+                                section.entries.forEachIndexed { index, entry ->
+                                    FoodLogEntryRow(
+                                        entry = entry,
+                                        onDelete = { viewModel.deleteLog(entry.logId) },
                                     )
+                                    if (index < section.entries.size - 1) {
+                                        HorizontalDivider(
+                                            color = colors.borderSubtle,
+                                            modifier = Modifier.padding(vertical = Spacing.sm),
+                                        )
+                                    }
                                 }
                             }
                         }
+                        Spacer(Modifier.height(Spacing.xl))
                     }
-                    Spacer(Modifier.height(Spacing.xl))
                 }
             }
         }
@@ -590,10 +637,15 @@ fun MealLogScreen(onBack: () -> Unit) {
 // ── Water Tracking ────────────────────────────────────────────────────────────
 
 @Composable
-fun WaterTrackingScreen(onBack: () -> Unit) {
+fun WaterTrackingScreen(
+    onBack: () -> Unit,
+    viewModel: NutritionViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
-    var waterMl by remember { mutableIntStateOf(1500) }
-    val goalMl = 2400
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val waterMl = uiState.waterMl
+    val goalMl = uiState.waterGoalMl
     val quickAddOptions = listOf(150, 250, 350, 500)
 
     Scaffold(
@@ -611,7 +663,7 @@ fun WaterTrackingScreen(onBack: () -> Unit) {
 
             // Progress ring with centered content
             AxiomProgressRing(
-                progress = waterMl.toFloat() / goalMl,
+                progress = if (goalMl > 0) (waterMl.toFloat() / goalMl).coerceIn(0f, 1f) else 0f,
                 size = 160.dp,
                 strokeWidth = 12.dp,
                 color = colors.info,
@@ -629,8 +681,9 @@ fun WaterTrackingScreen(onBack: () -> Unit) {
             }
 
             Spacer(Modifier.height(Spacing.xl))
+            val pct = if (goalMl > 0) (waterMl.toFloat() / goalMl * 100).toInt() else 0
             Text(
-                "of ${goalMl}ml · ${(waterMl.toFloat() / goalMl * 100).toInt()}% complete",
+                "of ${goalMl}ml · ${pct}% complete",
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.textSecondary,
             )
@@ -649,7 +702,7 @@ fun WaterTrackingScreen(onBack: () -> Unit) {
             ) {
                 quickAddOptions.forEach { ml ->
                     OutlinedButton(
-                        onClick = { waterMl = (waterMl + ml).coerceAtMost(goalMl * 2) },
+                        onClick = { viewModel.logWater(ml) },
                         modifier = Modifier.weight(1f),
                         shape = Radius.md,
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.info),
@@ -657,12 +710,6 @@ fun WaterTrackingScreen(onBack: () -> Unit) {
                     ) {
                         Text("+${ml}ml", style = MaterialTheme.typography.labelMedium)
                     }
-                }
-            }
-            Spacer(Modifier.height(Spacing.xxxl))
-            if (waterMl > 0) {
-                TextButton(onClick = { waterMl = (waterMl - 250).coerceAtLeast(0) }) {
-                    Text("Undo last entry", color = colors.textMuted)
                 }
             }
         }

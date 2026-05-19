@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +49,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.axiom.aicoach.ui.components.AxiomPrimaryButton
 import com.axiom.aicoach.ui.components.AxiomSecondaryButton
 import com.axiom.aicoach.ui.theme.AxiomTheme
@@ -62,13 +65,14 @@ fun SignInScreen(
     onNavigateToSignUp: () -> Unit,
     onForgotPassword: () -> Unit,
     onBack: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
     val focusManager = LocalFocusManager.current
 
     Box(
@@ -111,7 +115,7 @@ fun SignInScreen(
             // ── Fields ────────────────────────────────────────────────────────
             AxiomTextField(
                 value = email,
-                onValueChange = { email = it; errorMessage = null },
+                onValueChange = { email = it; viewModel.clearError() },
                 label = "Email",
                 leadingIcon = { Icon(Icons.Default.Email, null, tint = colors.textMuted) },
                 keyboardOptions = KeyboardOptions(
@@ -123,7 +127,7 @@ fun SignInScreen(
             Spacer(Modifier.height(20.dp))
             AxiomTextField(
                 value = password,
-                onValueChange = { password = it; errorMessage = null },
+                onValueChange = { password = it; viewModel.clearError() },
                 label = "Password",
                 leadingIcon = { Icon(Icons.Default.Lock, null, tint = colors.textMuted) },
                 trailingIcon = {
@@ -143,16 +147,15 @@ fun SignInScreen(
                 keyboardActions = KeyboardActions(onDone = {
                     focusManager.clearFocus()
                     if (email.isNotBlank() && password.isNotBlank()) {
-                        isLoading = true
-                        onSignInSuccess()
+                        viewModel.signIn(email, password, onSignInSuccess)
                     }
                 }),
             )
 
-            if (errorMessage != null) {
+            if (uiState.error != null) {
                 Spacer(Modifier.height(Spacing.md))
                 Text(
-                    text = errorMessage!!,
+                    text = uiState.error!!,
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.error,
                 )
@@ -175,13 +178,10 @@ fun SignInScreen(
             // ── Primary action ────────────────────────────────────────────────
             AxiomPrimaryButton(
                 text = "Sign In",
-                onClick = {
-                    isLoading = true
-                    onSignInSuccess()
-                },
+                onClick = { viewModel.signIn(email, password, onSignInSuccess) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = email.isNotBlank() && password.isNotBlank(),
-                loading = isLoading,
+                enabled = email.isNotBlank() && password.isNotBlank() && !uiState.isLoading,
+                loading = uiState.isLoading,
             )
 
             Spacer(Modifier.height(Spacing.xl))
@@ -229,14 +229,16 @@ fun SignUpScreen(
     onSignUpSuccess: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     onBack: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     val passwordStrength = remember(password) { getPasswordStrength(password) }
@@ -283,7 +285,7 @@ fun SignUpScreen(
             // ── Fields ────────────────────────────────────────────────────────
             AxiomTextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = { name = it; viewModel.clearError() },
                 label = "Full Name",
                 leadingIcon = { Icon(Icons.Default.Person, null, tint = colors.textMuted) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -292,7 +294,7 @@ fun SignUpScreen(
             Spacer(Modifier.height(20.dp))
             AxiomTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = { email = it; viewModel.clearError() },
                 label = "Email",
                 leadingIcon = { Icon(Icons.Default.Email, null, tint = colors.textMuted) },
                 keyboardOptions = KeyboardOptions(
@@ -304,7 +306,7 @@ fun SignUpScreen(
             Spacer(Modifier.height(20.dp))
             AxiomTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { password = it; viewModel.clearError() },
                 label = "Password",
                 leadingIcon = { Icon(Icons.Default.Lock, null, tint = colors.textMuted) },
                 trailingIcon = {
@@ -343,14 +345,23 @@ fun SignUpScreen(
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
 
+            if (uiState.error != null) {
+                Spacer(Modifier.height(Spacing.md))
+                Text(
+                    text = uiState.error!!,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.error,
+                )
+            }
+
             Spacer(Modifier.height(Spacing.s40))
 
             AxiomPrimaryButton(
                 text = "Create Account",
-                onClick = { isLoading = true; onSignUpSuccess() },
+                onClick = { viewModel.signUp(name, email, password, onSignUpSuccess) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = isValid,
-                loading = isLoading,
+                enabled = isValid && !uiState.isLoading,
+                loading = uiState.isLoading,
             )
 
             Spacer(Modifier.height(Spacing.xl))
@@ -392,8 +403,13 @@ fun SignUpScreen(
 // ── PasswordResetScreen ───────────────────────────────────────────────────────
 
 @Composable
-fun PasswordResetScreen(onBack: () -> Unit) {
+fun PasswordResetScreen(
+    onBack: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     var email by remember { mutableStateOf("") }
     var sent by remember { mutableStateOf(false) }
 
@@ -464,10 +480,13 @@ fun PasswordResetScreen(onBack: () -> Unit) {
                 )
                 Spacer(Modifier.height(Spacing.s40))
                 AxiomPrimaryButton(
-                    text = "Send Reset Link",
-                    onClick = { sent = true },
+                    text = if (uiState.isLoading) "Sending…" else "Send Reset Link",
+                    onClick = {
+                        viewModel.resetPassword(email) { sent = true }
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = email.contains("@"),
+                    enabled = email.contains("@") && !uiState.isLoading,
+                    loading = uiState.isLoading,
                 )
             }
         }

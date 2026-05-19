@@ -22,11 +22,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -51,6 +48,7 @@ data class WorkoutWithDetails(
 )
 
 data class WorkoutSessionUiState(
+    val workoutName: String = "Workout",
     val currentExerciseIndex: Int = 0,
     val exercises: List<SessionExercise> = emptyList(),
     val restTimerSec: Int = 0,
@@ -173,6 +171,7 @@ class WorkoutViewModel @Inject constructor(
 
             _sessionUiState.update {
                 WorkoutSessionUiState(
+                    workoutName = workout.name,
                     currentExerciseIndex = 0,
                     exercises = sessionExercises,
                     totalSets = totalSets,

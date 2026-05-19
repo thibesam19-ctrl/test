@@ -7,17 +7,10 @@ import com.axiom.aicoach.data.local.dao.FoodLogDao
 import com.axiom.aicoach.data.local.dao.StreakDao
 import com.axiom.aicoach.data.local.dao.UserProfileDao
 import com.axiom.aicoach.data.local.dao.WaterLogDao
-import com.axiom.aicoach.data.local.entities.FoodLogEntity
-import com.axiom.aicoach.data.local.entities.StreakEntity
-import com.axiom.aicoach.data.local.entities.UserProfileEntity
 import com.axiom.aicoach.util.toDbString
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import javax.inject.Inject
@@ -67,7 +60,6 @@ class DashboardViewModel @Inject constructor(
     private val streakFlow: Flow<StreakEntity?> =
         streakDao.observe(userId)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState = combine(
         profileFlow,
         foodLogsFlow,

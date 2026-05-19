@@ -258,12 +258,9 @@ fun WorkoutSessionScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            val workoutName = planUiState.workouts
-                .getOrNull(uiState.currentExerciseIndex)?.name
-                ?: "Workout"
             val safeTotal = if (uiState.totalSets > 0) uiState.totalSets else 1
             SessionTopBar(
-                workoutName = workoutName,
+                workoutName = uiState.workoutName,
                 elapsedSeconds = elapsedSeconds,
                 progress = uiState.completedSets.toFloat() / safeTotal,
                 onFinish = { viewModel.finishSession() },
@@ -382,7 +379,7 @@ private fun RestTimerBanner(secondsRemaining: Int, onSkip: () -> Unit) {
 
 @Composable
 private fun ExerciseSetCard(
-    exercise: ActiveExercise,
+    exercise: SessionExercise,
     setsCompleted: Int,
     isActive: Boolean,
     onSetComplete: () -> Unit,
@@ -412,7 +409,7 @@ private fun ExerciseSetCard(
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        "${exercise.sets} sets × ${exercise.repsMin}–${exercise.repsMax} reps · ${exercise.muscleGroup}",
+                        "${exercise.sets} sets × ${exercise.reps} reps",
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.textMuted,
                     )
@@ -431,7 +428,7 @@ private fun ExerciseSetCard(
                 Spacer(Modifier.height(Spacing.lg))
                 Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
                     repeat(exercise.sets) { i ->
-                        val done = i < setsCompleted
+                        val done = exercise.completedSets.getOrElse(i) { false }
                         Box(
                             Modifier
                                 .size(32.dp)
@@ -468,7 +465,7 @@ private fun ExerciseSetCard(
                 Spacer(Modifier.height(Spacing.md))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     repeat(exercise.sets) { i ->
-                        val done = i < setsCompleted
+                        val done = exercise.completedSets.getOrElse(i) { false }
                         Box(
                             Modifier
                                 .size(10.dp)

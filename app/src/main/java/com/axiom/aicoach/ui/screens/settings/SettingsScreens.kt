@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.axiom.aicoach.ui.components.*
 import com.axiom.aicoach.ui.theme.AxiomTheme
 import com.axiom.aicoach.ui.theme.Radius
@@ -43,8 +45,10 @@ fun SettingsScreen(
     onNotifications: () -> Unit,
     onPrivacy: () -> Unit,
     onBack: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val sections = listOf(
         "Account" to listOf(
@@ -98,18 +102,23 @@ fun SettingsScreen(
                                 .background(colors.primaryLight),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Text("👤", style = MaterialTheme.typography.titleLarge)
+                            Text(
+                                text = uiState.avatarInitial,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = colors.primary,
+                                fontWeight = FontWeight.Bold,
+                            )
                         }
                         Spacer(Modifier.width(Spacing.lg))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Alex Johnson",
+                                text = uiState.userName.ifBlank { "—" },
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = colors.textPrimary,
                             )
                             Text(
-                                text = "alex@example.com",
+                                text = uiState.userEmail.ifBlank { "—" },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = colors.textMuted,
                             )
@@ -233,10 +242,15 @@ private fun SettingsRow(item: SettingsItem, isDestructive: Boolean = false) {
 // ── Profile ───────────────────────────────────────────────────────────────────
 
 @Composable
-fun ProfileScreen(onBack: () -> Unit) {
+fun ProfileScreen(
+    onBack: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
-    var name by remember { mutableStateOf("Alex Johnson") }
-    var email by remember { mutableStateOf("alex@example.com") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    var name by remember(uiState.userName) { mutableStateOf(uiState.userName) }
+    var email by remember(uiState.userEmail) { mutableStateOf(uiState.userEmail) }
 
     Scaffold(
         topBar = { AxiomTopBar("Profile", onBack = onBack) },
@@ -264,8 +278,10 @@ fun ProfileScreen(onBack: () -> Unit) {
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "👤",
+                            text = uiState.avatarInitial,
                             style = MaterialTheme.typography.displayMedium,
+                            color = colors.primary,
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                     Spacer(Modifier.height(Spacing.lg))
@@ -314,7 +330,7 @@ fun ProfileScreen(onBack: () -> Unit) {
 
                 AxiomPrimaryButton(
                     text = "Save Changes",
-                    onClick = {},
+                    onClick = { viewModel.saveProfile(name, email) },
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(Spacing.s80))
@@ -448,24 +464,21 @@ fun SubscriptionScreen(onBack: () -> Unit) {
 // ── Notification Settings ─────────────────────────────────────────────────────
 
 @Composable
-fun NotificationSettingsScreen(onBack: () -> Unit) {
+fun NotificationSettingsScreen(
+    onBack: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
-    var workoutReminder by remember { mutableStateOf(true) }
-    var mealReminder by remember { mutableStateOf(true) }
-    var waterReminder by remember { mutableStateOf(true) }
-    var sleepReminder by remember { mutableStateOf(false) }
-    var weeklyProgress by remember { mutableStateOf(true) }
-    var streakProtection by remember { mutableStateOf(true) }
-    var tips by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Map notification keys to display metadata and state from uiState.
+    data class NotifItem(val key: String, val title: String, val subtitle: String, val enabled: Boolean)
 
     val items = listOf(
-        Triple("Workout Reminder", "Daily workout nudge", workoutReminder) to { v: Boolean -> workoutReminder = v },
-        Triple("Meal Logging", "Remember to log meals", mealReminder) to { v: Boolean -> mealReminder = v },
-        Triple("Water Reminder", "Every 2h during waking hours", waterReminder) to { v: Boolean -> waterReminder = v },
-        Triple("Sleep Wind-Down", "Evening wind-down reminder", sleepReminder) to { v: Boolean -> sleepReminder = v },
-        Triple("Weekly Progress", "Sunday evening summary", weeklyProgress) to { v: Boolean -> weeklyProgress = v },
-        Triple("Streak Protection", "Don't break your streak!", streakProtection) to { v: Boolean -> streakProtection = v },
-        Triple("Daily Tips", "Educational content", tips) to { v: Boolean -> tips = v },
+        NotifItem("workout", "Workout Reminder", "Daily workout nudge", uiState.notifyWorkout),
+        NotifItem("meals", "Meal Logging", "Remember to log meals", uiState.notifyMeals),
+        NotifItem("water", "Water Reminder", "Every 2h during waking hours", uiState.notifyWater),
+        NotifItem("weekly_report", "Weekly Progress", "Sunday evening summary", uiState.notifyWeeklyReport),
     )
 
     Scaffold(
@@ -486,13 +499,12 @@ fun NotificationSettingsScreen(onBack: () -> Unit) {
                 )
             }
 
-            items(items) { (triple, action) ->
-                val (title, subtitle, enabled) = triple
+            items(items) { item ->
                 NotificationToggleRow(
-                    title = title,
-                    subtitle = subtitle,
-                    enabled = enabled,
-                    onToggle = action,
+                    title = item.title,
+                    subtitle = item.subtitle,
+                    enabled = item.enabled,
+                    onToggle = { enabled -> viewModel.toggleNotification(item.key, enabled) },
                 )
                 HorizontalDivider(
                     color = colors.borderSubtle,

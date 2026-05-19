@@ -24,24 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.axiom.aicoach.ui.components.*
 import com.axiom.aicoach.ui.theme.AxiomTheme
 import com.axiom.aicoach.ui.theme.Radius
 import com.axiom.aicoach.ui.theme.Spacing
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
-// ── Demo data ─────────────────────────────────────────────────────────────────
-
-data class WeightEntry(val date: LocalDate, val kg: Float)
-
-val demoWeightHistory = listOf(
-    WeightEntry(LocalDate.now().minusDays(30), 82.4f),
-    WeightEntry(LocalDate.now().minusDays(23), 81.8f),
-    WeightEntry(LocalDate.now().minusDays(16), 81.1f),
-    WeightEntry(LocalDate.now().minusDays(9), 79.8f),
-    WeightEntry(LocalDate.now().minusDays(2), 78.2f),
-)
+// ── Static achievement data (not yet backed by a ViewModel) ──────────────────
 
 data class AchievementBadgeData(val emoji: String, val label: String, val earned: Boolean)
 
@@ -62,8 +52,22 @@ fun ProgressOverviewScreen(
     onBodyMeasurements: () -> Unit,
     onPhotoGallery: () -> Unit,
     onBack: () -> Unit,
+    viewModel: ProgressViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val startWeightLabel = uiState.startWeightKg?.let { String.format("%.1f kg", it) } ?: "—"
+    val currentWeightLabel = uiState.currentWeightKg?.let { String.format("%.1f kg", it) } ?: "—"
+    val lostLabel = if (uiState.totalWeightLost != 0f) {
+        String.format("%.1f kg", uiState.totalWeightLost)
+    } else "—"
+    val summaryText = if (uiState.totalWeightLost > 0f) {
+        "🎯 ${String.format("%.1f", uiState.totalWeightLost)} kg lost — on track for your goal"
+    } else {
+        "🎯 Log your first weight to start tracking"
+    }
+
     Scaffold(
         topBar = { AxiomTopBar("Progress", onBack = onBack) },
         containerColor = colors.background,
@@ -83,19 +87,19 @@ fun ProgressOverviewScreen(
                 ) {
                     StatCard(
                         label = "Start Weight",
-                        value = "82.4 kg",
+                        value = startWeightLabel,
                         color = colors.textPrimary,
                         modifier = Modifier.weight(1f),
                     )
                     StatCard(
                         label = "Current",
-                        value = "78.2 kg",
+                        value = currentWeightLabel,
                         color = colors.success,
                         modifier = Modifier.weight(1f),
                     )
                     StatCard(
                         label = "Lost",
-                        value = "4.2 kg",
+                        value = lostLabel,
                         color = colors.primary,
                         modifier = Modifier.weight(1f),
                     )
@@ -118,14 +122,14 @@ fun ProgressOverviewScreen(
                     ) {
                         Column {
                             Text(
-                                text = "🎯 4.2 kg lost in 30 days",
+                                text = summaryText,
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
                             )
                             Spacer(Modifier.height(Spacing.sm))
                             Text(
-                                text = "On track for your goal",
+                                text = "Keep up the great work",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color.White.copy(alpha = 0.9f),
                             )
@@ -256,11 +260,21 @@ private fun AchievementBadge(badge: AchievementBadgeData) {
 // ── Weight History ────────────────────────────────────────────────────────────
 
 @Composable
-fun WeightHistoryScreen(onBack: () -> Unit) {
+fun WeightHistoryScreen(
+    onBack: () -> Unit,
+    viewModel: ProgressViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     var newWeight by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
-    val formatter = DateTimeFormatter.ofPattern("MMM d")
+
+    val startLabel = uiState.startWeightKg?.let { String.format("%.1f kg", it) } ?: "—"
+    val currentLabel = uiState.currentWeightKg?.let { String.format("%.1f kg", it) } ?: "—"
+    val changeLabel = if (uiState.totalWeightLost != 0f) {
+        String.format("%.1f kg", -uiState.totalWeightLost)
+    } else "—"
 
     Scaffold(
         topBar = { AxiomTopBar("Weight History", onBack = onBack) },
@@ -290,7 +304,7 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
             ) {
                 StatCard(
                     label = "Start",
-                    value = "82.4 kg",
+                    value = startLabel,
                     color = colors.textPrimary,
                     modifier = Modifier.weight(1f),
                 )
@@ -298,24 +312,25 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
                 Box(modifier = Modifier.weight(1f)) {
                     StatCard(
                         label = "Current",
-                        value = "78.2 kg",
+                        value = currentLabel,
                         color = colors.success,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    // Trend down arrow in top-right of card
-                    Text(
-                        text = "↓",
-                        color = colors.success,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(Spacing.md),
-                    )
+                    if (uiState.totalWeightLost > 0f) {
+                        Text(
+                            text = "↓",
+                            color = colors.success,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(Spacing.md),
+                        )
+                    }
                 }
                 StatCard(
                     label = "Change",
-                    value = "-4.2 kg",
+                    value = changeLabel,
                     color = colors.success,
                     modifier = Modifier.weight(1f),
                 )
@@ -330,10 +345,20 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
             )
             Spacer(Modifier.height(Spacing.lg))
 
-            LazyColumn {
-                items(demoWeightHistory.reversed()) { entry ->
-                    WeightEntryRow(entry, formatter)
-                    HorizontalDivider(color = colors.borderSubtle)
+            if (uiState.weightLogs.isEmpty()) {
+                EmptyState(
+                    title = "No weight logs yet",
+                    message = "Tap + to log your first weight",
+                )
+            } else {
+                LazyColumn {
+                    items(uiState.weightLogs) { entry ->
+                        WeightLogEntryRow(
+                            entry = entry,
+                            onDelete = { viewModel.deleteWeight(entry.id) },
+                        )
+                        HorizontalDivider(color = colors.borderSubtle)
+                    }
                 }
             }
         }
@@ -341,7 +366,7 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
 
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = { showDialog = false; newWeight = "" },
             title = { Text("Log Weight") },
             text = {
                 OutlinedTextField(
@@ -355,7 +380,16 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
                 )
             },
             confirmButton = {
-                TextButton(onClick = { showDialog = false; newWeight = "" }) {
+                TextButton(
+                    onClick = {
+                        val kg = newWeight.toFloatOrNull()
+                        if (kg != null && kg > 0f) {
+                            viewModel.logWeight(kg)
+                        }
+                        showDialog = false
+                        newWeight = ""
+                    }
+                ) {
                     Text("Save", color = colors.primary)
                 }
             },
@@ -370,7 +404,7 @@ fun WeightHistoryScreen(onBack: () -> Unit) {
 }
 
 @Composable
-private fun WeightEntryRow(entry: WeightEntry, formatter: DateTimeFormatter) {
+private fun WeightLogEntryRow(entry: WeightLogUi, onDelete: () -> Unit) {
     val colors = AxiomTheme.colors
     Row(
         modifier = Modifier
@@ -380,38 +414,42 @@ private fun WeightEntryRow(entry: WeightEntry, formatter: DateTimeFormatter) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = entry.date.format(formatter),
+            text = entry.date,
             style = MaterialTheme.typography.bodyMedium,
             color = colors.textSecondary,
         )
         Text(
-            text = "${entry.kg} kg",
+            text = "${entry.weightKg} kg",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = colors.textPrimary,
         )
+        IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+            Icon(Icons.Default.Close, null, tint = colors.textMuted, modifier = Modifier.size(16.dp))
+        }
     }
 }
 
 // ── Body Measurements ─────────────────────────────────────────────────────────
 
 @Composable
-fun BodyMeasurementsScreen(onBack: () -> Unit) {
+fun BodyMeasurementsScreen(
+    onBack: () -> Unit,
+    viewModel: ProgressViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
-    var measurements by remember {
-        mutableStateOf(
-            mapOf(
-                "Chest" to "98.0",
-                "Waist" to "84.0",
-                "Hips" to "96.0",
-                "Left Arm" to "35.0",
-                "Right Arm" to "35.5",
-                "Left Thigh" to "56.0",
-                "Right Thigh" to "56.5",
-                "Neck" to "38.0",
-            )
-        )
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Editable state initialised from the latest measurement (if any)
+    val latest = uiState.bodyMeasurements.firstOrNull()
+
+    var chest by remember(latest) { mutableStateOf(latest?.chestCm?.let { String.format("%.1f", it) } ?: "") }
+    var waist by remember(latest) { mutableStateOf(latest?.waistCm?.let { String.format("%.1f", it) } ?: "") }
+    var hips by remember(latest) { mutableStateOf(latest?.hipCm?.let { String.format("%.1f", it) } ?: "") }
+    var arm by remember(latest) { mutableStateOf(latest?.armCm?.let { String.format("%.1f", it) } ?: "") }
+    var thigh by remember(latest) { mutableStateOf(latest?.thighCm?.let { String.format("%.1f", it) } ?: "") }
+
+    val lastMeasuredLabel = latest?.date?.let { "Last measured: $it" } ?: "No measurements yet"
 
     Scaffold(
         topBar = { AxiomTopBar("Body Measurements", onBack = onBack) },
@@ -426,19 +464,23 @@ fun BodyMeasurementsScreen(onBack: () -> Unit) {
             item {
                 Spacer(Modifier.height(Spacing.lg))
                 Text(
-                    text = "Last measured: Apr 15",
+                    text = lastMeasuredLabel,
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textMuted,
                 )
                 Spacer(Modifier.height(Spacing.lg))
             }
 
-            items(measurements.entries.toList()) { (label, value) ->
-                MeasurementRow(
-                    label = label,
-                    value = value,
-                    onUpdate = { measurements = measurements + (label to it) },
-                )
+            item {
+                MeasurementRow(label = "Chest", value = chest, onUpdate = { chest = it })
+                HorizontalDivider(color = colors.borderSubtle)
+                MeasurementRow(label = "Waist", value = waist, onUpdate = { waist = it })
+                HorizontalDivider(color = colors.borderSubtle)
+                MeasurementRow(label = "Hips", value = hips, onUpdate = { hips = it })
+                HorizontalDivider(color = colors.borderSubtle)
+                MeasurementRow(label = "Arm", value = arm, onUpdate = { arm = it })
+                HorizontalDivider(color = colors.borderSubtle)
+                MeasurementRow(label = "Thigh", value = thigh, onUpdate = { thigh = it })
                 HorizontalDivider(color = colors.borderSubtle)
             }
 
@@ -446,7 +488,15 @@ fun BodyMeasurementsScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(Spacing.xxxl))
                 AxiomPrimaryButton(
                     text = "Save Measurements",
-                    onClick = {},
+                    onClick = {
+                        viewModel.saveMeasurement(
+                            waist = waist.toFloatOrNull(),
+                            hip = hips.toFloatOrNull(),
+                            chest = chest.toFloatOrNull(),
+                            arm = arm.toFloatOrNull(),
+                            thigh = thigh.toFloatOrNull(),
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(Spacing.s80))
@@ -488,7 +538,7 @@ private fun MeasurementRow(label: String, value: String, onUpdate: (String) -> U
             }
         } else {
             Text(
-                text = "$value cm",
+                text = if (value.isNotBlank()) "$value cm" else "—",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.textPrimary,
@@ -508,12 +558,20 @@ private fun MeasurementRow(label: String, value: String, onUpdate: (String) -> U
 // ── Photo Gallery ─────────────────────────────────────────────────────────────
 
 @Composable
-fun PhotoGalleryScreen(onBack: () -> Unit) {
+fun PhotoGalleryScreen(
+    onBack: () -> Unit,
+    viewModel: ProgressViewModel = hiltViewModel(),
+) {
     val colors = AxiomTheme.colors
-    var photos by remember { mutableStateOf(listOf("Week 1", "Week 2", "Week 3", "Week 4")) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Local list merges DB photos + any newly picked in-session
+    var localPhotos by remember { mutableStateOf(listOf<String>()) }
+
+    val allPhotoLabels = uiState.progressPhotos.map { it.date } + localPhotos
 
     val photoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) photos = photos + "Week ${photos.size + 1}"
+        if (uri != null) localPhotos = localPhotos + "New Photo"
     }
 
     Scaffold(
@@ -561,37 +619,44 @@ fun PhotoGalleryScreen(onBack: () -> Unit) {
 
             // ── Photo grid ────────────────────────────────────────────────────
             item {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.lg),
-                    userScrollEnabled = false,
-                ) {
-                    items(photos) { weekLabel ->
-                        Box(
-                            modifier = Modifier
-                                .aspectRatio(0.75f)
-                                .clip(Radius.lg)
-                                .background(
-                                    Brush.linearGradient(
-                                        listOf(
-                                            colors.primaryLight,
-                                            colors.primary.copy(alpha = 0.3f),
+                if (allPhotoLabels.isEmpty()) {
+                    EmptyState(
+                        title = "No photos yet",
+                        message = "Tap the camera button to add your first progress photo",
+                    )
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+                        userScrollEnabled = false,
+                    ) {
+                        items(allPhotoLabels) { label ->
+                            Box(
+                                modifier = Modifier
+                                    .aspectRatio(0.75f)
+                                    .clip(Radius.lg)
+                                    .background(
+                                        Brush.linearGradient(
+                                            listOf(
+                                                colors.primaryLight,
+                                                colors.primary.copy(alpha = 0.3f),
+                                            )
                                         )
+                                    ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text("📷", fontSize = 32.sp)
+                                    Spacer(Modifier.height(Spacing.md))
+                                    Text(
+                                        text = label,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.SemiBold,
                                     )
-                                ),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("📷", fontSize = 32.sp)
-                                Spacer(Modifier.height(Spacing.md))
-                                Text(
-                                    text = weekLabel,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
+                                }
                             }
                         }
                     }
