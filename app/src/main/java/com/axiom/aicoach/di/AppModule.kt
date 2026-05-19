@@ -3,6 +3,8 @@ package com.axiom.aicoach.di
 import android.content.Context
 import androidx.room.Room
 import com.axiom.aicoach.data.local.database.AxiomDatabase
+import com.axiom.aicoach.data.repository.*
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,4 +42,29 @@ object DatabaseModule {
     @Provides fun provideStreakDao(db: AxiomDatabase) = db.streakDao()
     @Provides fun provideCoachMessageDao(db: AxiomDatabase) = db.coachMessageDao()
     @Provides fun provideNotificationPreferenceDao(db: AxiomDatabase) = db.notificationPreferenceDao()
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWorkoutRepository(impl: WorkoutRepositoryImpl): WorkoutRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNutritionRepository(impl: NutritionRepositoryImpl): NutritionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProgressRepository(impl: ProgressRepositoryImpl): ProgressRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCoachRepository(impl: CoachRepositoryImpl): CoachRepository
 }

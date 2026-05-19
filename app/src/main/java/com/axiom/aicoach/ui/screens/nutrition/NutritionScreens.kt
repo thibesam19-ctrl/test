@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.axiom.aicoach.domain.model.MealType
 import com.axiom.aicoach.ui.components.*
 import com.axiom.aicoach.ui.theme.AxiomTheme
@@ -35,27 +37,6 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.Executors
-
-// ── Nutrition Dashboard ───────────────────────────────────────────────────────
-
-data class DemoMealSection(val type: MealType, val items: List<DemoFoodEntry>)
-data class DemoFoodEntry(val name: String, val calories: Int, val protein: Int, val carbs: Int, val fat: Int)
-
-val demoMeals = listOf(
-    DemoMealSection(MealType.BREAKFAST, listOf(
-        DemoFoodEntry("Oatmeal with banana", 380, 12, 68, 7),
-        DemoFoodEntry("Black coffee", 5, 0, 1, 0),
-    )),
-    DemoMealSection(MealType.LUNCH, listOf(
-        DemoFoodEntry("Grilled chicken breast", 280, 52, 0, 6),
-        DemoFoodEntry("Brown rice (1 cup)", 215, 5, 45, 2),
-        DemoFoodEntry("Steamed broccoli", 55, 4, 11, 1),
-    )),
-    DemoMealSection(MealType.SNACK, listOf(
-        DemoFoodEntry("Greek yogurt", 100, 17, 6, 0),
-        DemoFoodEntry("Almonds (20g)", 120, 4, 5, 10),
-    )),
-)
 
 @Composable
 fun NutritionDashboardScreen(

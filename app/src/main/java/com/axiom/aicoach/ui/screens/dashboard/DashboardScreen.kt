@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.axiom.aicoach.ui.components.*
 import com.axiom.aicoach.ui.theme.*
 import java.time.LocalDate
@@ -32,21 +34,22 @@ fun DashboardScreen(
     onNavigateToCoach: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToWater: () -> Unit,
+    viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Demo state
-    val caloriesConsumed = 1420
-    val caloriesGoal = 2100
-    val proteinG = 98
-    val proteinGoal = 158
-    val carbsG = 168
-    val carbsGoal = 220
-    val fatG = 52
-    val fatGoal = 70
-    val waterMl = 1500
-    val waterGoalMl = 2400
-    val streakDays = 7
+    val caloriesConsumed = uiState.caloriesConsumed
+    val caloriesGoal = uiState.caloriesGoal
+    val proteinG = uiState.proteinG
+    val proteinGoal = uiState.proteinGoal
+    val carbsG = uiState.carbsG
+    val carbsGoal = uiState.carbsGoal
+    val fatG = uiState.fatG
+    val fatGoal = uiState.fatGoal
+    val waterMl = uiState.waterMl
+    val waterGoalMl = uiState.waterGoalMl
+    val streakDays = uiState.streakDays
 
     LazyColumn(
         modifier = Modifier
@@ -58,6 +61,7 @@ fun DashboardScreen(
         // ── 1. Scrollable header (greeting + date + streak + settings) ──────
         item {
             DashboardHeader(
+                userName = uiState.userName,
                 streakDays = streakDays,
                 onSettings = onNavigateToSettings,
             )
@@ -159,6 +163,7 @@ fun DashboardScreen(
 
 @Composable
 private fun DashboardHeader(
+    userName: String,
     streakDays: Int,
     onSettings: () -> Unit,
 ) {
@@ -180,7 +185,7 @@ private fun DashboardHeader(
             // Greeting + date
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "$greeting, Alex",
+                    text = "$greeting, $userName",
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     color = colors.textPrimary,

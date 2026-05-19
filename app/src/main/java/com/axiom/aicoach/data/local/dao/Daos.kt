@@ -275,6 +275,9 @@ interface CoachMessageDao {
 
     @Query("SELECT COUNT(*) FROM coach_messages WHERE userId = :userId AND timestamp >= :since AND role = 'USER'")
     suspend fun countUserMessagesSince(userId: String, since: String): Int
+
+    @Query("DELETE FROM coach_messages WHERE userId = :userId")
+    suspend fun deleteAll(userId: String)
 }
 
 @Dao

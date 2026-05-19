@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.axiom.aicoach.ui.components.*
 import com.axiom.aicoach.ui.theme.AxiomTheme
 import com.axiom.aicoach.ui.theme.Radius
@@ -29,31 +31,18 @@ import kotlinx.coroutines.delay
 
 // ── Workout Plan Screen ───────────────────────────────────────────────────────
 
-data class DemoWorkout(
-    val id: String,
-    val name: String,
-    val day: String,
-    val exerciseCount: Int,
-    val estimatedMin: Int,
-    val muscleGroups: List<String>,
-)
-
-val demoWorkouts = listOf(
-    DemoWorkout("w1", "Upper Body Power", "Monday", 6, 50, listOf("Chest", "Back", "Shoulders")),
-    DemoWorkout("w2", "Lower Body Strength", "Wednesday", 5, 45, listOf("Quads", "Hamstrings", "Glutes")),
-    DemoWorkout("w3", "Push Day", "Friday", 7, 55, listOf("Chest", "Shoulders", "Triceps")),
-    DemoWorkout("w4", "Pull Day", "Saturday", 6, 50, listOf("Back", "Biceps", "Rear Delts")),
-)
-
 @Composable
 fun WorkoutPlanScreen(
     onStartWorkout: (String) -> Unit,
     onExerciseDetail: (String) -> Unit,
     onBack: () -> Unit,
+    viewModel: WorkoutViewModel = hiltViewModel(),
 ) {
     val colors = AxiomTheme.colors
+    val uiState by viewModel.planUiState.collectAsStateWithLifecycle()
+
     Scaffold(
-        topBar = { AxiomTopBar("My Workout Plan", onBack = onBack) },
+        topBar = { AxiomTopBar(uiState.planName, onBack = onBack) },
         containerColor = colors.background,
     ) { padding ->
         LazyColumn(
@@ -77,11 +66,22 @@ fun WorkoutPlanScreen(
                 )
                 Spacer(Modifier.height(Spacing.md))
             }
-            items(demoWorkouts) { workout ->
-                WorkoutDayCard(workout, onStartWorkout = { onStartWorkout(workout.id) })
-            }
-            item {
-                RestDayCard()
+            if (uiState.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(Spacing.xxxl),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(color = colors.primary)
+                    }
+                }
+            } else {
+                items(uiState.workouts) { workout ->
+                    WorkoutDayCard(workout, onStartWorkout = { onStartWorkout(workout.id) })
+                }
+                item {
+                    RestDayCard()
+                }
             }
         }
     }
@@ -137,7 +137,7 @@ private fun PlanStatItem(label: String, value: String) {
 }
 
 @Composable
-private fun WorkoutDayCard(workout: DemoWorkout, onStartWorkout: () -> Unit) {
+private fun WorkoutDayCard(workout: WorkoutWithDetails, onStartWorkout: () -> Unit) {
     val colors = AxiomTheme.colors
     AxiomCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Spacing.xl)) {
@@ -148,7 +148,7 @@ private fun WorkoutDayCard(workout: DemoWorkout, onStartWorkout: () -> Unit) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        workout.day,
+                        workout.dayOfWeek,
                         style = MaterialTheme.typography.labelSmall,
                         color = colors.textMuted,
                     )
