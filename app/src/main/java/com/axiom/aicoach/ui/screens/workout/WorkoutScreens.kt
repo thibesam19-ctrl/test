@@ -1,12 +1,14 @@
 package com.axiom.aicoach.ui.screens.workout
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -14,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,23 +57,32 @@ fun WorkoutPlanScreen(
         containerColor = colors.background,
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = Spacing.xl),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = Spacing.xl,
+                end = Spacing.xl,
+                top = padding.calculateTopPadding() + Spacing.md,
+                bottom = padding.calculateBottomPadding() + Spacing.s64,
+            ),
             verticalArrangement = Arrangement.spacedBy(Spacing.lg),
         ) {
             item {
-                Spacer(Modifier.height(Spacing.md))
                 PlanHeaderCard()
                 Spacer(Modifier.height(Spacing.xl))
-                Text("This Week", style = MaterialTheme.typography.titleLarge, color = colors.textPrimary, fontWeight = FontWeight.Bold)
+                Text(
+                    "This Week",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = colors.textPrimary,
+                    fontWeight = FontWeight.Bold,
+                )
                 Spacer(Modifier.height(Spacing.md))
             }
             items(demoWorkouts) { workout ->
                 WorkoutDayCard(workout, onStartWorkout = { onStartWorkout(workout.id) })
             }
-            item { Spacer(Modifier.height(Spacing.s64)) }
+            item {
+                RestDayCard()
+            }
         }
     }
 }
@@ -83,20 +95,24 @@ private fun PlanHeaderCard() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    androidx.compose.ui.graphics.Brush.horizontalGradient(
-                        listOf(colors.primary, colors.secondary)
+                    Brush.horizontalGradient(
+                        listOf(colors.primaryDark, colors.primary)
                     )
                 )
-                .padding(Spacing.xl)
+                .padding(Spacing.xl),
         ) {
             Column {
-                Text("Upper/Lower Split", style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Bold)
-                Text("Week 3 of 8 · Intermediate · 4 days/week", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.8f))
-                Spacer(Modifier.height(Spacing.xl))
+                Text(
+                    "Upper/Lower Split · Week 3 of 8",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.height(Spacing.s32))
                 Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s32)) {
-                    StatBadge("Week", "3/8")
-                    StatBadge("Sessions", "2/4")
-                    StatBadge("Volume", "↑12%")
+                    PlanStatItem("Week", "3/8")
+                    PlanStatItem("Sessions", "2/4")
+                    PlanStatItem("Volume", "↑12%")
                 }
             }
         }
@@ -104,10 +120,19 @@ private fun PlanHeaderCard() {
 }
 
 @Composable
-private fun StatBadge(label: String, value: String) {
+private fun PlanStatItem(label: String, value: String) {
     Column {
-        Text(value, style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Bold)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.7f))
+        Text(
+            value,
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White.copy(alpha = 0.7f),
+        )
     }
 }
 
@@ -122,35 +147,60 @@ private fun WorkoutDayCard(workout: DemoWorkout, onStartWorkout: () -> Unit) {
                 verticalAlignment = Alignment.Top,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(workout.day, style = MaterialTheme.typography.labelMedium, color = colors.textMuted)
-                    Text(workout.name, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        workout.day,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.textMuted,
+                    )
+                    Text(
+                        workout.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colors.textPrimary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                     Spacer(Modifier.height(4.dp))
-                    Text("${workout.exerciseCount} exercises · ~${workout.estimatedMin} min", style = MaterialTheme.typography.bodySmall, color = colors.textMuted)
+                    Text(
+                        "${workout.exerciseCount} exercises · ~${workout.estimatedMin} min",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.textMuted,
+                    )
                 }
                 Button(
                     onClick = onStartWorkout,
                     shape = Radius.md,
                     colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    contentPadding = PaddingValues(horizontal = Spacing.xl, vertical = Spacing.md),
                 ) {
-                    Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("Start")
+                    Text("Start →", style = MaterialTheme.typography.labelMedium, color = colors.textOnPrimary)
                 }
             }
             Spacer(Modifier.height(Spacing.lg))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
                 workout.muscleGroups.forEach { muscle ->
-                    Box(
-                        Modifier
-                            .clip(Radius.pill)
-                            .background(colors.primaryLight)
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
-                    ) {
-                        Text(muscle, style = MaterialTheme.typography.labelSmall, color = colors.primary)
-                    }
+                    PillBadge(text = muscle, color = colors.primary)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun RestDayCard() {
+    val colors = AxiomTheme.colors
+    AxiomCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Spacing.xl),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("Sunday", style = MaterialTheme.typography.labelSmall, color = colors.textMuted)
+            Spacer(Modifier.width(Spacing.lg))
+            Text(
+                "🛌 Rest Day — Recovery is gains too",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.textSecondary,
+            )
         }
     }
 }
@@ -220,25 +270,23 @@ fun WorkoutSessionScreen(
 
     Scaffold(
         containerColor = colors.background,
-        topBar = {
-            SessionTopBar(
-                workoutName = "Upper Body Power",
-                elapsedSeconds = elapsedSeconds,
-                progress = totalSetsCompleted.toFloat() / totalSets,
-                onFinish = { sessionFinished = true },
-            )
-        }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            SessionTopBar(
+                workoutName = "Upper Body Power",
+                elapsedSeconds = elapsedSeconds,
+                progress = totalSetsCompleted.toFloat() / totalSets,
+                onFinish = { sessionFinished = true },
+            )
+
             if (restTimerActive) {
                 RestTimerBanner(restSeconds) { restTimerActive = false }
             }
 
-            // Exercise list
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
@@ -276,23 +324,43 @@ fun WorkoutSessionScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SessionTopBar(workoutName: String, elapsedSeconds: Int, progress: Float, onFinish: () -> Unit) {
+private fun SessionTopBar(
+    workoutName: String,
+    elapsedSeconds: Int,
+    progress: Float,
+    onFinish: () -> Unit,
+) {
     val colors = AxiomTheme.colors
     val min = elapsedSeconds / 60
     val sec = elapsedSeconds % 60
     Column {
         TopAppBar(
-            title = { Text(workoutName, style = MaterialTheme.typography.titleLarge, color = colors.textPrimary, fontWeight = FontWeight.Bold) },
+            title = {
+                Text(
+                    workoutName,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = colors.textPrimary,
+                    fontWeight = FontWeight.Bold,
+                )
+            },
             actions = {
-                Text(String.format("%02d:%02d", min, sec), style = MaterialTheme.typography.bodyMedium, color = colors.textMuted)
-                Spacer(Modifier.width(8.dp))
-                TextButton(onClick = onFinish) { Text("Finish", color = colors.success) }
+                Text(
+                    String.format("%02d:%02d", min, sec),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = colors.textMuted,
+                )
+                Spacer(Modifier.width(Spacing.md))
+                TextButton(onClick = onFinish) {
+                    Text("Finish", color = colors.success, fontWeight = FontWeight.SemiBold)
+                }
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background),
         )
         LinearProgressIndicator(
             progress = { progress },
-            modifier = Modifier.fillMaxWidth().height(3.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(3.dp),
             color = colors.success,
             trackColor = colors.borderSubtle,
         )
@@ -305,17 +373,24 @@ private fun RestTimerBanner(secondsRemaining: Int, onSkip: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colors.info.copy(alpha = 0.15f))
+            .background(
+                Brush.horizontalGradient(
+                    listOf(colors.info.copy(alpha = 0.1f), colors.info.copy(alpha = 0.05f))
+                )
+            )
             .padding(horizontal = Spacing.xl, vertical = Spacing.lg),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Timer, null, tint = colors.info)
-            Spacer(Modifier.width(8.dp))
-            Text("Rest: ${secondsRemaining}s", style = MaterialTheme.typography.titleMedium, color = colors.info, fontWeight = FontWeight.Bold)
+        Text(
+            "⏱ Rest ${secondsRemaining}s",
+            style = MaterialTheme.typography.titleMedium,
+            color = colors.info,
+            fontWeight = FontWeight.Bold,
+        )
+        TextButton(onClick = onSkip) {
+            Text("Skip", color = colors.info)
         }
-        TextButton(onClick = onSkip) { Text("Skip Rest", color = colors.info) }
     }
 }
 
@@ -328,72 +403,110 @@ private fun ExerciseSetCard(
     onInfo: () -> Unit,
 ) {
     val colors = AxiomTheme.colors
-    Card(
+    AxiomCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = Radius.lg,
-        colors = CardDefaults.cardColors(
-            containerColor = if (isActive) colors.primaryLight.copy(alpha = 0.4f) else colors.card
-        ),
-        border = if (isActive) androidx.compose.foundation.BorderStroke(1.5.dp, colors.primary) else null,
-        elevation = CardDefaults.cardElevation(1.dp),
     ) {
-        Column(modifier = Modifier.padding(Spacing.xl)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(exercise.name, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary, fontWeight = FontWeight.SemiBold)
-                    Text("${exercise.sets} sets × ${exercise.repsMin}–${exercise.repsMax} reps · ${exercise.muscleGroup}", style = MaterialTheme.typography.bodySmall, color = colors.textMuted)
-                }
-                IconButton(onClick = onInfo, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Default.Info, null, tint = colors.textMuted, modifier = Modifier.size(18.dp))
-                }
-            }
-
+        // Re-apply border and background tint for active state via a wrapping Box
+        val cardBg = if (isActive) colors.primaryLight.copy(alpha = 0.3f) else Color.Transparent
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(
+                    if (isActive) Modifier.background(cardBg)
+                    else Modifier
+                )
+                .then(
+                    if (isActive) Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    else Modifier
+                )
+        ) {
+            // Border overlay for active
             if (isActive) {
-                Spacer(Modifier.height(Spacing.lg))
-                // Set indicators
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    repeat(exercise.sets) { i ->
-                        val done = i < setsCompleted
-                        Box(
-                            Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(if (done) colors.success else colors.borderSubtle),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            if (done) Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(16.dp))
-                            else Text("${i + 1}", style = MaterialTheme.typography.labelSmall, color = if (done) Color.White else colors.textMuted)
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .background(Color.Transparent)
+                )
+            }
+            Column(modifier = Modifier.padding(Spacing.xl)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            exercise.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = colors.textPrimary,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            "${exercise.sets} sets × ${exercise.repsMin}–${exercise.repsMax} reps · ${exercise.muscleGroup}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.textMuted,
+                        )
+                    }
+                    IconButton(onClick = onInfo, modifier = Modifier.size(36.dp)) {
+                        Icon(
+                            Icons.Default.Info,
+                            null,
+                            tint = colors.textMuted,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                }
+
+                if (isActive) {
+                    Spacer(Modifier.height(Spacing.lg))
+                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                        repeat(exercise.sets) { i ->
+                            val done = i < setsCompleted
+                            Box(
+                                Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(if (done) colors.success else colors.borderSubtle),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                if (done) {
+                                    Icon(
+                                        Icons.Default.Check,
+                                        null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                } else {
+                                    Text(
+                                        "${i + 1}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = colors.textMuted,
+                                    )
+                                }
+                            }
                         }
                     }
-                }
-                if (setsCompleted < exercise.sets) {
-                    Spacer(Modifier.height(Spacing.lg))
-                    Button(
-                        onClick = onSetComplete,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = Radius.md,
-                        colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
-                    ) {
-                        Icon(Icons.Default.Check, null, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Log Set ${setsCompleted + 1}")
-                    }
-                }
-            } else {
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    repeat(exercise.sets) { i ->
-                        val done = i < setsCompleted
-                        Box(
-                            Modifier
-                                .size(10.dp)
-                                .clip(CircleShape)
-                                .background(if (done) colors.success else colors.borderSubtle)
+                    if (setsCompleted < exercise.sets) {
+                        Spacer(Modifier.height(Spacing.lg))
+                        AxiomPrimaryButton(
+                            text = "Log Set ${setsCompleted + 1}",
+                            onClick = onSetComplete,
+                            modifier = Modifier.fillMaxWidth(),
                         )
+                    }
+                } else {
+                    Spacer(Modifier.height(Spacing.md))
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        repeat(exercise.sets) { i ->
+                            val done = i < setsCompleted
+                            Box(
+                                Modifier
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(if (done) colors.success else colors.borderSubtle)
+                            )
+                        }
                     }
                 }
             }
@@ -404,27 +517,44 @@ private fun ExerciseSetCard(
 @Composable
 private fun WorkoutCompleteScreen(totalSets: Int, elapsedMin: Int, onFinish: () -> Unit) {
     val colors = AxiomTheme.colors
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
-            .padding(Spacing.xl)
-            .systemBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+            .background(colors.background),
     ) {
-        Text("🎉", style = MaterialTheme.typography.displayLarge)
-        Spacer(Modifier.height(Spacing.xxxl))
-        Text("Workout Complete!", style = MaterialTheme.typography.headlineLarge, color = colors.textPrimary, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        Spacer(Modifier.height(Spacing.xl))
-        Text("Incredible work. Your consistency is building results.", style = MaterialTheme.typography.bodyLarge, color = colors.textSecondary, textAlign = TextAlign.Center)
-        Spacer(Modifier.height(Spacing.s40))
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xl)) {
-            StatCard("Sets Done", totalSets.toString())
-            StatCard("Duration", "${elapsedMin}m")
+        ConfettiOverlay(visible = true)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Spacing.xl)
+                .systemBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text("🎉", style = MaterialTheme.typography.displayLarge)
+            Spacer(Modifier.height(Spacing.xxxl))
+            Text(
+                "Workout Complete!",
+                style = MaterialTheme.typography.displaySmall,
+                color = colors.textPrimary,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(Spacing.xl))
+            Text(
+                "Incredible work. Your consistency is building results.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = colors.textSecondary,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(Spacing.s40))
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xl)) {
+                StatCard("Sets Done", totalSets.toString())
+                StatCard("Duration", "${elapsedMin}m")
+            }
+            Spacer(Modifier.height(Spacing.s48))
+            AxiomPrimaryButton("Back to Dashboard", onFinish, Modifier.fillMaxWidth())
         }
-        Spacer(Modifier.height(Spacing.s48))
-        AxiomPrimaryButton("Back to Dashboard", onFinish, Modifier.fillMaxWidth())
     }
 }
 
@@ -438,58 +568,95 @@ fun ExerciseDetailScreen(exerciseId: String, onBack: () -> Unit) {
         containerColor = colors.background,
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = Spacing.xl),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = Spacing.xl,
+                end = Spacing.xl,
+                top = padding.calculateTopPadding() + Spacing.md,
+                bottom = padding.calculateBottomPadding() + 80.dp,
+            ),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xxxl),
         ) {
             item {
-                Spacer(Modifier.height(Spacing.md))
-                // Thumbnail placeholder
+                // Video placeholder
                 Box(
                     Modifier
                         .fillMaxWidth()
                         .height(200.dp)
                         .clip(Radius.lg)
-                        .background(colors.primaryLight),
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(colors.primaryDark, colors.primary)
+                            )
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.PlayCircle, null, tint = colors.primary, modifier = Modifier.size(48.dp))
-                        Spacer(Modifier.height(8.dp))
-                        Text("Exercise Video", style = MaterialTheme.typography.bodyMedium, color = colors.primary)
+                        Icon(
+                            Icons.Default.PlayCircle,
+                            null,
+                            tint = Color.White,
+                            modifier = Modifier.size(56.dp),
+                        )
+                        Spacer(Modifier.height(Spacing.md))
+                        Text(
+                            "Watch Demo",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold,
+                        )
                     }
                 }
-                Spacer(Modifier.height(Spacing.xl))
-                Text("Bench Press", style = MaterialTheme.typography.headlineLarge, color = colors.textPrimary, fontWeight = FontWeight.Bold)
-                Text("Chest · Compound · Intermediate", style = MaterialTheme.typography.bodyMedium, color = colors.textMuted)
-                Spacer(Modifier.height(Spacing.xxxl))
             }
             item {
-                DetailSection("Form Cues", listOf(
-                    "Set up with a natural arch in your lower back",
-                    "Retract and depress your shoulder blades",
-                    "Grip slightly wider than shoulder-width",
-                    "Touch bar to lower chest, elbows at 45–75°",
-                    "Drive feet into floor, press bar up and back",
-                ))
+                Column {
+                    Text(
+                        "Bench Press",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = colors.textPrimary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.height(Spacing.md))
+                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                        PillBadge("Chest", colors.primary)
+                        PillBadge("Compound", colors.secondary)
+                        PillBadge("Intermediate", colors.accent)
+                    }
+                }
             }
             item {
-                DetailSection("Common Mistakes", listOf(
-                    "Flaring elbows too wide (shoulder risk)",
-                    "Bouncing bar off chest (loss of control)",
-                    "Lifting glutes off bench",
-                    "Incomplete range of motion",
-                ))
+                DetailSection(
+                    "Form Cues",
+                    listOf(
+                        "Set up with a natural arch in your lower back",
+                        "Retract and depress your shoulder blades",
+                        "Grip slightly wider than shoulder-width",
+                        "Touch bar to lower chest, elbows at 45–75°",
+                        "Drive feet into floor, press bar up and back",
+                    )
+                )
             }
             item {
-                DetailSection("Substitutions", listOf(
-                    "Dumbbell Press (any equipment level)",
-                    "Push-Up (bodyweight alternative)",
-                    "Machine Chest Press (beginner-friendly)",
-                ))
+                DetailSection(
+                    "Common Mistakes",
+                    listOf(
+                        "Flaring elbows too wide (shoulder risk)",
+                        "Bouncing bar off chest (loss of control)",
+                        "Lifting glutes off bench",
+                        "Incomplete range of motion",
+                    )
+                )
             }
-            item { Spacer(Modifier.height(80.dp)) }
+            item {
+                DetailSection(
+                    "Substitutions",
+                    listOf(
+                        "Dumbbell Press (any equipment level)",
+                        "Push-Up (bodyweight alternative)",
+                        "Machine Chest Press (beginner-friendly)",
+                    )
+                )
+            }
         }
     }
 }
@@ -497,13 +664,33 @@ fun ExerciseDetailScreen(exerciseId: String, onBack: () -> Unit) {
 @Composable
 private fun DetailSection(title: String, items: List<String>) {
     val colors = AxiomTheme.colors
-    Column(modifier = Modifier.padding(bottom = Spacing.xxxl)) {
-        Text(title, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary, fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.height(Spacing.lg))
-        items.forEachIndexed { i, item ->
-            Row(modifier = Modifier.padding(bottom = Spacing.md)) {
-                Text("${i + 1}.", style = MaterialTheme.typography.bodyMedium, color = colors.primary, fontWeight = FontWeight.Bold, modifier = Modifier.width(24.dp))
-                Text(item, style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
+    AxiomCard(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(Spacing.xl)) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleMedium,
+                color = colors.textPrimary,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Spacer(Modifier.height(Spacing.lg))
+            items.forEachIndexed { i, item ->
+                Row(
+                    modifier = Modifier.padding(bottom = if (i < items.size - 1) Spacing.md else 0.dp),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Text(
+                        "${i + 1}.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.width(24.dp),
+                    )
+                    Text(
+                        item,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.textSecondary,
+                    )
+                }
             }
         }
     }

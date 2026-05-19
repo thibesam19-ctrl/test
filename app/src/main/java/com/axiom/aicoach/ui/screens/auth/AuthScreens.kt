@@ -1,18 +1,42 @@
 package com.axiom.aicoach.ui.screens.auth
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -24,12 +48,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.axiom.aicoach.ui.components.AxiomOutlinedButton
 import com.axiom.aicoach.ui.components.AxiomPrimaryButton
-import com.axiom.aicoach.ui.components.AxiomTopBar
+import com.axiom.aicoach.ui.components.AxiomSecondaryButton
 import com.axiom.aicoach.ui.theme.AxiomTheme
 import com.axiom.aicoach.ui.theme.Radius
 import com.axiom.aicoach.ui.theme.Spacing
+
+// ── SignInScreen ──────────────────────────────────────────────────────────────
 
 @Composable
 fun SignInScreen(
@@ -46,18 +71,28 @@ fun SignInScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val focusManager = LocalFocusManager.current
 
-    Scaffold(
-        topBar = { AxiomTopBar("Sign In", onBack = onBack) },
-        containerColor = colors.background,
-    ) { padding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background)
+            .systemBarsPadding(),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.xl, vertical = Spacing.xxxl),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .imePadding()
+                .padding(horizontal = Spacing.xl),
         ) {
+            // ── Inline back button ────────────────────────────────────────────
+            Spacer(Modifier.height(Spacing.xl))
+            IconButton(onClick = onBack, modifier = Modifier.size(40.dp)) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = colors.textPrimary)
+            }
+
+            Spacer(Modifier.height(Spacing.s32))
+
+            // ── Title ─────────────────────────────────────────────────────────
             Text(
                 text = "Welcome back",
                 style = MaterialTheme.typography.headlineLarge,
@@ -66,21 +101,26 @@ fun SignInScreen(
             )
             Spacer(Modifier.height(Spacing.md))
             Text(
-                text = "Sign in to continue your transformation",
+                text = "Sign in to continue",
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.textSecondary,
             )
+
             Spacer(Modifier.height(Spacing.s40))
 
+            // ── Fields ────────────────────────────────────────────────────────
             AxiomTextField(
                 value = email,
                 onValueChange = { email = it; errorMessage = null },
                 label = "Email",
                 leadingIcon = { Icon(Icons.Default.Email, null, tint = colors.textMuted) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next,
+                ),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
             )
-            Spacer(Modifier.height(Spacing.xl))
+            Spacer(Modifier.height(20.dp))
             AxiomTextField(
                 value = password,
                 onValueChange = { password = it; errorMessage = null },
@@ -89,14 +129,17 @@ fun SignInScreen(
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            null,
+                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null,
                             tint = colors.textMuted,
                         )
                     }
                 },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                ),
                 keyboardActions = KeyboardActions(onDone = {
                     focusManager.clearFocus()
                     if (email.isNotBlank() && password.isNotBlank()) {
@@ -108,15 +151,28 @@ fun SignInScreen(
 
             if (errorMessage != null) {
                 Spacer(Modifier.height(Spacing.md))
-                Text(errorMessage!!, style = MaterialTheme.typography.bodySmall, color = colors.error)
+                Text(
+                    text = errorMessage!!,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.error,
+                )
             }
 
             Spacer(Modifier.height(Spacing.md))
-            TextButton(onClick = onForgotPassword, modifier = Modifier.align(Alignment.End)) {
-                Text("Forgot password?", color = colors.primary)
+            TextButton(
+                onClick = onForgotPassword,
+                modifier = Modifier.align(Alignment.End),
+            ) {
+                Text(
+                    text = "Forgot password?",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = colors.primary,
+                )
             }
 
-            Spacer(Modifier.height(Spacing.xxxl))
+            Spacer(Modifier.height(Spacing.s32))
+
+            // ── Primary action ────────────────────────────────────────────────
             AxiomPrimaryButton(
                 text = "Sign In",
                 onClick = {
@@ -127,27 +183,46 @@ fun SignInScreen(
                 enabled = email.isNotBlank() && password.isNotBlank(),
                 loading = isLoading,
             )
-            Spacer(Modifier.height(Spacing.xl))
 
+            Spacer(Modifier.height(Spacing.xl))
             OrDivider()
-
             Spacer(Modifier.height(Spacing.xl))
-            AxiomOutlinedButton(
-                text = "Continue with Google",
+
+            // ── Google button ─────────────────────────────────────────────────
+            AxiomSecondaryButton(
+                text = "G   Continue with Google",
                 onClick = onSignInSuccess,
                 modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(Modifier.height(Spacing.s40))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Don't have an account? ", style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
+
+            // ── Bottom nav ────────────────────────────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = "Don't have an account? ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.textSecondary,
+                )
                 TextButton(onClick = onNavigateToSignUp) {
-                    Text("Sign Up", color = colors.primary, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = "Sign Up",
+                        color = colors.primary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 }
             }
+
+            Spacer(Modifier.height(Spacing.xxxl))
         }
     }
 }
+
+// ── SignUpScreen ──────────────────────────────────────────────────────────────
 
 @Composable
 fun SignUpScreen(
@@ -168,61 +243,108 @@ fun SignUpScreen(
     val passwordMatch = confirmPassword.isEmpty() || password == confirmPassword
     val isValid = name.isNotBlank() && email.contains("@") && password.length >= 8 && passwordMatch
 
-    Scaffold(
-        topBar = { AxiomTopBar("Create Account", onBack = onBack) },
-        containerColor = colors.background,
-    ) { padding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background)
+            .systemBarsPadding(),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.xl, vertical = Spacing.xxxl),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .imePadding()
+                .padding(horizontal = Spacing.xl),
         ) {
-            Text("Start your transformation", style = MaterialTheme.typography.headlineLarge, color = colors.textPrimary, fontWeight = FontWeight.Bold)
+            // ── Inline back button ────────────────────────────────────────────
+            Spacer(Modifier.height(Spacing.xl))
+            IconButton(onClick = onBack, modifier = Modifier.size(40.dp)) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = colors.textPrimary)
+            }
+
+            Spacer(Modifier.height(Spacing.s32))
+
+            // ── Title ─────────────────────────────────────────────────────────
+            Text(
+                text = "Create your account",
+                style = MaterialTheme.typography.headlineLarge,
+                color = colors.textPrimary,
+                fontWeight = FontWeight.Bold,
+            )
             Spacer(Modifier.height(Spacing.md))
-            Text("7-day free trial, no credit card required", style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
+            Text(
+                text = "7-day free trial, no card required",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.textSecondary,
+            )
+
             Spacer(Modifier.height(Spacing.s40))
 
-            AxiomTextField(value = name, onValueChange = { name = it }, label = "Full Name",
+            // ── Fields ────────────────────────────────────────────────────────
+            AxiomTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = "Full Name",
                 leadingIcon = { Icon(Icons.Default.Person, null, tint = colors.textMuted) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
             )
-            Spacer(Modifier.height(Spacing.xl))
-            AxiomTextField(value = email, onValueChange = { email = it }, label = "Email",
+            Spacer(Modifier.height(20.dp))
+            AxiomTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = "Email",
                 leadingIcon = { Icon(Icons.Default.Email, null, tint = colors.textMuted) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next,
+                ),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
             )
-            Spacer(Modifier.height(Spacing.xl))
-            AxiomTextField(value = password, onValueChange = { password = it }, label = "Password",
+            Spacer(Modifier.height(20.dp))
+            AxiomTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = "Password",
                 leadingIcon = { Icon(Icons.Default.Lock, null, tint = colors.textMuted) },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, null, tint = colors.textMuted)
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null,
+                            tint = colors.textMuted,
+                        )
                     }
                 },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next,
+                ),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
             )
             if (password.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
                 PasswordStrengthBar(passwordStrength)
             }
-            Spacer(Modifier.height(Spacing.xl))
-            AxiomTextField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = "Confirm Password",
+            Spacer(Modifier.height(20.dp))
+            AxiomTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = "Confirm Password",
                 leadingIcon = { Icon(Icons.Default.Lock, null, tint = colors.textMuted) },
                 visualTransformation = PasswordVisualTransformation(),
                 isError = !passwordMatch,
                 supportingText = if (!passwordMatch) "Passwords don't match" else null,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                ),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
 
             Spacer(Modifier.height(Spacing.s40))
+
             AxiomPrimaryButton(
                 text = "Create Account",
                 onClick = { isLoading = true; onSignUpSuccess() },
@@ -230,21 +352,44 @@ fun SignUpScreen(
                 enabled = isValid,
                 loading = isLoading,
             )
+
             Spacer(Modifier.height(Spacing.xl))
             OrDivider()
             Spacer(Modifier.height(Spacing.xl))
-            AxiomOutlinedButton(text = "Continue with Google", onClick = onSignUpSuccess, modifier = Modifier.fillMaxWidth())
+
+            AxiomSecondaryButton(
+                text = "G   Continue with Google",
+                onClick = onSignUpSuccess,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
             Spacer(Modifier.height(Spacing.s40))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Already have an account? ", style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = "Already have an account? ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.textSecondary,
+                )
                 TextButton(onClick = onNavigateToSignIn) {
-                    Text("Sign In", color = colors.primary, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = "Sign In",
+                        color = colors.primary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 }
             }
+
+            Spacer(Modifier.height(Spacing.xxxl))
         }
     }
 }
+
+// ── PasswordResetScreen ───────────────────────────────────────────────────────
 
 @Composable
 fun PasswordResetScreen(onBack: () -> Unit) {
@@ -252,30 +397,68 @@ fun PasswordResetScreen(onBack: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var sent by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = { AxiomTopBar("Reset Password", onBack = onBack) },
-        containerColor = colors.background,
-    ) { padding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background)
+            .systemBarsPadding(),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = Spacing.xl, vertical = Spacing.xxxl),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(horizontal = Spacing.xl),
         ) {
+            Spacer(Modifier.height(Spacing.xl))
+            IconButton(onClick = onBack, modifier = Modifier.size(40.dp)) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = colors.textPrimary)
+            }
+
             if (sent) {
-                Spacer(Modifier.height(80.dp))
-                Text("📧", style = MaterialTheme.typography.displayLarge)
-                Spacer(Modifier.height(Spacing.xxxl))
-                Text("Check your email", style = MaterialTheme.typography.headlineMedium, color = colors.textPrimary, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(Spacing.xl))
-                Text("We sent a reset link to $email", style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary, textAlign = TextAlign.Center)
+                // ── Success state ─────────────────────────────────────────────
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = Spacing.xl),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Text("✉️", style = MaterialTheme.typography.displayLarge, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(Spacing.xxxl))
+                    Text(
+                        text = "Sent!",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = colors.success,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(Spacing.xl))
+                    Text(
+                        text = "Check your inbox — we sent a reset link to $email",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.textSecondary,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             } else {
-                Text("Forgot your password?", style = MaterialTheme.typography.headlineLarge, color = colors.textPrimary, fontWeight = FontWeight.Bold)
+                // ── Form state ────────────────────────────────────────────────
+                Spacer(Modifier.height(Spacing.s32))
+                Text(
+                    text = "Forgot your password?",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = colors.textPrimary,
+                    fontWeight = FontWeight.Bold,
+                )
                 Spacer(Modifier.height(Spacing.md))
-                Text("Enter your email and we'll send a reset link.", style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
+                Text(
+                    text = "Enter your email and we'll send a reset link.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.textSecondary,
+                )
                 Spacer(Modifier.height(Spacing.s40))
-                AxiomTextField(value = email, onValueChange = { email = it }, label = "Email",
+                AxiomTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = "Email",
                     leadingIcon = { Icon(Icons.Default.Email, null, tint = colors.textMuted) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 )
@@ -356,7 +539,10 @@ fun PasswordStrengthBar(strength: PasswordStrength) {
         PasswordStrength.GOOD -> colors.info to "Good"
         PasswordStrength.STRONG -> colors.success to "Strong"
     }
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
         repeat(4) { i ->
             val filled = i < strength.ordinal + 1
             Box(
@@ -367,7 +553,7 @@ fun PasswordStrengthBar(strength: PasswordStrength) {
                     .let {
                         if (filled) it.background(color, Radius.pill)
                         else it.background(colors.borderSubtle, Radius.pill)
-                    }
+                    },
             )
         }
         Text(label, style = MaterialTheme.typography.labelSmall, color = color)
