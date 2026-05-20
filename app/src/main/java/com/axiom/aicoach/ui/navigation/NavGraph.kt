@@ -31,6 +31,9 @@ import com.axiom.aicoach.ui.screens.progress.BodyMeasurementsScreen
 import com.axiom.aicoach.ui.screens.progress.PhotoGalleryScreen
 import com.axiom.aicoach.ui.screens.progress.ProgressOverviewScreen
 import com.axiom.aicoach.ui.screens.progress.WeightHistoryScreen
+import com.axiom.aicoach.ui.screens.legal.LegalHubScreen
+import com.axiom.aicoach.ui.screens.legal.PrivacyPolicyScreen
+import com.axiom.aicoach.ui.screens.legal.TermsOfServiceScreen
 import com.axiom.aicoach.ui.screens.settings.AiConsentScreen
 import com.axiom.aicoach.ui.screens.settings.NotificationSettingsScreen
 import com.axiom.aicoach.ui.screens.settings.PrivacyScreen
@@ -82,6 +85,9 @@ sealed class Screen(val route: String) {
     object NotificationSettings : Screen("notification_settings")
     object Privacy : Screen("privacy")
     object AiConsent : Screen("ai_consent")
+    object LegalHub : Screen("legal_hub")
+    object PrivacyPolicy : Screen("privacy_policy")
+    object TermsOfService : Screen("terms_of_service")
 }
 
 @Composable
@@ -254,6 +260,7 @@ fun AxiomNavGraph(
                 onNotifications = { navController.navigate(Screen.NotificationSettings.route) },
                 onPrivacy = { navController.navigate(Screen.Privacy.route) },
                 onAiConsent = { navController.navigate(Screen.AiConsent.route) },
+                onLegalHub = { navController.navigate(Screen.LegalHub.route) },
                 onBack = { navController.popBackStack() },
             )
         }
