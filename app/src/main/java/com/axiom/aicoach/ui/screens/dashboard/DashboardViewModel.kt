@@ -13,6 +13,10 @@ import com.axiom.aicoach.data.local.dao.UserProfileDao
 import com.axiom.aicoach.data.local.dao.WaterLogDao
 import com.axiom.aicoach.util.toDbString
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.axiom.aicoach.data.local.entities.FoodLogEntity
+import com.axiom.aicoach.data.local.entities.StreakEntity
+import com.axiom.aicoach.data.local.entities.UserProfileEntity
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

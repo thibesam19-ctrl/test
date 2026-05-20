@@ -10,4 +10,6 @@
 local.properties
 *.jks
 *.keystore
-google-services.json
+# google-services.json with real credentials — commit the placeholder only
+# Real credentials must be configured via Firebase console + CI secrets
+# google-services.json
