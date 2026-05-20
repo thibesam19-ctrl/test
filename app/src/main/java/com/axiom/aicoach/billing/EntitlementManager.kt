@@ -59,7 +59,7 @@ class EntitlementManager @Inject constructor() {
     /** Restores previous purchases from RevenueCat and refreshes the cached tier. */
     suspend fun restorePurchases() {
         try {
-            val customerInfo = suspendCoroutine { cont ->
+            val customerInfo = suspendCoroutine<CustomerInfo?> { cont ->
                 Purchases.sharedInstance.restorePurchases(object : ReceiveCustomerInfoCallback {
                     override fun onReceived(customerInfo: CustomerInfo) {
                         cont.resume(customerInfo)

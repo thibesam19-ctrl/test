@@ -10,6 +10,7 @@ import com.axiom.aicoach.data.local.dao.WorkoutSessionDao
 import com.axiom.aicoach.domain.model.FitnessGoal
 import com.axiom.aicoach.util.toDbString
 import java.time.LocalDate
+import kotlinx.coroutines.flow.first
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -178,18 +179,11 @@ class InsightsEngine @Inject constructor(
 
         // ── 6. Hydration Low ─────────────────────────────────────────────────
         val todayStr = today.toDbString()
-        // Use first() on the flow by collecting it once
-        val todayWaterTotal = waterLogDao.observeTotalForDate(userId, todayStr)
-            .let { flow ->
-                // Collect the first emitted value synchronously via kotlinx.coroutines
-                var total = 0f
-                try {
-                    kotlinx.coroutines.flow.first(flow).also { total = it }
-                } catch (e: Exception) {
-                    // no data
-                }
-                total
-            }
+        val todayWaterTotal = try {
+            waterLogDao.observeTotalForDate(userId, todayStr).first()
+        } catch (e: Exception) {
+            0f
+        }
 
         if (todayWaterTotal < 1500f) {
             insights.add(
