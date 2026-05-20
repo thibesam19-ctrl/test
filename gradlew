@@ -40,16 +40,14 @@ do
     esac
 done
 
-# This is reliable cross-platform.
 APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
 
 APP_NAME="Gradle"
 APP_BASE_NAME=${0##*/}
 
-# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+# JVM options for the Gradle wrapper process (no inner quotes — plain word-split).
+DEFAULT_JVM_OPTS="-Xmx64m -Xms64m"
 
-# Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD=maximum
 
 warn () {
@@ -76,7 +74,6 @@ case "$( uname )" in                #(
 esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
-
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
@@ -107,8 +104,6 @@ fi
 if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
     case $MAX_FD in #(
       max*)
-        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
-        # shellcheck disable=SC2039,SC3045
         MAX_FD=$( ulimit -H -n ) ||
             warn "Could not query maximum file descriptor limit"
         ;;
@@ -116,52 +111,24 @@ if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
     case $MAX_FD in  #(
       '' | soft) :;; #(
       *)
-        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
-        # shellcheck disable=SC2039,SC3045
         ulimit -n "$MAX_FD" ||
             warn "Could not set maximum file descriptor limit to $MAX_FD"
         ;;
     esac
 fi
 
-# Collect all arguments for the java command;
-#   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
-#     shell script including quotes and variable substitutions, so put them in
-#     double quotes to make sure that they get re-expanded; and
-#   * put everything else in single quotes, so that it's not re-expanded.
-
-set -- \
-        "-Dorg.gradle.appname=$APP_BASE_NAME" \
-        -classpath "$CLASSPATH" \
-        org.gradle.wrapper.GradleWrapperMain \
-        "$@"
-
-# Stop when "xargs" is not available.
-if ! command -v xargs >/dev/null 2>&1
-then
-    die "xargs is not available"
+# For Cygwin or MSYS, switch paths to Windows format before running java.
+if "$cygwin" || "$msys" ; then
+    APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
+    CLASSPATH=$( cygpath --path --mixed "$CLASSPATH" )
+    JAVACMD=$( cygpath --unix "$JAVACMD" )
 fi
 
-# Use "xargs" to parse quoted args.
-#
-# With -n1 it outputs one arg per line, with the quotes and backslashes removed.
-#
-# In Bash we could simply go:
-#
-#   readarray ARGS < <( xargs -n1 <<<"$DEFAULT_JVM_OPTS" )
-#
-# but POSIX shell has neither arrays nor command substitution with redirection
-# (i.e. `<(...)` syntax).
-#
-# With `set`, we can apply a template for multiple arguments. However, this
-# requires some care with quoting, to not lose any arguments.
-
+# $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS are intentionally
+# unquoted so shell word-splitting turns them into individual flags.
 # shellcheck disable=SC2086
-eval "set -- $(
-        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
-        xargs -n1 |
-        sed ' s~[^a-zA-Z0-9/=@_-]~\\&~g; ' |
-        tr '\n' ' '
-    )" '"$@"'
-
-exec "$JAVACMD" "$@"
+exec "$JAVACMD" $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS \
+    -classpath "$CLASSPATH" \
+    "-Dorg.gradle.appname=$APP_BASE_NAME" \
+    org.gradle.wrapper.GradleWrapperMain \
+    "$@"
