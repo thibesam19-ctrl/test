@@ -11,6 +11,9 @@ jobs:
   build:
     name: Build Debug APK
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+      JAVA_TOOL_OPTIONS: ""
 
     steps:
       - name: Checkout code
@@ -86,6 +89,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     needs: build
+    env:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+      JAVA_TOOL_OPTIONS: ""
 
     steps:
       - name: Checkout code
