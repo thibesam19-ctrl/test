@@ -279,5 +279,18 @@ fun AxiomNavGraph(
         composable(Screen.AiConsent.route) {
             AiConsentScreen(onBack = { navController.popBackStack() })
         }
+        composable(Screen.LegalHub.route) {
+            LegalHubScreen(
+                onPrivacyPolicy = { navController.navigate(Screen.PrivacyPolicy.route) },
+                onTermsOfService = { navController.navigate(Screen.TermsOfService.route) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(Screen.PrivacyPolicy.route) {
+            PrivacyPolicyScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.TermsOfService.route) {
+            TermsOfServiceScreen(onBack = { navController.popBackStack() })
+        }
     }
 }
