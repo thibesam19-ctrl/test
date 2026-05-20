@@ -79,6 +79,8 @@ import com.axiom.aicoach.ui.theme.AxiomMotion
 import com.axiom.aicoach.ui.theme.AxiomTheme
 import com.axiom.aicoach.ui.theme.Radius
 import com.axiom.aicoach.ui.theme.Spacing
+import android.provider.Settings
+import androidx.compose.ui.platform.LocalContext
 
 // ---------------------------------------------------------------------------
 // AxiomTopBar
@@ -338,7 +340,9 @@ fun AxiomCard(
 
     Card(
         modifier = if (onClick != null) {
-            baseModifier.clickable(onClick = onClick)
+            baseModifier
+                .semantics { role = Role.Button }
+                .clickable(onClick = onClick)
         } else {
             baseModifier
         },
@@ -784,4 +788,30 @@ fun ConfettiOverlay(visible: Boolean) {
             )
         }
     }
+}
+
+// ---------------------------------------------------------------------------
+// ReducedMotionProvider
+// ---------------------------------------------------------------------------
+
+/**
+ * Checks the system "Remove animations" accessibility setting and provides the
+ * result via [LocalReducedMotion]. Wrap screens or individual animated
+ * composables with this to automatically respect the user's motion preference.
+ */
+val LocalReducedMotion = androidx.compose.runtime.compositionLocalOf { false }
+
+@Composable
+fun ReducedMotionProvider(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    val animatorScale = Settings.Global.getFloat(
+        context.contentResolver,
+        Settings.Global.ANIMATOR_DURATION_SCALE,
+        1f,
+    )
+    val reducedMotion = animatorScale == 0f
+    androidx.compose.runtime.CompositionLocalProvider(
+        LocalReducedMotion provides reducedMotion,
+        content = content,
+    )
 }

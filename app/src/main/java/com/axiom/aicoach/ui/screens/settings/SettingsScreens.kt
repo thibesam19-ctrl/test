@@ -45,6 +45,7 @@ fun SettingsScreen(
     onNotifications: () -> Unit,
     onPrivacy: () -> Unit,
     onAiConsent: () -> Unit = {},
+    onLegalHub: () -> Unit = {},
     onBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -70,6 +71,9 @@ fun SettingsScreen(
             SettingsItem(Icons.Default.Help, "Help Center", "FAQs & guides"),
             SettingsItem(Icons.Default.Feedback, "Send Feedback", "Report a bug or request"),
             SettingsItem(Icons.Default.Info, "About Axiom", ""),
+        ),
+        "Legal" to listOf(
+            SettingsItem(Icons.Default.Gavel, "Legal", "Privacy Policy & Terms of Service", onLegalHub),
         ),
     )
 

@@ -11,7 +11,7 @@ class SubscriptionManager @Inject constructor(
 
     /** Exposes the current [SubscriptionTier] as a [StateFlow]. */
     val currentTier: StateFlow<SubscriptionTier> =
-        entitlementManager.getCurrentTier() as StateFlow<SubscriptionTier>
+        entitlementManager.getCurrentTierAsStateFlow()
 
     /** Returns true when the user is on any paid tier. */
     val isPremium: Boolean
