@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Bold "A" shape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,12 L88,88 L72,88 L64,68 L44,68 L36,88 L20,88 Z M54,32 L68,62 L40,62 Z" />
+    <!-- Horizontal crossbar -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,54 L70,54 L70,60 L38,60 Z" />
+</vector>
