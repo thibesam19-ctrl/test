@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -54,6 +55,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
@@ -144,6 +151,7 @@ fun AxiomPrimaryButton(
     loading: Boolean = false,
 ) {
     val colors = AxiomTheme.colors
+    val haptic = LocalHapticFeedback.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -154,10 +162,18 @@ fun AxiomPrimaryButton(
     )
 
     Button(
-        onClick = onClick,
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            onClick()
+        },
         modifier = modifier
+            .defaultMinSize(minHeight = 48.dp)
             .height(52.dp)
-            .scale(scale),
+            .scale(scale)
+            .semantics {
+                role = Role.Button
+                contentDescription = text
+            },
         enabled = enabled && !loading,
         shape = Radius.md,
         interactionSource = interactionSource,
@@ -262,9 +278,19 @@ fun AxiomGhostButton(
     enabled: Boolean = true,
 ) {
     val colors = AxiomTheme.colors
+    val haptic = LocalHapticFeedback.current
     TextButton(
-        onClick = onClick,
-        modifier = modifier.height(48.dp),
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            onClick()
+        },
+        modifier = modifier
+            .defaultMinSize(minHeight = 48.dp)
+            .height(48.dp)
+            .semantics {
+                role = Role.Button
+                contentDescription = text
+            },
         enabled = enabled,
         shape = Radius.md,
         colors = ButtonDefaults.textButtonColors(
