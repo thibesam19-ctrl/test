@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axiom AI Coach — App Preview</title>
+<style>
+  :root {
+    --bg:         #F5F9FF;
+    --surface:    #FFFFFF;
+    --primary:    #2563EB;
+    --primary-dk: #1D4ED8;
+    --primary-lt: #DBEAFE;
+    --secondary:  #06B6D4;
+    --accent:     #8B5CF6;
+    --text1:      #0F172A;
+    --text2:      #475569;
+    --text3:      #64748B;
+    --border:     #CBD5E1;
+    --border-sub: #E2E8F0;
+    --success:    #16A34A;
+    --success-bg: #DCFCE7;
+    --warning:    #F59E0B;
+    --error:      #DC2626;
+    --error-bg:   #FEE2E2;
+    --info:       #0EA5E9;
+    --disabled:   #E2E8F0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'SF Pro Display', BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #1E293B;
+    color: var(--text1);
+    min-height: 100vh;
+  }
+
+  /* ── Page Layout ── */
+  .page-header {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+    padding: 48px 40px 32px;
+    text-align: center;
+  }
+  .page-header h1 { font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .page-header p  { color: #94A3B8; margin-top: 8px; font-size: 15px; }
+  .badge { display: inline-block; background: var(--primary); color: #fff;
+    border-radius: 999px; padding: 4px 14px; font-size: 12px; font-weight: 600;
+    margin-top: 12px; letter-spacing: 0.5px; }
+
+  .screens-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+    padding: 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* ── Phone Frame ── */
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .phone-label { color: #94A3B8; font-size: 13px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1px; }
+  .phone {
+    width: 320px;
+    height: 693px;
+    background: var(--bg);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 0 0 8px #1E293B, 0 0 0 10px #334155, 0 32px 64px rgba(0,0,0,0.5);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 20px 4px;
+    background: var(--bg);
+    font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .status-bar .notch {
+    width: 80px; height: 20px; background: #0F172A;
+    border-radius: 0 0 14px 14px;
+    position: absolute; left: 50%; transform: translateX(-50%);
+    top: 0;
+  }
+  .status-icons { display: flex; gap: 4px; align-items: center; }
+
+  /* ── Screen Content ── */
+  .screen { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+  .screen::-webkit-scrollbar { width: 0; }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav {
+    display: flex; height: 72px; background: var(--surface);
+    border-top: 1px solid var(--border-sub);
+    flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 3px; cursor: pointer;
+    font-size: 10px; font-weight: 500; color: var(--text3);
+  }
+  .nav-item.active { color: var(--primary); }
+  .nav-item .nav-icon { font-size: 20px; }
+
+  /* ── Typography helpers ── */
+  .text-xs   { font-size: 11px; }
+  .text-sm   { font-size: 13px; }
+  .text-base { font-size: 15px; }
+  .text-lg   { font-size: 17px; }
+  .text-xl   { font-size: 20px; }
+  .text-2xl  { font-size: 24px; }
+  .text-3xl  { font-size: 30px; }
+  .fw-400 { font-weight: 400; }
+  .fw-500 { font-weight: 500; }
+  .fw-600 { font-weight: 600; }
+  .fw-700 { font-weight: 700; }
+  .fw-800 { font-weight: 800; }
+  .text-primary   { color: var(--primary); }
+  .text-secondary { color: var(--text2); }
+  .text-muted     { color: var(--text3); }
+  .text-white     { color: #fff; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.07), 0 4px 12px rgba(15,23,42,.05);
+    border: 1px solid var(--border-sub);
+    padding: 16px;
+  }
+
+  /* ── Button ── */
+  .btn-primary {
+    background: var(--primary); color: #fff; border: none; border-radius: 14px;
+    padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+    width: 100%; text-align: center;
+  }
+  .btn-secondary {
+    background: var(--primary-lt); color: var(--primary); border: none; border-radius: 14px;
+    padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+    width: 100%; text-align: center;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--text2); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+    width: 100%; text-align: center;
+  }
+
+  /* ── Progress Ring ── */
+  .ring-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+  .ring-center { position: absolute; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+  /* ── Progress Bar ── */
+  .progress-track { background: var(--border-sub); border-radius: 999px; height: 6px; width: 100%; }
+  .progress-fill  { height: 6px; border-radius: 999px; }
+
+  /* ── Chip ── */
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--primary-lt); color: var(--primary);
+    border-radius: 999px; padding: 6px 12px;
+    font-size: 12px; font-weight: 600;
+  }
+  .chip-neutral {
+    background: var(--border-sub); color: var(--text2);
+  }
+  .chip-success {
+    background: var(--success-bg); color: var(--success);
+  }
+
+  /* ── Top App Bar ── */
+  .top-bar {
+    padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+    background: var(--bg);
+  }
+  .top-bar .title { flex: 1; font-size: 17px; font-weight: 700; color: var(--text1); }
+  .back-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--surface); display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-sub); font-size: 16px; cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.06);
+  }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--surface); display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-sub); font-size: 16px; cursor: pointer;
+  }
+
+  /* ── Avatar ── */
+  .avatar {
+    width: 40px; height: 40px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .avatar-sm {
+    width: 32px; height: 32px; font-size: 13px;
+  }
+
+  /* ── Tag ── */
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .tag-primary { background: var(--primary-lt); color: var(--primary); }
+  .tag-success { background: var(--success-bg); color: var(--success); }
+  .tag-warning { background: #FEF3C7; color: #B45309; }
+  .tag-purple  { background: #EDE9FE; color: #7C3AED; }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--border-sub); margin: 8px 0; }
+
+  /* ── Input ── */
+  .input-wrap {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 12px 14px;
+  }
+  .input-wrap.focused { border-color: var(--primary); }
+  .input-placeholder { color: var(--text3); font-size: 14px; flex: 1; }
+
+  /* ── Separator ── */
+  .section-pad { padding: 0 16px; }
+  .section-gap { height: 12px; }
+
+  /* ── Gradient Card ── */
+  .gradient-card {
+    border-radius: 20px;
+    padding: 20px;
+    color: #fff;
+  }
+  .gradient-blue { background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 60%, #0EA5E9 100%); }
+  .gradient-teal { background: linear-gradient(135deg, #0E7490 0%, #06B6D4 100%); }
+  .gradient-purple { background: linear-gradient(135deg, #6D28D9 0%, #8B5CF6 100%); }
+  .gradient-green { background: linear-gradient(135deg, #15803D 0%, #16A34A 100%); }
+
+  /* ── Chat bubble ── */
+  .bubble {
+    max-width: 82%; border-radius: 18px; padding: 10px 14px;
+    font-size: 13.5px; line-height: 1.5;
+  }
+  .bubble-user {
+    background: var(--primary); color: #fff;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+  }
+  .bubble-ai {
+    background: var(--surface); color: var(--text1);
+    border-bottom-left-radius: 4px;
+    border: 1px solid var(--border-sub);
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    align-self: flex-start;
+  }
+
+  /* ── Exercise row ── */
+  .exercise-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0;
+  }
+  .exercise-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--primary-lt); display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+
+  /* ── Pulse animation (typing indicator) ── */
+  @keyframes pulse { 0%,100%{opacity:.4;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); display: inline-block; animation: pulse 1.4s infinite; }
+  .dot:nth-child(2) { animation-delay: .2s; }
+  .dot:nth-child(3) { animation-delay: .4s; }
+
+  /* ── Macro circle ── */
+  .macro-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Rest timer ── */
+  .rest-banner {
+    background: linear-gradient(135deg, #7C3AED, #8B5CF6);
+    color: #fff; border-radius: 14px; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 16px; font-weight: 700; color: var(--text1);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .see-all { font-size: 12px; font-weight: 600; color: var(--primary); }
+
+  /* ── Onboarding ── */
+  .option-card {
+    border: 2px solid var(--border-sub); border-radius: 14px;
+    padding: 14px 16px; cursor: pointer; background: var(--surface);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .option-card.selected { border-color: var(--primary); background: var(--primary-lt); }
+
+  /* ── Water bar ── */
+  .water-segment { flex: 1; height: 8px; border-radius: 999px; background: var(--border-sub); margin: 0 2px; }
+  .water-segment.filled { background: var(--secondary); }
+
+  /* ── Overlay callout ── */
+  .insight-card {
+    border-radius: 14px; padding: 14px 16px;
+    border-left: 4px solid;
+    background: var(--surface);
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+
+  /* ── Form analysis overlay ── */
+  .camera-frame {
+    width: 100%; aspect-ratio: 3/4;
+    background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
+    border-radius: 16px; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .skeleton-human {
+    opacity: .55; font-size: 120px; color: #06B6D4;
+    filter: drop-shadow(0 0 12px rgba(6,182,212,.4));
+  }
+  .overlay-label {
+    position: absolute; padding: 4px 10px; border-radius: 999px;
+    font-size: 10px; font-weight: 700; color: #fff;
+  }
+
+  /* ── Progress photo ── */
+  .photo-box {
+    aspect-ratio: 3/4; border-radius: 12px; overflow: hidden;
+    background: linear-gradient(180deg, #DBEAFE 0%, #F5F9FF 100%);
+    display: flex; align-items: flex-end; justify-content: center;
+    font-size: 64px; padding-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>⚡ Axiom AI Coach</h1>
+  <p>Premium AI-Powered Fitness Transformation Platform</p>
+  <span class="badge">Jetpack Compose · Material 3 · Kotlin · MVVM · Room · Hilt</span>
+</div>
+
+<div class="screens-grid">
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 1: WELCOME
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Welcome</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="color:var(--text1);font-size:11px;">9:41</span>
+        <div class="status-icons">
+          <span>📶</span><span>🔋</span>
+        </div>
+      </div>
+
+      <div class="screen" style="background: var(--bg); padding: 0;">
+        <!-- Hero Logo -->
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 32px 24px 0;">
+          <!-- Logo mark -->
+          <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#1D4ED8 0%,#06B6D4 100%);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 24px rgba(37,99,235,.3);">
+            <span style="font-size:36px;">⚡</span>
+          </div>
+          <div style="font-size:32px;font-weight:800;color:var(--primary);letter-spacing:4px;">AXIOM</div>
+          <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:6px;margin-top:2px;">AI COACH</div>
+
+          <!-- Carousel card -->
+          <div style="margin-top:48px;width:100%;text-align:center;">
+            <div style="font-size:56px;margin-bottom:16px;">🧠</div>
+            <div style="font-size:20px;font-weight:800;color:var(--text1);line-height:1.2;margin-bottom:8px;">Your AI Personal<br>Trainer</div>
+            <div style="font-size:14px;color:var(--text2);line-height:1.5;">Expert workout plans tailored to<br>your body, goals, and schedule.</div>
+          </div>
+
+          <!-- Dots -->
+          <div style="display:flex;gap:6px;margin-top:28px;align-items:center;">
+            <div style="width:20px;height:8px;border-radius:999px;background:var(--primary);"></div>
+            <div style="width:8px;height:8px;border-radius:999px;background:var(--border);"></div>
+            <div style="width:8px;height:8px;border-radius:999px;background:var(--border);"></div>
+          </div>
+        </div>
+
+        <!-- Bottom CTAs -->
+        <div style="padding:24px 24px 32px;gap:10px;display:flex;flex-direction:column;">
+          <div class="btn-primary">Get Started Free</div>
+          <div class="btn-ghost">Sign In</div>
+          <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:4px;">
+            By continuing you agree to our <span style="color:var(--primary);">Terms</span> & <span style="color:var(--primary);">Privacy Policy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 2: DASHBOARD
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Dashboard</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="color:var(--text1);font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);">
+        <!-- Greeting bar -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px 6px;">
+          <div>
+            <div style="font-size:13px;color:var(--text2);">Good morning 👋</div>
+            <div style="font-size:19px;font-weight:800;color:var(--text1);">Alex Carter</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="background:var(--primary);color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;">🔥 14</div>
+            <div class="icon-btn">⚙️</div>
+          </div>
+        </div>
+
+        <!-- Calorie Hero Card -->
+        <div style="padding:0 16px 12px;">
+          <div class="gradient-card gradient-blue">
+            <div style="font-size:12px;font-weight:600;opacity:.8;margin-bottom:12px;">TODAY'S NUTRITION</div>
+            <div style="display:flex;align-items:center;gap:16px;">
+              <!-- Ring -->
+              <div class="ring-wrap">
+                <svg width="90" height="90" viewBox="0 0 90 90">
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="8"/>
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="#fff" stroke-width="8"
+                    stroke-dasharray="238.76" stroke-dashoffset="71.6"
+                    stroke-linecap="round" transform="rotate(-90 45 45)"/>
+                </svg>
+                <div class="ring-center" style="color:#fff;">
+                  <div style="font-size:18px;font-weight:800;">1,640</div>
+                  <div style="font-size:9px;opacity:.8;">/ 2,100 kcal</div>
+                </div>
+              </div>
+              <!-- Macros -->
+              <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                    <span style="font-size:11px;opacity:.85;">Protein</span>
+                    <span style="font-size:11px;font-weight:700;">118g / 158g</span>
+                  </div>
+                  <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.25);">
+                    <div style="height:5px;border-radius:999px;background:#fff;width:75%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                    <span style="font-size:11px;opacity:.85;">Carbs</span>
+                    <span style="font-size:11px;font-weight:700;">182g / 220g</span>
+                  </div>
+                  <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.25);">
+                    <div style="height:5px;border-radius:999px;background:#93C5FD;width:83%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                    <span style="font-size:11px;opacity:.85;">Fat</span>
+                    <span style="font-size:11px;font-weight:700;">48g / 70g</span>
+                  </div>
+                  <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.25);">
+                    <div style="height:5px;border-radius:999px;background:#BAE6FD;width:69%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Quick log buttons -->
+            <div style="display:flex;gap:8px;margin-top:14px;">
+              <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;font-size:11px;font-weight:600;color:#fff;">+ Breakfast</div>
+              <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;font-size:11px;font-weight:600;color:#fff;">+ Lunch</div>
+              <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;font-size:11px;font-weight:600;color:#fff;">+ Snack</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Water Card -->
+        <div style="padding:0 16px 12px;">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="font-size:14px;font-weight:700;">💧 Hydration</div>
+              <div style="font-size:12px;color:var(--text2);">1,800 / 2,400 ml</div>
+            </div>
+            <div style="display:flex;gap:3px;margin-bottom:6px;">
+              <div class="water-segment filled"></div><div class="water-segment filled"></div>
+              <div class="water-segment filled"></div><div class="water-segment filled"></div>
+              <div class="water-segment filled"></div><div class="water-segment filled"></div>
+              <div class="water-segment"></div><div class="water-segment"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text3);">75% of daily goal · 2 glasses remaining</div>
+          </div>
+        </div>
+
+        <!-- AI Insight -->
+        <div style="padding:0 16px 6px;">
+          <div class="section-title" style="margin-bottom:10px;">
+            <span>AI Insights</span><span class="see-all">View All</span>
+          </div>
+          <div class="insight-card" style="border-left-color:var(--primary);margin-bottom:8px;">
+            <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:4px;">🎯 Protein target on track</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;">You're hitting 75% of your protein goal. Add a Greek yogurt post-workout to reach your target.</div>
+          </div>
+          <div class="insight-card" style="border-left-color:var(--warning);">
+            <div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:4px;">⚠️ Rest day recommended</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;">You've trained 4 days in a row. Schedule recovery today to prevent overtraining.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <div class="nav-item active"><div class="nav-icon">🏠</div>Home</div>
+        <div class="nav-item"><div class="nav-icon">🏋️</div>Train</div>
+        <div class="nav-item"><div class="nav-icon">🥗</div>Nutrition</div>
+        <div class="nav-item"><div class="nav-icon">📈</div>Progress</div>
+        <div class="nav-item"><div class="nav-icon">🤖</div>Coach</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 3: AI COACH CHAT
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">AI Coach Chat</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);">
+        <!-- Header -->
+        <div style="padding:10px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-sub);background:var(--surface);">
+          <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#1D4ED8,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;">Coach Axiom</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--success);">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--success);"></div>
+              Online · AI-powered
+            </div>
+          </div>
+          <div class="icon-btn">⋮</div>
+        </div>
+
+        <!-- Chat messages -->
+        <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
+          <!-- AI intro -->
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <div style="width:28px;height:28px;border-radius:999px;background:linear-gradient(135deg,#1D4ED8,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🤖</div>
+            <div class="bubble bubble-ai">
+              Hey! I'm Coach Axiom 👋<br><br>
+              I'm here to help with workouts, nutrition, recovery, and motivation.<br><br>
+              What's on your mind today? 💪
+            </div>
+          </div>
+
+          <!-- User message -->
+          <div class="bubble bubble-user" style="margin-left:auto;">
+            Can you build me a cutting plan? I want to lose 8kg in 10 weeks
+          </div>
+
+          <!-- AI response -->
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <div style="width:28px;height:28px;border-radius:999px;background:linear-gradient(135deg,#1D4ED8,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🤖</div>
+            <div class="bubble bubble-ai">
+              Great goal! 8kg in 10 weeks = 0.8kg/week — aggressive but achievable. Here's your plan:
+              <br><br>
+              <strong>🍽️ Calories:</strong> 1,850 kcal/day (500 deficit)<br>
+              <strong>💪 Protein:</strong> 160g (2g/kg body weight)<br>
+              <strong>🏋️ Training:</strong> 4×/week strength + 2× cardio<br>
+              <strong>💧 Water:</strong> 3L daily
+              <br><br>
+              Want me to generate your meal plan and workout schedule?
+            </div>
+          </div>
+
+          <!-- Typing indicator -->
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <div style="width:28px;height:28px;border-radius:999px;background:linear-gradient(135deg,#1D4ED8,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🤖</div>
+            <div class="bubble bubble-ai" style="padding:12px 16px;">
+              <div style="display:flex;gap:5px;align-items:center;">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suggested prompts -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+            <div style="background:var(--surface);border:1.5px solid var(--primary-lt);border-radius:999px;padding:7px 12px;font-size:11px;font-weight:600;color:var(--primary);">Yes, generate plan 🚀</div>
+            <div style="background:var(--surface);border:1.5px solid var(--border-sub);border-radius:999px;padding:7px 12px;font-size:11px;font-weight:600;color:var(--text2);">Show macros breakdown</div>
+          </div>
+        </div>
+
+        <!-- Input bar -->
+        <div style="padding:10px 12px 14px;background:var(--surface);border-top:1px solid var(--border-sub);">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:24px;padding:10px 16px;font-size:13px;color:var(--text3);">Message Coach Axiom...</div>
+            <div style="width:40px;height:40px;border-radius:999px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:18px;">➤</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item"><div class="nav-icon">🏠</div>Home</div>
+        <div class="nav-item"><div class="nav-icon">🏋️</div>Train</div>
+        <div class="nav-item"><div class="nav-icon">🥗</div>Nutrition</div>
+        <div class="nav-item"><div class="nav-icon">📈</div>Progress</div>
+        <div class="nav-item active"><div class="nav-icon">🤖</div>Coach</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 4: WORKOUT PLAN
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Workout Plan</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);">
+        <!-- Header -->
+        <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;font-size:19px;font-weight:800;color:var(--text1);">My Workouts</div>
+          <div class="icon-btn">+</div>
+        </div>
+
+        <!-- Active plan card -->
+        <div style="padding:0 16px 12px;">
+          <div class="gradient-card gradient-blue">
+            <div style="font-size:11px;font-weight:700;opacity:.8;margin-bottom:6px;">ACTIVE PLAN</div>
+            <div style="font-size:17px;font-weight:800;margin-bottom:4px;">Push/Pull/Legs Split</div>
+            <div style="font-size:12px;opacity:.85;">Week 3 of 12 · 4 sessions/week</div>
+            <div style="display:flex;gap:8px;margin-top:14px;">
+              <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#fff;">6 exercises</div>
+              <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#fff;">~60 min</div>
+              <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#fff;">Intermediate</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- This week -->
+        <div style="padding:0 16px 8px;">
+          <div class="section-title" style="margin-bottom:10px;">This Week</div>
+        </div>
+
+        <!-- Workout day rows -->
+        <div style="padding:0 16px;display:flex;flex-direction:column;gap:8px;">
+          <!-- Day 1 — done -->
+          <div class="card" style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:12px;background:var(--success-bg);display:flex;align-items:center;justify-content:center;font-size:18px;">✅</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">Push Day</div>
+              <div style="font-size:11px;color:var(--text2);">Mon · Chest, Shoulders, Triceps</div>
+            </div>
+            <div class="tag tag-success">Done</div>
+          </div>
+          <!-- Day 2 — today -->
+          <div class="card" style="display:flex;align-items:center;gap:12px;border:2px solid var(--primary);">
+            <div style="width:42px;height:42px;border-radius:12px;background:var(--primary-lt);display:flex;align-items:center;justify-content:center;font-size:18px;">🏋️</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;color:var(--primary);">Pull Day — TODAY</div>
+              <div style="font-size:11px;color:var(--text2);">Tue · Back, Biceps, Rear Delts</div>
+            </div>
+            <div style="background:var(--primary);color:#fff;border-radius:10px;padding:6px 10px;font-size:11px;font-weight:700;">Start</div>
+          </div>
+          <!-- Day 3 -->
+          <div class="card" style="display:flex;align-items:center;gap:12px;opacity:.7;">
+            <div style="width:42px;height:42px;border-radius:12px;background:var(--border-sub);display:flex;align-items:center;justify-content:center;font-size:18px;">🦵</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">Leg Day</div>
+              <div style="font-size:11px;color:var(--text2);">Thu · Quads, Hamstrings, Glutes</div>
+            </div>
+            <div class="tag tag-primary">Thu</div>
+          </div>
+          <!-- Rest -->
+          <div class="card" style="display:flex;align-items:center;gap:12px;opacity:.6;">
+            <div style="width:42px;height:42px;border-radius:12px;background:var(--border-sub);display:flex;align-items:center;justify-content:center;font-size:18px;">😴</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">Rest Day</div>
+              <div style="font-size:11px;color:var(--text2);">Wed · Active recovery recommended</div>
+            </div>
+            <div class="tag tag-warning">Rest</div>
+          </div>
+        </div>
+
+        <!-- Form Analysis promo -->
+        <div style="padding:12px 16px 8px;">
+          <div class="card" style="background:linear-gradient(135deg,#1E3A8A,#1D4ED8);border:none;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:28px;">📸</div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:#fff;">AI Form Analysis</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.75);">Get real-time pose feedback during lifts</div>
+              </div>
+              <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;color:#fff;">Try</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item"><div class="nav-icon">🏠</div>Home</div>
+        <div class="nav-item active"><div class="nav-icon">🏋️</div>Train</div>
+        <div class="nav-item"><div class="nav-icon">🥗</div>Nutrition</div>
+        <div class="nav-item"><div class="nav-icon">📈</div>Progress</div>
+        <div class="nav-item"><div class="nav-icon">🤖</div>Coach</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 5: ACTIVE WORKOUT SESSION
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Active Session</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);">
+        <!-- Session header -->
+        <div class="gradient-card gradient-blue" style="border-radius:0 0 24px 24px;padding:16px 16px 20px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;opacity:.8;">PULL DAY · EXERCISE 2 OF 5</div>
+              <div style="font-size:20px;font-weight:800;margin-top:4px;">Barbell Row</div>
+            </div>
+            <div style="background:rgba(255,255,255,.2);border-radius:10px;padding:6px 12px;font-size:13px;font-weight:700;">32:14</div>
+          </div>
+          <!-- Progress -->
+          <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.25);">
+            <div style="height:4px;border-radius:999px;background:#fff;width:40%;"></div>
+          </div>
+        </div>
+
+        <!-- Rest timer -->
+        <div style="padding:12px 16px 0;">
+          <div class="rest-banner">
+            <div>
+              <div style="font-size:11px;font-weight:700;opacity:.85;">REST TIMER</div>
+              <div style="font-size:22px;font-weight:800;">01:24</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:#fff;">+30s</div>
+              <div style="background:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#7C3AED;">Skip</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Set logging -->
+        <div style="padding:12px 16px 0;">
+          <div class="card">
+            <div style="display:flex;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding-bottom:8px;border-bottom:1px solid var(--border-sub);margin-bottom:8px;">
+              <div style="width:30px;">Set</div>
+              <div style="flex:1;text-align:center;">Previous</div>
+              <div style="flex:1;text-align:center;">kg</div>
+              <div style="flex:1;text-align:center;">Reps</div>
+              <div style="width:30px;"></div>
+            </div>
+            <!-- Set rows -->
+            <div style="display:flex;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border-sub);">
+              <div style="width:30px;font-weight:700;color:var(--text3);">1</div>
+              <div style="flex:1;text-align:center;color:var(--text3);">80×8</div>
+              <div style="flex:1;text-align:center;font-weight:700;">82.5</div>
+              <div style="flex:1;text-align:center;font-weight:700;">8</div>
+              <div style="width:30px;text-align:right;font-size:16px;">✅</div>
+            </div>
+            <div style="display:flex;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border-sub);background:var(--primary-lt);border-radius:8px;padding:8px 6px;margin:4px 0;">
+              <div style="width:30px;font-weight:700;color:var(--primary);">2</div>
+              <div style="flex:1;text-align:center;color:var(--text3);">80×8</div>
+              <div style="flex:1;text-align:center;font-weight:800;color:var(--primary);">82.5</div>
+              <div style="flex:1;text-align:center;font-weight:800;color:var(--primary);">8</div>
+              <div style="width:30px;text-align:right;font-size:16px;color:var(--primary);">●</div>
+            </div>
+            <div style="display:flex;align-items:center;font-size:13px;padding:6px 0;opacity:.5;">
+              <div style="width:30px;font-weight:700;color:var(--text3);">3</div>
+              <div style="flex:1;text-align:center;color:var(--text3);">80×8</div>
+              <div style="flex:1;text-align:center;color:var(--text3);">—</div>
+              <div style="flex:1;text-align:center;color:var(--text3);">—</div>
+              <div style="width:30px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Log set button -->
+        <div style="padding:12px 16px;">
+          <div class="btn-primary" style="font-size:16px;padding:16px;">Log Set ✓</div>
+        </div>
+
+        <!-- Form tip -->
+        <div style="padding:0 16px;">
+          <div class="insight-card" style="border-left-color:var(--info);">
+            <div style="font-size:11px;font-weight:700;color:var(--info);margin-bottom:3px;">💡 Form Cue</div>
+            <div style="font-size:12px;color:var(--text2);">Keep chest proud, drive elbows toward hips, squeeze shoulder blades at the top.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 6: NUTRITION LOG
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Nutrition Log</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);">
+        <!-- Header -->
+        <div style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:19px;font-weight:800;">Nutrition</div>
+          <div style="display:flex;gap:8px;">
+            <div class="icon-btn" title="Barcode scan">📷</div>
+            <div class="icon-btn">+</div>
+          </div>
+        </div>
+
+        <!-- Macro summary -->
+        <div style="padding:0 16px 12px;">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="font-size:14px;font-weight:700;">Today's Summary</div>
+              <div style="font-size:12px;color:var(--text2);">Tuesday, May 20</div>
+            </div>
+            <!-- Calorie bar -->
+            <div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:12px;font-weight:600;color:var(--text2);">Calories</span>
+                <span style="font-size:12px;font-weight:700;">1,640 / 2,100</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="background:var(--primary);width:78%;"></div></div>
+            </div>
+            <!-- Macro pills -->
+            <div style="display:flex;gap:8px;">
+              <div style="flex:1;background:var(--primary-lt);border-radius:10px;padding:8px;text-align:center;">
+                <div style="font-size:15px;font-weight:800;color:var(--primary);">118g</div>
+                <div style="font-size:10px;color:var(--text2);font-weight:600;">Protein</div>
+              </div>
+              <div style="flex:1;background:#E0F2FE;border-radius:10px;padding:8px;text-align:center;">
+                <div style="font-size:15px;font-weight:800;color:#0284C7;">182g</div>
+                <div style="font-size:10px;color:var(--text2);font-weight:600;">Carbs</div>
+              </div>
+              <div style="flex:1;background:#FEF3C7;border-radius:10px;padding:8px;text-align:center;">
+                <div style="font-size:15px;font-weight:800;color:#B45309;">48g</div>
+                <div style="font-size:10px;color:var(--text2);font-weight:600;">Fat</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meal sections -->
+        <div style="padding:0 16px;">
+          <div class="section-title" style="margin-bottom:8px;">🌅 Breakfast <span style="font-size:12px;font-weight:500;color:var(--text3);">620 kcal</span></div>
+        </div>
+        <div style="padding:0 16px;display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
+          <div class="card" style="padding:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;font-size:18px;">🥚</div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:600;">Scrambled Eggs (3)</div>
+                <div style="font-size:11px;color:var(--text2);">220 kcal · P:18g C:2g F:16g</div>
+              </div>
+              <div style="font-size:11px;color:var(--text3);">1 serving</div>
+            </div>
+          </div>
+          <div class="card" style="padding:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:#DCFCE7;display:flex;align-items:center;justify-content:center;font-size:18px;">🥛</div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:600;">Greek Yogurt</div>
+                <div style="font-size:11px;color:var(--text2);">130 kcal · P:17g C:9g F:0g</div>
+              </div>
+              <div style="font-size:11px;color:var(--text3);">200g</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add food bar -->
+        <div style="padding:0 16px 8px;">
+          <div style="border:1.5px dashed var(--border);border-radius:12px;padding:10px;display:flex;align-items:center;gap:8px;justify-content:center;color:var(--primary);">
+            <span style="font-size:14px;font-weight:700;">+ Add to Lunch</span>
+          </div>
+        </div>
+
+        <!-- AI Food scan CTA -->
+        <div style="padding:0 16px 8px;">
+          <div class="card" style="background:linear-gradient(135deg,#0E7490,#06B6D4);border:none;padding:14px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="font-size:28px;">📸</span>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:#fff;">Snap & Log</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.8);">AI identifies food from your camera</div>
+              </div>
+              <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;">Scan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item"><div class="nav-icon">🏠</div>Home</div>
+        <div class="nav-item"><div class="nav-icon">🏋️</div>Train</div>
+        <div class="nav-item active"><div class="nav-icon">🥗</div>Nutrition</div>
+        <div class="nav-item"><div class="nav-icon">📈</div>Progress</div>
+        <div class="nav-item"><div class="nav-icon">🤖</div>Coach</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 7: PROGRESS
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Progress</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);">
+        <div style="padding:10px 16px 6px;font-size:19px;font-weight:800;">Progress</div>
+
+        <!-- Weight chart placeholder -->
+        <div style="padding:0 16px 12px;">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div style="font-size:14px;font-weight:700;">⚖️ Weight</div>
+              <div style="display:flex;gap:4px;">
+                <div style="border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;background:var(--primary);color:#fff;">4W</div>
+                <div style="border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--text3);">8W</div>
+                <div style="border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--text3);">3M</div>
+              </div>
+            </div>
+            <!-- Fake chart with SVG -->
+            <svg width="100%" height="90" viewBox="0 0 280 90" style="overflow:visible;">
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2563EB" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Grid lines -->
+              <line x1="0" y1="20" x2="280" y2="20" stroke="#E2E8F0" stroke-width="1"/>
+              <line x1="0" y1="50" x2="280" y2="50" stroke="#E2E8F0" stroke-width="1"/>
+              <line x1="0" y1="80" x2="280" y2="80" stroke="#E2E8F0" stroke-width="1"/>
+              <!-- Chart area fill -->
+              <path d="M0,70 L40,65 L80,58 L120,52 L160,48 L200,44 L240,40 L280,36 L280,90 L0,90 Z"
+                fill="url(#chartGrad)"/>
+              <!-- Chart line -->
+              <path d="M0,70 L40,65 L80,58 L120,52 L160,48 L200,44 L240,40 L280,36"
+                fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Dots -->
+              <circle cx="0" cy="70" r="3.5" fill="#2563EB"/>
+              <circle cx="80" cy="58" r="3.5" fill="#2563EB"/>
+              <circle cx="160" cy="48" r="3.5" fill="#2563EB"/>
+              <circle cx="280" cy="36" r="5" fill="#2563EB" stroke="#fff" stroke-width="2"/>
+            </svg>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px;">
+              <span>Apr 21</span><span>Apr 28</span><span>May 5</span><span>May 12</span><span>Today</span>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:12px;">
+              <div>
+                <div style="font-size:20px;font-weight:800;color:var(--primary);">85.4 kg</div>
+                <div style="font-size:11px;color:var(--text2);">Current</div>
+              </div>
+              <div style="width:1px;background:var(--border-sub);"></div>
+              <div>
+                <div style="font-size:20px;font-weight:800;color:var(--success);">−2.1 kg</div>
+                <div style="font-size:11px;color:var(--text2);">This month</div>
+              </div>
+              <div style="width:1px;background:var(--border-sub);"></div>
+              <div>
+                <div style="font-size:20px;font-weight:800;">80 kg</div>
+                <div style="font-size:11px;color:var(--text2);">Goal</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress photos -->
+        <div style="padding:0 16px 12px;">
+          <div class="section-title" style="margin-bottom:10px;">
+            <span>Progress Photos</span><span class="see-all">View All</span>
+          </div>
+          <div style="display:flex;gap:8px;overflow-x:auto;">
+            <div style="flex-shrink:0;">
+              <div class="photo-box" style="width:90px;font-size:48px;">🏃</div>
+              <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px;">Apr 21</div>
+            </div>
+            <div style="flex-shrink:0;">
+              <div class="photo-box" style="width:90px;font-size:48px;">🏃</div>
+              <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px;">May 1</div>
+            </div>
+            <div style="flex-shrink:0;opacity:.6;">
+              <div class="photo-box" style="width:90px;font-size:48px;background:#F1F5F9;border:2px dashed var(--border);">+</div>
+              <div style="font-size:10px;color:var(--primary);text-align:center;margin-top:4px;font-weight:700;">Add</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body metrics -->
+        <div style="padding:0 16px;">
+          <div class="section-title" style="margin-bottom:10px;">Body Measurements</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="card" style="padding:12px;">
+              <div style="font-size:11px;color:var(--text2);margin-bottom:2px;">Chest</div>
+              <div style="font-size:18px;font-weight:800;">102 cm</div>
+              <div style="font-size:10px;color:var(--success);">↓ 1.5 cm</div>
+            </div>
+            <div class="card" style="padding:12px;">
+              <div style="font-size:11px;color:var(--text2);margin-bottom:2px;">Waist</div>
+              <div style="font-size:18px;font-weight:800;">84 cm</div>
+              <div style="font-size:10px;color:var(--success);">↓ 2.5 cm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item"><div class="nav-icon">🏠</div>Home</div>
+        <div class="nav-item"><div class="nav-icon">🏋️</div>Train</div>
+        <div class="nav-item"><div class="nav-icon">🥗</div>Nutrition</div>
+        <div class="nav-item active"><div class="nav-icon">📈</div>Progress</div>
+        <div class="nav-item"><div class="nav-icon">🤖</div>Coach</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 8: ONBOARDING — GOAL SELECTION
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Onboarding · Goals</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);padding:20px 20px 0;">
+        <!-- Progress -->
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:6px;">
+            <span>Step 1 of 7</span><span>14%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="background:var(--primary);width:14%;"></div></div>
+        </div>
+
+        <div style="font-size:22px;font-weight:800;margin-bottom:4px;">What's your<br>main goal? 🎯</div>
+        <div style="font-size:14px;color:var(--text2);margin-bottom:24px;">We'll personalise your plan around this</div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="option-card selected">
+            <div style="font-size:28px;">🔥</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--primary);">Lose Fat</div>
+              <div style="font-size:12px;color:var(--text2);">Burn body fat while preserving muscle</div>
+            </div>
+          </div>
+          <div class="option-card">
+            <div style="font-size:28px;">💪</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;">Build Muscle</div>
+              <div style="font-size:12px;color:var(--text2);">Gain size and strength progressively</div>
+            </div>
+          </div>
+          <div class="option-card">
+            <div style="font-size:28px;">⚡</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;">Get Stronger</div>
+              <div style="font-size:12px;color:var(--text2);">Increase your 1-rep maxes</div>
+            </div>
+          </div>
+          <div class="option-card">
+            <div style="font-size:28px;">❤️</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;">Improve Health</div>
+              <div style="font-size:12px;color:var(--text2);">Better energy, sleep, and wellbeing</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:20px 0 24px;">
+          <div class="btn-primary">Continue →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 9: SIGN IN
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Sign In</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);padding:20px;">
+        <div style="margin-bottom:28px;">
+          <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Welcome back 👋</div>
+          <div style="font-size:14px;color:var(--text2);">Sign in to continue your journey</div>
+        </div>
+
+        <!-- Google button -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--border);border-radius:14px;padding:13px;margin-bottom:16px;background:var(--surface);">
+          <span style="font-size:18px;">G</span>
+          <span style="font-size:14px;font-weight:600;">Continue with Google</span>
+        </div>
+
+        <!-- Or divider -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="flex:1;height:1px;background:var(--border-sub);"></div>
+          <div style="font-size:12px;color:var(--text3);">or</div>
+          <div style="flex:1;height:1px;background:var(--border-sub);"></div>
+        </div>
+
+        <!-- Email input -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">Email address</div>
+          <div class="input-wrap focused">
+            <span style="font-size:16px;">✉️</span>
+            <div style="font-size:14px;color:var(--text1);">alex@example.com</div>
+          </div>
+        </div>
+
+        <!-- Password input -->
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text2);">Password</div>
+            <div style="font-size:12px;color:var(--primary);font-weight:600;">Forgot?</div>
+          </div>
+          <div class="input-wrap">
+            <span style="font-size:16px;">🔒</span>
+            <div style="font-size:14px;color:var(--text3);">••••••••••</div>
+            <span style="font-size:14px;margin-left:auto;color:var(--text3);">👁</span>
+          </div>
+        </div>
+
+        <div class="btn-primary" style="margin-bottom:12px;">Sign In</div>
+
+        <div style="text-align:center;font-size:13px;color:var(--text2);">
+          Don't have an account? <span style="color:var(--primary);font-weight:700;">Sign Up</span>
+        </div>
+
+        <!-- Biometric -->
+        <div style="text-align:center;margin-top:24px;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Or use biometric</div>
+          <div style="font-size:36px;">🔐</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 10: SETTINGS
+       ══════════════════════════════════════════════════════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">Settings</div>
+    <div class="phone">
+      <div class="status-bar">
+        <div class="notch"></div>
+        <span style="font-size:11px;">9:41</span>
+        <div class="status-icons"><span>📶</span><span>🔋</span></div>
+      </div>
+
+      <div class="screen" style="background:var(--bg);">
+        <div style="padding:10px 16px 12px;font-size:19px;font-weight:800;">Settings</div>
+
+        <!-- Profile card -->
+        <div style="padding:0 16px 12px;">
+          <div class="gradient-card gradient-blue" style="padding:16px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="avatar" style="width:52px;height:52px;font-size:22px;">AC</div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:800;">Alex Carter</div>
+                <div style="font-size:12px;opacity:.85;">alex@example.com</div>
+                <div style="margin-top:4px;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.2);border-radius:999px;padding:2px 8px;">
+                  <span style="font-size:10px;font-weight:700;">⭐ PREMIUM</span>
+                </div>
+              </div>
+              <div style="color:rgba(255,255,255,.7);font-size:18px;">›</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings rows -->
+        <div style="padding:0 16px;display:flex;flex-direction:column;gap:6px;">
+          <div class="card" style="padding:0;">
+            <div style="padding:14px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-sub);">
+              <div style="width:32px;height:32px;border-radius:10px;background:var(--primary-lt);display:flex;align-items:center;justify-content:center;">🔔</div>
+              <div style="flex:1;font-size:14px;font-weight:600;">Notifications</div>
+              <div style="font-size:16px;color:var(--text3);">›</div>
+            </div>
+            <div style="padding:14px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-sub);">
+              <div style="width:32px;height:32px;border-radius:10px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;">🤖</div>
+              <div style="flex:1;font-size:14px;font-weight:600;">AI Consent</div>
+              <div style="font-size:16px;color:var(--text3);">›</div>
+            </div>
+            <div style="padding:14px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-sub);">
+              <div style="width:32px;height:32px;border-radius:10px;background:#DCFCE7;display:flex;align-items:center;justify-content:center;">💳</div>
+              <div style="flex:1;font-size:14px;font-weight:600;">Subscription</div>
+              <div style="background:var(--success-bg);color:var(--success);border-radius:999px;padding:2px 8px;font-size:10px;font-weight:700;">PREMIUM</div>
+              <div style="font-size:16px;color:var(--text3);">›</div>
+            </div>
+            <div style="padding:14px 14px;display:flex;align-items:center;gap:12px;">
+              <div style="width:32px;height:32px;border-radius:10px;background:#FEE2E2;display:flex;align-items:center;justify-content:center;">🔒</div>
+              <div style="flex:1;font-size:14px;font-weight:600;">Privacy & Data</div>
+              <div style="font-size:16px;color:var(--text3);">›</div>
+            </div>
+          </div>
+
+          <!-- Sign out -->
+          <div class="card" style="padding:14px;display:flex;align-items:center;gap:12px;">
+            <div style="width:32px;height:32px;border-radius:10px;background:#FEE2E2;display:flex;align-items:center;justify-content:center;">🚪</div>
+            <div style="flex:1;font-size:14px;font-weight:600;color:var(--error);">Sign Out</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div style="text-align:center;padding:32px 40px 48px;color:#475569;font-size:13px;border-top:1px solid #1E293B;">
+  <div style="font-size:15px;font-weight:700;color:#94A3B8;margin-bottom:8px;">Axiom AI Coach · Android App Preview</div>
+  <div>Kotlin · Jetpack Compose · Material 3 · MVVM · Room · Hilt · CameraX · ML Kit · Firebase · RevenueCat</div>
+  <div style="margin-top:6px;color:#64748B;">92 Kotlin source files · 20 Room entities · 5 AI providers · Full CI/CD via GitHub Actions</div>
+</div>
+
+</body>
+</html>
