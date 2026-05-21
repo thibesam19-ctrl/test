@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axiom AI Coach — Redesign</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --white:   #FFFFFF;
+  --bg:      #F5F5F7;
+  --surface: #FFFFFF;
+  --s2:      #F9F9FB;
+  --blue:    #0071E3;
+  --blue-lt: #EAF3FF;
+  --blue-dk: #0058B0;
+  --green:   #34C759;
+  --green-lt:#E8FAF0;
+  --orange:  #FF9500;
+  --red:     #FF3B30;
+  --t1:      #1D1D1F;
+  --t2:      #6E6E73;
+  --t3:      #AEAEB2;
+  --border:  #E5E5EA;
+  --border2: #F2F2F7;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  background:#E8E8ED;
+  min-height:100vh;
+  color:var(--t1);
+}
+
+/* ── Page wrapper ── */
+.page-header{
+  background:#1D1D1F;
+  padding:52px 40px 36px;
+  text-align:center;
+}
+.page-header h1{
+  font-size:34px;font-weight:800;color:#fff;letter-spacing:-.5px;
+}
+.page-header p{color:#86868B;margin-top:6px;font-size:14px;font-weight:400;}
+.badge{
+  display:inline-block;background:var(--blue);color:#fff;
+  border-radius:999px;padding:5px 16px;font-size:11px;font-weight:600;
+  margin-top:14px;letter-spacing:.3px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:40px;
+  padding:48px 40px;
+  max-width:1680px;
+  margin:0 auto;
+}
+
+/* ── Phone shell ── */
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.phone-label{
+  font-size:11px;font-weight:700;color:#86868B;
+  letter-spacing:1.2px;text-transform:uppercase;
+}
+.phone{
+  width:300px;height:650px;
+  background:var(--bg);
+  border-radius:44px;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:
+    0 0 0 9px #1D1D1F,
+    0 0 0 11px #3A3A3C,
+    0 40px 80px rgba(0,0,0,.45),
+    0 8px 24px rgba(0,0,0,.2);
+  position:relative;
+}
+
+/* ── Status bar ── */
+.sb{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 22px 6px;
+  background:transparent;
+  font-size:11px;font-weight:700;
+  flex-shrink:0;
+  position:relative;z-index:2;
+}
+.sb-notch{
+  position:absolute;left:50%;transform:translateX(-50%);
+  top:0;width:90px;height:26px;
+  background:#1D1D1F;border-radius:0 0 16px 16px;
+}
+.sb-time{font-size:12px;font-weight:700;color:var(--t1);}
+.sb-icons{display:flex;gap:5px;align-items:center;}
+
+/* ── Screen scroll area ── */
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;}
+.screen::-webkit-scrollbar{width:0;}
+
+/* ── Bottom Tab Bar ── */
+.tab-bar{
+  display:flex;height:76px;background:rgba(255,255,255,.92);
+  border-top:1px solid var(--border2);
+  backdrop-filter:blur(20px);
+  flex-shrink:0;padding-bottom:10px;
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;cursor:pointer;
+  font-size:9.5px;font-weight:500;color:var(--t3);
+}
+.tab.on{color:var(--blue);}
+
+/* ── Typography ── */
+.h1{font-size:24px;font-weight:800;color:var(--t1);letter-spacing:-.4px;}
+.h2{font-size:18px;font-weight:700;color:var(--t1);letter-spacing:-.3px;}
+.h3{font-size:15px;font-weight:600;color:var(--t1);}
+.body{font-size:13px;font-weight:400;color:var(--t2);line-height:1.5;}
+.caption{font-size:11px;font-weight:500;color:var(--t3);}
+.label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);}
+.num-xl{font-size:42px;font-weight:800;letter-spacing:-1.5px;color:var(--t1);}
+.num-lg{font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--t1);}
+.num-md{font-size:20px;font-weight:700;letter-spacing:-.5px;color:var(--t1);}
+
+/* ── Cards ── */
+.card{
+  background:var(--white);
+  border-radius:18px;
+  padding:16px;
+  border:1px solid var(--border2);
+}
+.card-sm{border-radius:14px;padding:14px;}
+
+/* ── Buttons ── */
+.btn{
+  border:none;border-radius:14px;padding:14px 20px;
+  font-size:15px;font-weight:600;cursor:pointer;
+  width:100%;text-align:center;font-family:inherit;
+}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-secondary{background:var(--blue-lt);color:var(--blue);}
+.btn-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--border);}
+.btn-sm{
+  padding:8px 16px;font-size:12px;font-weight:600;border:none;
+  border-radius:10px;cursor:pointer;font-family:inherit;
+}
+.btn-sm-blue{background:var(--blue);color:#fff;}
+.btn-sm-light{background:var(--blue-lt);color:var(--blue);}
+.btn-sm-ghost{background:var(--border2);color:var(--t2);}
+
+/* ── Progress ── */
+.track{background:var(--border2);border-radius:999px;overflow:hidden;}
+.fill{height:100%;border-radius:999px;}
+
+/* ── Chip ── */
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  border-radius:999px;padding:5px 11px;
+  font-size:11px;font-weight:600;
+}
+.chip-blue{background:var(--blue-lt);color:var(--blue);}
+.chip-green{background:var(--green-lt);color:#1E8740;}
+.chip-orange{background:#FFF4E5;color:#B86800;}
+.chip-gray{background:var(--border2);color:var(--t2);}
+
+/* ── Section header ── */
+.sec{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 16px;margin-bottom:10px;
+}
+.sec-link{font-size:13px;font-weight:600;color:var(--blue);}
+
+/* ── Row ── */
+.row{display:flex;align-items:center;gap:12px;}
+
+/* ── Divider ── */
+.div{height:1px;background:var(--border2);margin:0 16px;}
+
+/* ── Input ── */
+.input-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--s2);border:1.5px solid var(--border);
+  border-radius:13px;padding:12px 14px;
+}
+.input-row.focus{border-color:var(--blue);}
+.placeholder{font-size:14px;color:var(--t3);flex:1;}
+.input-val{font-size:14px;color:var(--t1);flex:1;}
+
+/* ── Avatar ── */
+.av{
+  border-radius:999px;background:linear-gradient(135deg,#0071E3,#34C759);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;flex-shrink:0;
+}
+
+/* ── Icon button ── */
+.icon-btn{
+  width:34px;height:34px;border-radius:10px;
+  background:var(--white);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+}
+
+/* ── Tag ── */
+.tag{display:inline-block;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.2px;}
+.tag-blue{background:var(--blue-lt);color:var(--blue);}
+.tag-green{background:var(--green-lt);color:#1E8740;}
+.tag-orange{background:#FFF4E5;color:#B86800;}
+
+/* ── Ring SVG ── */
+.ring-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.ring-center{position:absolute;text-align:center;display:flex;flex-direction:column;align-items:center;}
+
+/* ── Gradient blocks ── */
+.grad-blue{background:linear-gradient(145deg,#0058B0 0%,#0071E3 100%);}
+.grad-dark{background:linear-gradient(145deg,#1D1D1F 0%,#3A3A3C 100%);}
+.grad-green{background:linear-gradient(145deg,#1E8740 0%,#34C759 100%);}
+
+/* ── Chat bubble ── */
+.bbl{max-width:80%;border-radius:18px;padding:10px 14px;font-size:13px;line-height:1.5;}
+.bbl-u{background:var(--blue);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+.bbl-a{background:var(--white);color:var(--t1);border-bottom-left-radius:4px;border:1px solid var(--border2);align-self:flex-start;}
+
+/* ── Typing dots ── */
+@keyframes blink{0%,80%,100%{opacity:.3;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--t3);display:inline-block;}
+.dot:nth-child(1){animation:blink 1.2s infinite .0s;}
+.dot:nth-child(2){animation:blink 1.2s infinite .2s;}
+.dot:nth-child(3){animation:blink 1.2s infinite .4s;}
+
+/* ── Option card ── */
+.opt{
+  border:1.5px solid var(--border);border-radius:14px;
+  padding:14px 16px;background:var(--white);
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+}
+.opt.on{border-color:var(--blue);background:var(--blue-lt);}
+
+/* ── Metrics grid ── */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.metric-card{
+  background:var(--white);border-radius:16px;
+  padding:14px;border:1px solid var(--border2);
+}
+
+/* ── Exercise thumbnail ── */
+.ex-thumb{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--blue-lt);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+
+/* ── Water segments ── */
+.wseg{height:6px;border-radius:999px;flex:1;background:var(--border2);margin:0 1.5px;}
+.wseg.on{background:var(--blue);}
+
+/* ── Settings row ── */
+.set-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;
+}
+.set-icon{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+
+/* ── Utility ── */
+.px{padding-left:16px;padding-right:16px;}
+.mt4{margin-top:4px;} .mt6{margin-top:6px;} .mt8{margin-top:8px;}
+.mt10{margin-top:10px;} .mt12{margin-top:12px;} .mt16{margin-top:16px;}
+.mb8{margin-bottom:8px;} .mb10{margin-bottom:10px;} .mb12{margin-bottom:12px;}
+.mb16{margin-bottom:16px;}
+.flex{display:flex;} .col{flex-direction:column;} .gap4{gap:4px;}
+.gap6{gap:6px;} .gap8{gap:8px;} .gap10{gap:10px;} .gap12{gap:12px;}
+.jcsb{justify-content:space-between;} .aic{align-items:center;}
+.f1{flex:1;} .fw{width:100%;}
+.ta-c{text-align:center;}
+.bold{font-weight:700;} .semibold{font-weight:600;}
+
+/* SVG icons */
+svg.icon{display:block;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Axiom AI Coach — Redesign</h1>
+  <p>Light · Modern · Clean — 2025 Design System</p>
+  <span class="badge">Inter · SVG Icons · Bento Grid · SF-inspired</span>
+</div>
+
+<div class="grid">
+
+<!-- ══════════════════════════ WELCOME ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Welcome</div>
+  <div class="phone" style="background:#fff;">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span>
+      <div class="sb-icons">
+        <svg class="icon" width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="0" width="3" height="12" rx="1.5" fill="#1D1D1F"/><rect x="4.5" y="3" width="3" height="9" rx="1.5" fill="#1D1D1F"/><rect x="9" y="6" width="3" height="6" rx="1.5" fill="#1D1D1F"/><rect x="13.5" y="8" width="2.5" height="4" rx="1.25" fill="#AEAEB2"/></svg>
+        <svg class="icon" width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="1" y="3" width="13" height="8" rx="1.5" stroke="#1D1D1F" stroke-width="1.5" fill="none"/><rect x="13.5" y="5" width="1.5" height="4" rx=".75" fill="#1D1D1F"/><rect x="2" y="4.5" width="8" height="5" rx=".75" fill="#1D1D1F"/></svg>
+      </div>
+    </div>
+
+    <div class="screen" style="padding:0 24px;background:#fff;">
+      <!-- Logo area -->
+      <div style="margin-top:36px;margin-bottom:40px;">
+        <div style="width:56px;height:56px;border-radius:16px;background:var(--blue);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M14 4L22 10V18L14 24L6 18V10L14 4Z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M14 9L18 12V16L14 19L10 16V12L14 9Z" fill="#fff"/>
+          </svg>
+        </div>
+        <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;color:var(--t1);">Axiom</div>
+        <div style="font-size:13px;font-weight:500;color:var(--t3);margin-top:2px;letter-spacing:2px;text-transform:uppercase;">AI Coach</div>
+      </div>
+
+      <!-- Slide content -->
+      <div style="background:var(--s2);border-radius:22px;padding:24px;margin-bottom:20px;border:1px solid var(--border2);">
+        <div style="width:48px;height:48px;background:var(--blue-lt);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+        <div class="h3" style="margin-bottom:6px;">Your AI Personal Trainer</div>
+        <div class="body">Expert plans tailored to your body, goals, and schedule — every day.</div>
+      </div>
+
+      <!-- Dots -->
+      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:32px;">
+        <div style="width:20px;height:5px;border-radius:999px;background:var(--blue);"></div>
+        <div style="width:5px;height:5px;border-radius:999px;background:var(--border);"></div>
+        <div style="width:5px;height:5px;border-radius:999px;background:var(--border);"></div>
+      </div>
+
+      <div class="btn btn-primary mb8">Get Started Free</div>
+      <div class="btn btn-ghost">Sign In</div>
+      <div class="caption ta-c mt12" style="padding-bottom:28px;">By continuing you agree to our <span style="color:var(--blue);">Terms</span> & <span style="color:var(--blue);">Privacy</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ DASHBOARD ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Dashboard</div>
+  <div class="phone">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span>
+      <div class="sb-icons">
+        <svg class="icon" width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="0" width="3" height="12" rx="1.5" fill="#1D1D1F"/><rect x="4.5" y="3" width="3" height="9" rx="1.5" fill="#1D1D1F"/><rect x="9" y="6" width="3" height="6" rx="1.5" fill="#1D1D1F"/><rect x="13.5" y="8" width="2.5" height="4" rx="1.25" fill="#AEAEB2"/></svg>
+        <svg class="icon" width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="1" y="3" width="13" height="8" rx="1.5" stroke="#1D1D1F" stroke-width="1.5" fill="none"/><rect x="13.5" y="5" width="1.5" height="4" rx=".75" fill="#1D1D1F"/><rect x="2" y="4.5" width="8" height="5" rx=".75" fill="#1D1D1F"/></svg>
+      </div>
+    </div>
+
+    <div class="screen">
+      <!-- Greeting -->
+      <div class="flex jcsb aic px" style="margin-top:12px;margin-bottom:14px;">
+        <div>
+          <div class="caption">Good morning</div>
+          <div class="h2" style="margin-top:1px;">Alex Carter</div>
+        </div>
+        <div class="flex gap8 aic">
+          <div style="background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:5px 10px;display:flex;align-items:center;gap:5px;">
+            <svg width="12" height="14" viewBox="0 0 12 14" fill="none"><path d="M6 1L7.5 5H11.5L8.5 7.5L9.5 12L6 9.5L2.5 12L3.5 7.5L0.5 5H4.5L6 1Z" fill="#FF9500"/></svg>
+            <span style="font-size:12px;font-weight:700;color:var(--t1);">14</span>
+          </div>
+          <div class="icon-btn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="6" r="2.5"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calorie bento card -->
+      <div class="px mb8">
+        <div class="card" style="border-radius:22px;padding:18px;">
+          <div class="label mb10">Today's Calories</div>
+          <div class="flex gap12 aic">
+            <!-- Ring -->
+            <div class="ring-wrap">
+              <svg width="88" height="88" viewBox="0 0 88 88">
+                <circle cx="44" cy="44" r="36" fill="none" stroke="var(--border2)" stroke-width="7"/>
+                <circle cx="44" cy="44" r="36" fill="none" stroke="var(--blue)" stroke-width="7"
+                  stroke-dasharray="226.19" stroke-dashoffset="68" stroke-linecap="round"
+                  transform="rotate(-90 44 44)"/>
+              </svg>
+              <div class="ring-center" style="gap:1px;">
+                <div style="font-size:19px;font-weight:800;letter-spacing:-.5px;color:var(--t1);">1,640</div>
+                <div style="font-size:9px;font-weight:600;color:var(--t3);">/ 2,100</div>
+              </div>
+            </div>
+            <!-- Macros -->
+            <div class="f1 flex col gap10">
+              <div>
+                <div class="flex jcsb mb4"><span class="caption">Protein</span><span style="font-size:11px;font-weight:700;">118g</span></div>
+                <div class="track" style="height:4px;"><div class="fill" style="width:75%;background:var(--blue);height:4px;"></div></div>
+              </div>
+              <div>
+                <div class="flex jcsb mb4"><span class="caption">Carbs</span><span style="font-size:11px;font-weight:700;">182g</span></div>
+                <div class="track" style="height:4px;"><div class="fill" style="width:83%;background:#34C759;height:4px;"></div></div>
+              </div>
+              <div>
+                <div class="flex jcsb mb4"><span class="caption">Fat</span><span style="font-size:11px;font-weight:700;">48g</span></div>
+                <div class="track" style="height:4px;"><div class="fill" style="width:69%;background:var(--orange);height:4px;"></div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Quick add -->
+          <div class="flex gap6 mt12">
+            <div class="btn-sm btn-sm-light f1">+ Breakfast</div>
+            <div class="btn-sm btn-sm-light f1">+ Lunch</div>
+            <div class="btn-sm btn-sm-ghost f1">+ Snack</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento: water + streak -->
+      <div class="px mb8">
+        <div class="flex gap8">
+          <!-- Water -->
+          <div class="card f1 card-sm">
+            <div class="flex jcsb aic mb8">
+              <div class="label">Water</div>
+              <svg width="14" height="18" viewBox="0 0 14 18" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1C7 1 1 7.5 1 11.5a6 6 0 0012 0C13 7.5 7 1 7 1z"/></svg>
+            </div>
+            <div style="font-size:18px;font-weight:800;letter-spacing:-.5px;">1.8L</div>
+            <div class="caption mt2">of 2.4L</div>
+            <div class="flex mt8" style="gap:3px;">
+              <div class="wseg on"></div><div class="wseg on"></div><div class="wseg on"></div>
+              <div class="wseg on"></div><div class="wseg on"></div><div class="wseg on"></div>
+              <div class="wseg"></div><div class="wseg"></div>
+            </div>
+          </div>
+          <!-- Streak -->
+          <div class="card f1 card-sm" style="background:var(--blue);border-color:transparent;">
+            <div class="flex jcsb aic mb8">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.7);">Streak</div>
+              <svg width="14" height="16" viewBox="0 0 14 16" fill="none"><path d="M7 1C5 5 2 6 2 10a5 5 0 0010 0c0-2-1-4-3-5 0 2-1 3-2 3C6 8 7 5 7 1Z" fill="rgba(255,255,255,.9)"/></svg>
+            </div>
+            <div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px;">14</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px;">days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Insight -->
+      <div class="px mb8">
+        <div class="flex jcsb aic mb10">
+          <div class="h3">AI Insights</div>
+          <div class="sec-link">See all</div>
+        </div>
+        <div class="card card-sm" style="border-left:3px solid var(--blue);border-radius:14px 14px 14px 14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:4px;">Protein on track</div>
+          <div class="body" style="font-size:12px;">Add a Greek yogurt post-workout to hit today's 158g target.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab on">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </div>
+      <div class="tab">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M6 4h12M6 20h12M6 4v16M18 4v16M9 8h6M9 12h6M9 16h6"/></svg>
+        Train
+      </div>
+      <div class="tab">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 017 7c0 4-4 8-7 13C9 17 5 13 5 9a7 7 0 017-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        Nutrition
+      </div>
+      <div class="tab">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Progress
+      </div>
+      <div class="tab">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+        Coach
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ AI COACH CHAT ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">AI Coach</div>
+  <div class="phone">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span>
+      <div class="sb-icons">
+        <svg class="icon" width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="0" width="3" height="12" rx="1.5" fill="#1D1D1F"/><rect x="4.5" y="3" width="3" height="9" rx="1.5" fill="#1D1D1F"/><rect x="9" y="6" width="3" height="6" rx="1.5" fill="#1D1D1F"/><rect x="13.5" y="8" width="2.5" height="4" rx="1.25" fill="#AEAEB2"/></svg>
+        <svg class="icon" width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="1" y="3" width="13" height="8" rx="1.5" stroke="#1D1D1F" stroke-width="1.5" fill="none"/><rect x="13.5" y="5" width="1.5" height="4" rx=".75" fill="#1D1D1F"/><rect x="2" y="4.5" width="8" height="5" rx=".75" fill="#1D1D1F"/></svg>
+      </div>
+    </div>
+
+    <div class="screen" style="background:#fff;">
+      <!-- Header -->
+      <div style="padding:10px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border2);">
+        <div style="width:36px;height:36px;border-radius:12px;background:var(--blue);display:flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="f1">
+          <div class="h3" style="font-size:14px;">Coach Axiom</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:1px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div>
+            <div class="caption" style="color:var(--green);">Online</div>
+          </div>
+        </div>
+        <div class="icon-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="3" r="1.2" fill="var(--t2)"/><circle cx="8" cy="8" r="1.2" fill="var(--t2)"/><circle cx="8" cy="13" r="1.2" fill="var(--t2)"/></svg>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="f1 flex col gap10" style="padding:14px 14px;overflow-y:auto;">
+        <!-- AI -->
+        <div class="flex gap8 aic" style="align-items:flex-end;">
+          <div style="width:26px;height:26px;border-radius:999px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="bbl bbl-a">
+            Hey! I'm Coach Axiom 👋<br>
+            What are we working on today?
+          </div>
+        </div>
+
+        <!-- User -->
+        <div class="bbl bbl-u" style="margin-left:auto;">
+          Build me a cutting plan — lose 8 kg in 10 weeks
+        </div>
+
+        <!-- AI response -->
+        <div class="flex gap8" style="align-items:flex-end;">
+          <div style="width:26px;height:26px;border-radius:999px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="bbl bbl-a">
+            Great goal — 0.8 kg/week is achievable.<br><br>
+            <strong>Your plan:</strong><br>
+            Calories: 1,850 kcal/day<br>
+            Protein: 160 g · Carbs: 180 g · Fat: 55 g<br>
+            Training: 4× strength + 2× cardio<br><br>
+            Want the full meal plan?
+          </div>
+        </div>
+
+        <!-- Typing -->
+        <div class="flex gap8" style="align-items:flex-end;">
+          <div style="width:26px;height:26px;border-radius:999px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>
+          </div>
+          <div class="bbl bbl-a" style="padding:12px 16px;">
+            <div class="flex gap5 aic"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          </div>
+        </div>
+
+        <!-- Suggested -->
+        <div class="flex gap6" style="flex-wrap:wrap;margin-top:4px;">
+          <div style="background:var(--blue-lt);border-radius:999px;padding:7px 13px;font-size:11px;font-weight:600;color:var(--blue);">Yes, generate plan</div>
+          <div style="background:var(--s2);border-radius:999px;padding:7px 13px;font-size:11px;font-weight:600;color:var(--t2);border:1px solid var(--border2);">Show breakdown</div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div style="padding:10px 12px 16px;border-top:1px solid var(--border2);">
+        <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1.5px solid var(--border);border-radius:99px;padding:9px 9px 9px 16px;">
+          <div class="placeholder f1">Message Coach Axiom…</div>
+          <div style="width:34px;height:34px;border-radius:999px;background:var(--blue);display:flex;align-items:center;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Home</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>Train</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Nutrition</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</div>
+      <div class="tab on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Coach</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ WORKOUT PLAN ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Workout Plan</div>
+  <div class="phone">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span>
+      <div class="sb-icons"><svg class="icon" width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="0" width="3" height="12" rx="1.5" fill="#1D1D1F"/><rect x="4.5" y="3" width="3" height="9" rx="1.5" fill="#1D1D1F"/><rect x="9" y="6" width="3" height="6" rx="1.5" fill="#1D1D1F"/><rect x="13.5" y="8" width="2.5" height="4" rx="1.25" fill="#AEAEB2"/></svg></div>
+    </div>
+    <div class="screen">
+      <!-- Header -->
+      <div class="flex jcsb aic px" style="margin:12px 0 14px;">
+        <div class="h1" style="font-size:22px;">Train</div>
+        <div class="icon-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+        </div>
+      </div>
+
+      <!-- Active plan pill -->
+      <div class="px mb10">
+        <div style="background:var(--blue);border-radius:18px;padding:16px 18px;">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.65);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;">Active Plan</div>
+          <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:8px;">Push / Pull / Legs</div>
+          <div style="display:flex;gap:8px;">
+            <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:#fff;">Week 3 / 12</div>
+            <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:#fff;">4 days/wk</div>
+            <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:#fff;">~60 min</div>
+          </div>
+          <div style="margin-top:12px;height:4px;border-radius:999px;background:rgba(255,255,255,.25);">
+            <div style="height:4px;border-radius:999px;background:#fff;width:25%;"></div>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:4px;">25% complete</div>
+        </div>
+      </div>
+
+      <!-- This week -->
+      <div class="sec"><div class="h3">This Week</div></div>
+      <div class="px flex col gap6 mb10">
+        <!-- Done -->
+        <div class="card card-sm flex aic gap12">
+          <div class="ex-thumb" style="background:var(--green-lt);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="f1">
+            <div class="h3" style="font-size:13px;">Push Day</div>
+            <div class="caption mt2">Mon · Chest · Shoulders · Triceps</div>
+          </div>
+          <div class="tag tag-green">Done</div>
+        </div>
+        <!-- Today -->
+        <div class="card card-sm flex aic gap12" style="border:2px solid var(--blue);">
+          <div class="ex-thumb">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M6 4v16M18 4v16M3 8h18M3 16h18"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:13px;font-weight:700;color:var(--blue);">Pull Day · Today</div>
+            <div class="caption mt2">Tue · Back · Biceps · Rear delts</div>
+          </div>
+          <div class="btn-sm btn-sm-blue">Start</div>
+        </div>
+        <!-- Rest -->
+        <div class="card card-sm flex aic gap12" style="opacity:.55;">
+          <div class="ex-thumb" style="background:var(--border2);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M12 2a8 8 0 100 16A8 8 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:13px;font-weight:600;">Rest Day</div>
+            <div class="caption mt2">Wed · Active recovery</div>
+          </div>
+          <div class="tag tag-orange">Rest</div>
+        </div>
+        <!-- Leg day -->
+        <div class="card card-sm flex aic gap12" style="opacity:.65;">
+          <div class="ex-thumb" style="background:var(--border2);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round"><path d="M12 2v10M7 8l5 4 5-4M7 16l5 4 5-4"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:13px;font-weight:600;">Leg Day</div>
+            <div class="caption mt2">Thu · Quads · Hamstrings · Glutes</div>
+          </div>
+          <div class="tag tag-blue">Thu</div>
+        </div>
+      </div>
+
+      <!-- AI Form banner -->
+      <div class="px">
+        <div class="card card-sm flex aic gap12" style="background:var(--s2);">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:13px;font-weight:600;">AI Form Analysis</div>
+            <div class="caption mt1">Real-time pose feedback</div>
+          </div>
+          <div class="btn-sm btn-sm-light">Try</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Home</div>
+      <div class="tab on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>Train</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Nutrition</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Coach</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ ACTIVE SESSION ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Active Session</div>
+  <div class="phone">
+    <div class="sb" style="background:var(--blue);"><div class="sb-notch" style="background:#003D8F;"></div><span class="sb-time" style="color:#fff;">9:41</span>
+      <div class="sb-icons"><svg class="icon" width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="1" y="3" width="13" height="8" rx="1.5" stroke="#fff" stroke-width="1.5" fill="none"/><rect x="13.5" y="5" width="1.5" height="4" rx=".75" fill="#fff"/><rect x="2" y="4.5" width="8" height="5" rx=".75" fill="#fff"/></svg></div>
+    </div>
+    <div class="screen">
+      <!-- Session hero -->
+      <div style="background:var(--blue);padding:12px 16px 22px;">
+        <div class="flex jcsb aic mb10">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.8px;">Pull Day · Ex 2 of 5</div>
+          <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:5px 12px;font-size:13px;font-weight:700;color:#fff;">32:14</div>
+        </div>
+        <div style="font-size:21px;font-weight:800;color:#fff;margin-bottom:10px;">Barbell Row</div>
+        <div style="height:3px;border-radius:999px;background:rgba(255,255,255,.25);">
+          <div style="height:3px;border-radius:999px;background:#fff;width:40%;"></div>
+        </div>
+      </div>
+
+      <!-- Rest timer -->
+      <div class="px mt12 mb8">
+        <div style="background:var(--s2);border-radius:16px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border2);">
+          <div>
+            <div class="label mb4">Rest Timer</div>
+            <div style="font-size:26px;font-weight:800;letter-spacing:-1px;color:var(--t1);">01:24</div>
+          </div>
+          <div class="flex gap8">
+            <div class="btn-sm btn-sm-ghost">+30s</div>
+            <div class="btn-sm btn-sm-blue">Skip</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Set table -->
+      <div class="px mb8">
+        <div class="card" style="border-radius:16px;padding:14px;">
+          <div class="flex" style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding-bottom:10px;border-bottom:1px solid var(--border2);margin-bottom:6px;">
+            <div style="width:28px;">Set</div>
+            <div style="flex:1;text-align:center;">Prev</div>
+            <div style="flex:1;text-align:center;">kg</div>
+            <div style="flex:1;text-align:center;">Reps</div>
+            <div style="width:24px;"></div>
+          </div>
+          <!-- Row done -->
+          <div class="flex aic" style="font-size:13px;padding:7px 0;border-bottom:1px solid var(--border2);">
+            <div style="width:28px;font-weight:700;color:var(--t3);">1</div>
+            <div style="flex:1;text-align:center;color:var(--t3);">80×8</div>
+            <div style="flex:1;text-align:center;font-weight:700;">82.5</div>
+            <div style="flex:1;text-align:center;font-weight:700;">8</div>
+            <div style="width:24px;display:flex;justify-content:flex-end;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>
+          <!-- Active row -->
+          <div class="flex aic" style="font-size:13px;padding:8px 6px;background:var(--blue-lt);border-radius:10px;margin:4px 0;">
+            <div style="width:28px;font-weight:800;color:var(--blue);">2</div>
+            <div style="flex:1;text-align:center;color:var(--t3);">80×8</div>
+            <div style="flex:1;text-align:center;font-weight:800;color:var(--blue);">82.5</div>
+            <div style="flex:1;text-align:center;font-weight:800;color:var(--blue);">8</div>
+            <div style="width:24px;display:flex;justify-content:flex-end;"><div style="width:8px;height:8px;border-radius:50%;background:var(--blue);"></div></div>
+          </div>
+          <!-- Upcoming -->
+          <div class="flex aic" style="font-size:13px;padding:7px 0;opacity:.4;">
+            <div style="width:28px;font-weight:700;color:var(--t3);">3</div>
+            <div style="flex:1;text-align:center;color:var(--t3);">80×8</div>
+            <div style="flex:1;text-align:center;color:var(--t3);">—</div>
+            <div style="flex:1;text-align:center;color:var(--t3);">—</div>
+            <div style="width:24px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px mb8"><div class="btn btn-primary" style="font-size:16px;padding:16px;border-radius:16px;">Log Set</div></div>
+
+      <div class="px">
+        <div style="background:var(--s2);border-radius:12px;padding:12px 14px;border-left:3px solid var(--blue);">
+          <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:3px;">Form Cue</div>
+          <div class="body" style="font-size:12px;">Drive elbows toward hips. Squeeze shoulder blades at the top.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ NUTRITION ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Nutrition</div>
+  <div class="phone">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span>
+      <div class="sb-icons"><svg class="icon" width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="0" width="3" height="12" rx="1.5" fill="#1D1D1F"/><rect x="4.5" y="3" width="3" height="9" rx="1.5" fill="#1D1D1F"/><rect x="9" y="6" width="3" height="6" rx="1.5" fill="#1D1D1F"/></svg></div>
+    </div>
+    <div class="screen">
+      <div class="flex jcsb aic px" style="margin:12px 0 12px;">
+        <div class="h1" style="font-size:22px;">Nutrition</div>
+        <div class="flex gap8">
+          <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        </div>
+      </div>
+
+      <!-- Macro summary bento -->
+      <div class="px mb10">
+        <div class="card" style="border-radius:20px;">
+          <div class="label mb10">Today · May 20</div>
+          <div class="flex jcsb aic mb12">
+            <div style="font-size:32px;font-weight:800;letter-spacing:-1px;">1,640</div>
+            <div style="text-align:right;"><div class="caption">of 2,100 kcal</div><div class="track mt4" style="height:5px;width:80px;"><div class="fill" style="width:78%;background:var(--blue);height:5px;"></div></div></div>
+          </div>
+          <div class="flex gap6">
+            <div style="flex:1;background:var(--blue-lt);border-radius:10px;padding:8px;text-align:center;">
+              <div style="font-size:15px;font-weight:800;color:var(--blue);">118g</div>
+              <div class="caption mt2">Protein</div>
+            </div>
+            <div style="flex:1;background:var(--green-lt);border-radius:10px;padding:8px;text-align:center;">
+              <div style="font-size:15px;font-weight:800;color:#1E8740;">182g</div>
+              <div class="caption mt2">Carbs</div>
+            </div>
+            <div style="flex:1;background:#FFF4E5;border-radius:10px;padding:8px;text-align:center;">
+              <div style="font-size:15px;font-weight:800;color:#B86800;">48g</div>
+              <div class="caption mt2">Fat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breakfast -->
+      <div class="sec"><div class="h3" style="font-size:14px;">Breakfast <span class="caption" style="font-weight:500;margin-left:6px;">620 kcal</span></div><div class="sec-link">+ Add</div></div>
+      <div class="px flex col gap6 mb10">
+        <div class="card card-sm flex aic gap10">
+          <div style="width:38px;height:38px;border-radius:10px;background:#FFF4E5;display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B86800" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12a4 4 0 008 0"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:13px;font-weight:600;">Scrambled Eggs (3)</div>
+            <div class="caption mt1">220 kcal · P 18g · C 2g · F 16g</div>
+          </div>
+          <div class="caption">1 srv</div>
+        </div>
+        <div class="card card-sm flex aic gap10">
+          <div style="width:38px;height:38px;border-radius:10px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C8 3 5 7 5 11c0 5 7 10 7 10s7-5 7-10c0-4-3-8-7-8z"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:13px;font-weight:600;">Greek Yogurt</div>
+            <div class="caption mt1">130 kcal · P 17g · C 9g · F 0g</div>
+          </div>
+          <div class="caption">200g</div>
+        </div>
+      </div>
+
+      <!-- Add lunch -->
+      <div class="px mb10">
+        <div style="border:1.5px dashed var(--border);border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+          <span style="font-size:13px;font-weight:600;color:var(--blue);">Add to Lunch</span>
+        </div>
+      </div>
+
+      <!-- Snap & log -->
+      <div class="px">
+        <div style="background:var(--blue);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:13px;font-weight:700;color:#fff;">Snap & Log</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.75);">AI identifies food from photo</div>
+          </div>
+          <div style="background:rgba(255,255,255,.2);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:600;color:#fff;">Scan</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Home</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>Train</div>
+      <div class="tab on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Nutrition</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Coach</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PROGRESS ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Progress</div>
+  <div class="phone">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span>
+      <div class="sb-icons"><svg class="icon" width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="0" width="3" height="12" rx="1.5" fill="#1D1D1F"/><rect x="4.5" y="3" width="3" height="9" rx="1.5" fill="#1D1D1F"/><rect x="9" y="6" width="3" height="6" rx="1.5" fill="#1D1D1F"/></svg></div>
+    </div>
+    <div class="screen">
+      <div class="px" style="margin:12px 0 14px;"><div class="h1" style="font-size:22px;">Progress</div></div>
+
+      <!-- Weight card -->
+      <div class="px mb8">
+        <div class="card" style="border-radius:20px;padding:16px;">
+          <div class="flex jcsb aic mb12">
+            <div class="label">Weight</div>
+            <div class="flex gap4">
+              <div style="border-radius:8px;padding:3px 10px;font-size:11px;font-weight:600;background:var(--blue);color:#fff;">4W</div>
+              <div style="border-radius:8px;padding:3px 10px;font-size:11px;font-weight:600;background:var(--border2);color:var(--t2);">3M</div>
+            </div>
+          </div>
+          <!-- Chart -->
+          <svg width="100%" height="80" viewBox="0 0 268 80" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0071E3" stop-opacity=".15"/>
+                <stop offset="100%" stop-color="#0071E3" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line x1="0" y1="20" x2="268" y2="20" stroke="var(--border2)" stroke-width="1"/>
+            <line x1="0" y1="50" x2="268" y2="50" stroke="var(--border2)" stroke-width="1"/>
+            <path d="M0,68 C30,65 50,60 80,54 C110,48 130,44 160,40 C190,36 220,34 268,28 L268,80 L0,80Z" fill="url(#wg)"/>
+            <path d="M0,68 C30,65 50,60 80,54 C110,48 130,44 160,40 C190,36 220,34 268,28" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="268" cy="28" r="4.5" fill="var(--blue)" stroke="#fff" stroke-width="2"/>
+          </svg>
+          <div class="flex" style="gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border2);">
+            <div>
+              <div style="font-size:20px;font-weight:800;letter-spacing:-.5px;">85.4<span style="font-size:13px;font-weight:500;color:var(--t2);margin-left:2px;">kg</span></div>
+              <div class="caption">Current</div>
+            </div>
+            <div style="width:1px;background:var(--border2);"></div>
+            <div>
+              <div style="font-size:20px;font-weight:800;letter-spacing:-.5px;color:var(--green);">−2.1<span style="font-size:13px;font-weight:500;margin-left:2px;">kg</span></div>
+              <div class="caption">This month</div>
+            </div>
+            <div style="width:1px;background:var(--border2);"></div>
+            <div>
+              <div style="font-size:20px;font-weight:800;letter-spacing:-.5px;">80<span style="font-size:13px;font-weight:500;color:var(--t2);margin-left:2px;">kg</span></div>
+              <div class="caption">Goal</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body metrics bento -->
+      <div class="px mb8">
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="caption mb6">Chest</div>
+            <div style="font-size:18px;font-weight:800;letter-spacing:-.5px;">102 <span style="font-size:12px;font-weight:500;color:var(--t2);">cm</span></div>
+            <div style="font-size:11px;font-weight:600;color:var(--green);margin-top:3px;">↓ 1.5 cm</div>
+          </div>
+          <div class="metric-card">
+            <div class="caption mb6">Waist</div>
+            <div style="font-size:18px;font-weight:800;letter-spacing:-.5px;">84 <span style="font-size:12px;font-weight:500;color:var(--t2);">cm</span></div>
+            <div style="font-size:11px;font-weight:600;color:var(--green);margin-top:3px;">↓ 2.5 cm</div>
+          </div>
+          <div class="metric-card">
+            <div class="caption mb6">Body Fat</div>
+            <div style="font-size:18px;font-weight:800;letter-spacing:-.5px;">18.2 <span style="font-size:12px;font-weight:500;color:var(--t2);">%</span></div>
+            <div style="font-size:11px;font-weight:600;color:var(--green);margin-top:3px;">↓ 1.4 %</div>
+          </div>
+          <div class="metric-card">
+            <div class="caption mb6">Muscle</div>
+            <div style="font-size:18px;font-weight:800;letter-spacing:-.5px;">69.7 <span style="font-size:12px;font-weight:500;color:var(--t2);">kg</span></div>
+            <div style="font-size:11px;font-weight:600;color:var(--blue);margin-top:3px;">↑ 0.3 kg</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photos -->
+      <div class="sec"><div class="h3" style="font-size:14px;">Progress Photos</div><div class="sec-link">View all</div></div>
+      <div class="px">
+        <div class="flex gap8">
+          <div style="flex:1;aspect-ratio:3/4;border-radius:14px;background:linear-gradient(180deg,#DBEAFE,#F5F9FF);display:flex;align-items:center;justify-content:flex-end;flex-direction:column;padding-bottom:8px;overflow:hidden;">
+            <svg width="40" height="70" viewBox="0 0 40 70" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round"><circle cx="20" cy="8" r="5"/><line x1="20" y1="13" x2="20" y2="40"/><path d="M8 22l12 6 12-6"/><path d="M14 40l-4 16"/><path d="M26 40l4 16"/></svg>
+            <div class="caption" style="margin-top:6px;">Apr 21</div>
+          </div>
+          <div style="flex:1;aspect-ratio:3/4;border-radius:14px;background:linear-gradient(180deg,#DBEAFE,#F5F9FF);display:flex;align-items:center;justify-content:flex-end;flex-direction:column;padding-bottom:8px;">
+            <svg width="40" height="70" viewBox="0 0 40 70" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round"><circle cx="20" cy="8" r="5"/><line x1="20" y1="13" x2="20" y2="40"/><path d="M8 22l12 6 12-6"/><path d="M14 40l-4 16"/><path d="M26 40l4 16"/></svg>
+            <div class="caption" style="margin-top:6px;">May 20</div>
+          </div>
+          <div style="flex:1;aspect-ratio:3/4;border-radius:14px;border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <div style="font-size:10px;font-weight:600;color:var(--blue);">Add photo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Home</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>Train</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Nutrition</div>
+      <div class="tab on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</div>
+      <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>Coach</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ ONBOARDING ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Onboarding</div>
+  <div class="phone" style="background:#fff;">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span><div class="sb-icons"><svg class="icon" width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="1" y="3" width="13" height="8" rx="1.5" stroke="#1D1D1F" stroke-width="1.5" fill="none"/><rect x="2" y="4.5" width="8" height="5" rx=".75" fill="#1D1D1F"/></svg></div></div>
+    <div class="screen" style="padding:0 24px;background:#fff;">
+      <!-- Progress bar -->
+      <div style="margin-top:16px;margin-bottom:24px;">
+        <div class="flex jcsb mb6"><span class="caption">Step 1 of 7</span><span class="caption">14%</span></div>
+        <div class="track" style="height:4px;"><div class="fill" style="width:14%;background:var(--blue);height:4px;"></div></div>
+      </div>
+
+      <div class="h2" style="font-size:22px;margin-bottom:6px;">What's your main goal?</div>
+      <div class="body mb24">We'll personalise everything around this.</div>
+
+      <div class="flex col gap8 mb24">
+        <div class="opt on">
+          <div style="width:38px;height:38px;border-radius:12px;background:var(--blue);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 7 5 10 5 14a7 7 0 0014 0c0-4-3-7-7-12z"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:14px;font-weight:700;color:var(--blue);">Lose Fat</div>
+            <div class="caption mt1">Burn body fat, preserve muscle</div>
+          </div>
+          <div style="width:20px;height:20px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
+          </div>
+        </div>
+        <div class="opt">
+          <div style="width:38px;height:38px;border-radius:12px;background:var(--border2);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12M6 20h12M6 4v16M18 4v16M9 8h6M9 12h6M9 16h6"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:14px;font-weight:600;">Build Muscle</div>
+            <div class="caption mt1">Gain size and strength</div>
+          </div>
+          <div style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);"></div>
+        </div>
+        <div class="opt">
+          <div style="width:38px;height:38px;border-radius:12px;background:var(--border2);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round"><polyline points="13 2 13 9 20 9"/><path d="M20 3l-7 7-4-4-6 6"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:14px;font-weight:600;">Get Stronger</div>
+            <div class="caption mt1">Increase 1-rep maxes</div>
+          </div>
+          <div style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);"></div>
+        </div>
+        <div class="opt">
+          <div style="width:38px;height:38px;border-radius:12px;background:var(--border2);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="f1">
+            <div style="font-size:14px;font-weight:600;">Improve Health</div>
+            <div class="caption mt1">Energy, sleep, and wellbeing</div>
+          </div>
+          <div style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);"></div>
+        </div>
+      </div>
+
+      <div class="btn btn-primary" style="border-radius:16px;">Continue</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SIGN IN ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Sign In</div>
+  <div class="phone" style="background:#fff;">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span><div class="sb-icons"></div></div>
+    <div class="screen" style="padding:0 24px;background:#fff;">
+      <div style="margin-top:36px;margin-bottom:32px;">
+        <div class="h1" style="font-size:26px;margin-bottom:6px;">Welcome back</div>
+        <div class="body">Sign in to continue your journey</div>
+      </div>
+
+      <!-- Google -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;border:1.5px solid var(--border);border-radius:14px;padding:13px;margin-bottom:16px;background:#fff;cursor:pointer;">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        <span style="font-size:14px;font-weight:600;">Continue with Google</span>
+      </div>
+
+      <!-- Divider -->
+      <div class="flex aic gap10 mb16">
+        <div style="flex:1;height:1px;background:var(--border2);"></div>
+        <div class="caption">or</div>
+        <div style="flex:1;height:1px;background:var(--border2);"></div>
+      </div>
+
+      <!-- Email -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;">Email</div>
+        <div class="input-row focus">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <div class="input-val">alex@example.com</div>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div style="margin-bottom:22px;">
+        <div class="flex jcsb mb6">
+          <div style="font-size:12px;font-weight:600;color:var(--t2);">Password</div>
+          <div style="font-size:12px;font-weight:600;color:var(--blue);">Forgot?</div>
+        </div>
+        <div class="input-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <div class="placeholder">••••••••••</div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+      </div>
+
+      <div class="btn btn-primary mb12" style="border-radius:14px;">Sign In</div>
+      <div class="body ta-c" style="font-size:13px;">No account? <span style="color:var(--blue);font-weight:700;">Sign Up</span></div>
+
+      <!-- Face ID -->
+      <div class="ta-c" style="margin-top:28px;">
+        <div class="caption mb8">Or use Face ID</div>
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="12" height="12" rx="3"/><rect x="26" y="2" width="12" height="12" rx="3"/>
+          <rect x="2" y="26" width="12" height="12" rx="3"/><rect x="26" y="26" width="12" height="12" rx="3"/>
+          <circle cx="15" cy="17" r="1.5" fill="var(--t2)"/><circle cx="25" cy="17" r="1.5" fill="var(--t2)"/>
+          <path d="M15 24s2 3 5 0"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SETTINGS ══════════════════════════ -->
+<div class="phone-wrap">
+  <div class="phone-label">Settings</div>
+  <div class="phone">
+    <div class="sb"><div class="sb-notch"></div><span class="sb-time">9:41</span><div class="sb-icons"><svg class="icon" width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="0" width="3" height="12" rx="1.5" fill="#1D1D1F"/><rect x="4.5" y="3" width="3" height="9" rx="1.5" fill="#1D1D1F"/><rect x="9" y="6" width="3" height="6" rx="1.5" fill="#1D1D1F"/></svg></div></div>
+    <div class="screen">
+      <div class="px" style="margin:12px 0 14px;"><div class="h1" style="font-size:22px;">Settings</div></div>
+
+      <!-- Profile card -->
+      <div class="px mb12">
+        <div style="background:var(--white);border-radius:20px;padding:16px;border:1px solid var(--border2);display:flex;align-items:center;gap:14px;">
+          <div class="av" style="width:52px;height:52px;font-size:18px;font-weight:800;">AC</div>
+          <div class="f1">
+            <div class="h3">Alex Carter</div>
+            <div class="caption mt2">alex@example.com</div>
+            <div class="chip chip-blue mt6" style="font-size:10px;padding:3px 9px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Premium
+            </div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+      <!-- Settings groups -->
+      <div class="px flex col gap6">
+        <div style="background:var(--white);border-radius:16px;border:1px solid var(--border2);overflow:hidden;">
+          <div class="set-row" style="border-bottom:1px solid var(--border2);">
+            <div class="set-icon" style="background:#EEF2FF;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+            <div class="f1"><div class="h3" style="font-size:14px;">Notifications</div></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="set-row" style="border-bottom:1px solid var(--border2);">
+            <div class="set-icon" style="background:#EDE9FE;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div class="f1"><div class="h3" style="font-size:14px;">AI Consent</div></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="set-row">
+            <div class="set-icon" style="background:var(--green-lt);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+            <div class="f1"><div class="h3" style="font-size:14px;">Subscription</div></div>
+            <div class="chip chip-green" style="font-size:10px;padding:3px 8px;margin-right:6px;">Premium</div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:16px;border:1px solid var(--border2);overflow:hidden;">
+          <div class="set-row" style="border-bottom:1px solid var(--border2);">
+            <div class="set-icon" style="background:#FEE2E2;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div class="f1"><div class="h3" style="font-size:14px;">Privacy & Data</div></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="set-row">
+            <div class="set-icon" style="background:#FEF3C7;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+            <div class="f1"><div style="font-size:14px;font-weight:600;color:var(--red);">Sign Out</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<div style="text-align:center;padding:32px 40px 52px;color:#6E6E73;font-size:13px;background:#1D1D1F;border-top:1px solid #3A3A3C;">
+  <div style="font-size:15px;font-weight:700;color:#86868B;margin-bottom:8px;">Axiom AI Coach · Redesign Preview</div>
+  <div>Clean SVG icons · Inter typeface · SF-inspired design language · 8pt grid · Material 3 tokens</div>
+</div>
+
+</body>
+</html>
