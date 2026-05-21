@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.axiom.aicoach.security.ScreenSecurity
 import com.axiom.aicoach.ui.components.AxiomPrimaryButton
 import com.axiom.aicoach.ui.components.AxiomSecondaryButton
 import com.axiom.aicoach.ui.theme.AxiomTheme
@@ -74,6 +75,9 @@ fun SignInScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+
+    // Prevent screen capture on the sign-in screen (passwords visible)
+    ScreenSecurity(enabled = true)
 
     Box(
         modifier = Modifier

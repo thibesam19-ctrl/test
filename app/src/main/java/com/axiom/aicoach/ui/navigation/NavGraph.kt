@@ -13,6 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.axiom.aicoach.ui.screens.auth.SignInScreen
 import com.axiom.aicoach.ui.screens.auth.SignUpScreen
 import com.axiom.aicoach.ui.screens.auth.PasswordResetScreen
@@ -153,7 +154,10 @@ fun AxiomNavGraph(
                 onContinue = { navController.navigate(Screen.Dashboard.route) { popUpTo(0) } },
             )
         }
-        composable(Screen.Dashboard.route) {
+        composable(
+            route = Screen.Dashboard.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "axiom://home" }),
+        ) {
             DashboardScreen(
                 onNavigateToWorkout = { navController.navigate(Screen.WorkoutPlan.route) },
                 onNavigateToNutrition = { navController.navigate(Screen.NutritionDashboard.route) },
@@ -163,7 +167,10 @@ fun AxiomNavGraph(
                 onNavigateToWater = { navController.navigate(Screen.WaterTracking.route) },
             )
         }
-        composable(Screen.WorkoutPlan.route) {
+        composable(
+            route = Screen.WorkoutPlan.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "axiom://workout" }),
+        ) {
             WorkoutPlanScreen(
                 onStartWorkout = { planId -> navController.navigate(Screen.WorkoutSession.createRoute(planId)) },
                 onExerciseDetail = { exerciseId -> navController.navigate(Screen.ExerciseDetail.createRoute(exerciseId)) },
@@ -230,7 +237,10 @@ fun AxiomNavGraph(
         composable(Screen.MealLog.route) {
             MealLogScreen(onBack = { navController.popBackStack() })
         }
-        composable(Screen.WaterTracking.route) {
+        composable(
+            route = Screen.WaterTracking.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "axiom://water" }),
+        ) {
             WaterTrackingScreen(onBack = { navController.popBackStack() })
         }
         composable(Screen.ProgressOverview.route) {
@@ -250,7 +260,10 @@ fun AxiomNavGraph(
         composable(Screen.PhotoGallery.route) {
             PhotoGalleryScreen(onBack = { navController.popBackStack() })
         }
-        composable(Screen.CoachChat.route) {
+        composable(
+            route = Screen.CoachChat.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "axiom://coach" }),
+        ) {
             CoachChatScreen(onBack = { navController.popBackStack() })
         }
         composable(Screen.Settings.route) {

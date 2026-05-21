@@ -7,6 +7,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.axiom.aicoach.BuildConfig
 import com.axiom.aicoach.data.local.database.AxiomDatabase
+import com.axiom.aicoach.data.local.database.AxiomDatabase.Companion.MIGRATION_1_2
+import com.google.firebase.auth.FirebaseAuth
 import com.axiom.aicoach.data.repository.*
 import dagger.Binds
 import dagger.Module
@@ -30,7 +32,12 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AxiomDatabase =
         Room.databaseBuilder(context, AxiomDatabase::class.java, "axiom.db")
+            .addMigrations(MIGRATION_1_2)
             .build()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
     @Provides fun provideUserProfileDao(db: AxiomDatabase) = db.userProfileDao()
     @Provides fun provideFoodItemDao(db: AxiomDatabase) = db.foodItemDao()
@@ -56,13 +63,17 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
         return OkHttpClient.Builder()
-            .addInterceptor(logging)
+            .apply {
+                // Only log HTTP bodies in debug builds — never in release (keys would leak to logcat)
+                if (BuildConfig.DEBUG) {
+                    addInterceptor(HttpLoggingInterceptor().apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    })
+                }
+            }
             .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }

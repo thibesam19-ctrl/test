@@ -11,6 +11,9 @@ import com.axiom.aicoach.data.local.dao.FoodLogDao
 import com.axiom.aicoach.data.local.dao.StreakDao
 import com.axiom.aicoach.data.local.dao.UserProfileDao
 import com.axiom.aicoach.data.local.dao.WaterLogDao
+import com.axiom.aicoach.analytics.AnalyticsEvent
+import com.axiom.aicoach.analytics.AxiomAnalytics
+import com.axiom.aicoach.security.UserSession
 import com.axiom.aicoach.util.toDbString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import com.axiom.aicoach.data.local.entities.FoodLogEntity
@@ -54,10 +57,11 @@ class DashboardViewModel @Inject constructor(
     private val streakDao: StreakDao,
     private val insightsEngine: InsightsEngine,
     private val recommendationEngine: RecommendationEngine,
+    private val analytics: AxiomAnalytics,
+    private val userSession: UserSession,
 ) : ViewModel() {
 
-    // The local user ID used until proper auth is wired up.
-    private val userId = "local_user"
+    private val userId: String get() = userSession.userId
     private val today: String = LocalDate.now().toDbString()
 
     private val _insights = MutableStateFlow<List<WeeklyInsight>>(emptyList())
@@ -67,10 +71,10 @@ class DashboardViewModel @Inject constructor(
     val recommendations: StateFlow<List<Recommendation>> = _recommendations.asStateFlow()
 
     init {
+        analytics.track(AnalyticsEvent.ScreenViewed("dashboard"))
         viewModelScope.launch {
-            val insightUserId = "default_user"
-            _insights.value = insightsEngine.generateInsights(insightUserId)
-            _recommendations.value = recommendationEngine.getRecommendations(insightUserId)
+            _insights.value = insightsEngine.generateInsights(userId)
+            _recommendations.value = recommendationEngine.getRecommendations(userId)
         }
     }
 

@@ -3,6 +3,7 @@ package com.axiom.aicoach.data.repository
 import com.axiom.aicoach.data.local.dao.*
 import com.axiom.aicoach.data.local.entities.*
 import com.axiom.aicoach.domain.model.*
+import com.axiom.aicoach.security.UserSession
 import com.axiom.aicoach.util.newId
 import com.axiom.aicoach.util.toDbString
 import com.axiom.aicoach.util.toLocalDateTime
@@ -137,9 +138,10 @@ class WorkoutRepositoryImpl @Inject constructor(
     private val exerciseLogDao: ExerciseLogDao,
     private val setLogDao: SetLogDao,
     private val personalRecordDao: PersonalRecordDao,
+    private val userSession: UserSession,
 ) : WorkoutRepository {
 
-    private val userId = "local_user"
+    private val userId: String get() = userSession.userId
 
     private suspend fun buildWorkout(entity: WorkoutEntity): Workout {
         val weEntities = workoutExerciseDao.getForWorkout(entity.id)

@@ -7,6 +7,7 @@ import com.axiom.aicoach.data.local.entities.FoodItemEntity
 import com.axiom.aicoach.data.local.entities.FoodLogEntity
 import com.axiom.aicoach.data.local.entities.WaterLogEntity
 import com.axiom.aicoach.domain.model.*
+import com.axiom.aicoach.security.UserSession
 import com.axiom.aicoach.util.newId
 import com.axiom.aicoach.util.toDbString
 import com.axiom.aicoach.util.toLocalDateTime
@@ -112,9 +113,10 @@ class NutritionRepositoryImpl @Inject constructor(
     private val foodLogDao: FoodLogDao,
     private val foodItemDao: FoodItemDao,
     private val waterLogDao: WaterLogDao,
+    private val userSession: UserSession,
 ) : NutritionRepository {
 
-    private val userId = "local_user"
+    private val userId: String get() = userSession.userId
 
     private suspend fun enrichLogs(entities: List<FoodLogEntity>): List<FoodLog> =
         entities.map { entity ->

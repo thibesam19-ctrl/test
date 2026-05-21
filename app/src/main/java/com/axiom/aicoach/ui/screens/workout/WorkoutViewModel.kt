@@ -23,6 +23,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import com.axiom.aicoach.analytics.AnalyticsEvent
+import com.axiom.aicoach.analytics.AxiomAnalytics
+import com.axiom.aicoach.security.UserSession
+import com.axiom.aicoach.util.toLocalDateTime
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -78,9 +82,11 @@ class WorkoutViewModel @Inject constructor(
     private val exerciseLogDao: ExerciseLogDao,
     private val setLogDao: SetLogDao,
     private val exerciseDao: ExerciseDao,
+    private val analytics: AxiomAnalytics,
+    private val userSession: UserSession,
 ) : ViewModel() {
 
-    private val userId = "local_user"
+    private val userId: String get() = userSession.userId
 
     // ── Plan state ────────────────────────────────────────────────────────────
 
@@ -117,6 +123,7 @@ class WorkoutViewModel @Inject constructor(
     }
 
     fun startSession(planId: String, workoutId: String) {
+        analytics.track(AnalyticsEvent.WorkoutStarted(planId))
         viewModelScope.launch {
             val workout = workoutDao.findById(workoutId) ?: return@launch
             val exerciseEntities = workoutExerciseDao.getForWorkout(workoutId)
@@ -262,10 +269,16 @@ class WorkoutViewModel @Inject constructor(
         viewModelScope.launch {
             activeSessionId?.let { sessionId ->
                 val existing = workoutSessionDao.findById(sessionId) ?: return@let
+                val durationMinutes = runCatching {
+                    val start = existing.startedAt.toLocalDateTime()
+                    java.time.Duration.between(start, LocalDateTime.now()).toMinutes().toInt()
+                }.getOrDefault(0)
                 val completed = existing.copy(
                     completedAt = LocalDateTime.now().toDbString(),
+                    durationMinutes = durationMinutes,
                 )
                 workoutSessionDao.upsert(completed)
+                analytics.track(AnalyticsEvent.WorkoutCompleted(existing.workoutId, durationMinutes))
             }
             _sessionUiState.update { it.copy(isComplete = true, isRestTimerActive = false) }
         }

@@ -20,6 +20,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import com.axiom.aicoach.analytics.AnalyticsEvent
+import com.axiom.aicoach.analytics.AxiomAnalytics
+import com.axiom.aicoach.security.UserSession
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -151,10 +154,11 @@ class NutritionViewModel @Inject constructor(
     private val waterLogDao: WaterLogDao,
     private val userProfileDao: UserProfileDao,
     private val foodRecognitionRepository: FoodRecognitionRepository,
+    private val analytics: AxiomAnalytics,
+    private val userSession: UserSession,
 ) : ViewModel() {
 
-    // Hard-coded demo user id; swap for real auth when ready
-    private val userId = "demo_user"
+    private val userId: String get() = userSession.userId
     private val todayDate: String get() = LocalDate.now().toString()
 
     private val _searchQuery = MutableStateFlow("")
@@ -262,6 +266,7 @@ class NutritionViewModel @Inject constructor(
                 loggedAt = LocalDateTime.now().toString(),
             )
             foodLogDao.insert(entity)
+            analytics.track(AnalyticsEvent.ScreenViewed("food_logged"))
         }
     }
 

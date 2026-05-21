@@ -10,6 +10,7 @@ import com.axiom.aicoach.domain.model.BodyMeasurement
 import com.axiom.aicoach.domain.model.PhotoAngle
 import com.axiom.aicoach.domain.model.ProgressPhoto
 import com.axiom.aicoach.domain.model.WeightLog
+import com.axiom.aicoach.security.UserSession
 import com.axiom.aicoach.util.newId
 import com.axiom.aicoach.util.toDbString
 import com.axiom.aicoach.util.toLocalDateTime
@@ -104,9 +105,10 @@ class ProgressRepositoryImpl @Inject constructor(
     private val weightLogDao: WeightLogDao,
     private val bodyMeasurementDao: BodyMeasurementDao,
     private val progressPhotoDao: ProgressPhotoDao,
+    private val userSession: UserSession,
 ) : ProgressRepository {
 
-    private val userId = "local_user"
+    private val userId: String get() = userSession.userId
 
     override fun getWeightLogs(): Flow<List<WeightLog>> =
         weightLogDao.observeAll(userId)

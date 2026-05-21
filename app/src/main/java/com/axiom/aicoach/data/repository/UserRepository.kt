@@ -5,6 +5,7 @@ import com.axiom.aicoach.data.local.dao.UserProfileDao
 import com.axiom.aicoach.data.local.entities.StreakEntity
 import com.axiom.aicoach.data.local.entities.UserProfileEntity
 import com.axiom.aicoach.domain.model.*
+import com.axiom.aicoach.security.UserSession
 import com.axiom.aicoach.util.newId
 import com.axiom.aicoach.util.toDbString
 import com.axiom.aicoach.util.toLocalDate
@@ -72,6 +73,8 @@ interface UserRepository {
     suspend fun updateProfile(profile: UserProfile)
     fun getStreak(): Flow<StreakEntity?>
     suspend fun incrementStreak()
+    /** GDPR Article 17 — erase all locally stored data for the current user. */
+    suspend fun deleteAllUserData()
 }
 
 // ── Implementation ────────────────────────────────────────────────────────────
@@ -80,10 +83,10 @@ interface UserRepository {
 class UserRepositoryImpl @Inject constructor(
     private val dao: UserProfileDao,
     private val streakDao: StreakDao,
+    private val userSession: UserSession,
 ) : UserRepository {
 
-    // Uses a fixed single-user ID; swap for real auth when needed.
-    private val userId = "local_user"
+    private val userId: String get() = userSession.userId
 
     override fun getProfile(): Flow<UserProfile?> =
         dao.observeProfile(userId)
@@ -124,5 +127,10 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
         }
+    }
+
+    override suspend fun deleteAllUserData() {
+        dao.delete(userId)
+        streakDao.deleteById(userId)
     }
 }

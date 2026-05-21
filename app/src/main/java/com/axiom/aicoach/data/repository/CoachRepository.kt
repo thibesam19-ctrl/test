@@ -5,6 +5,7 @@ import com.axiom.aicoach.data.local.entities.CoachMessageEntity
 import com.axiom.aicoach.domain.model.CoachIntent
 import com.axiom.aicoach.domain.model.CoachMessage
 import com.axiom.aicoach.domain.model.MessageRole
+import com.axiom.aicoach.security.UserSession
 import com.axiom.aicoach.util.newId
 import com.axiom.aicoach.util.toDbString
 import com.axiom.aicoach.util.toLocalDateTime
@@ -40,9 +41,10 @@ interface CoachRepository {
 @Singleton
 class CoachRepositoryImpl @Inject constructor(
     private val coachMessageDao: CoachMessageDao,
+    private val userSession: UserSession,
 ) : CoachRepository {
 
-    private val userId = "local_user"
+    private val userId: String get() = userSession.userId
     private val conversationId = "default_conversation"
 
     override fun getMessages(): Flow<List<CoachMessage>> =

@@ -5,8 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.axiom.aicoach.ai.coaching.CoachingEngine
 import com.axiom.aicoach.ai.provider.AiMessage
 import com.axiom.aicoach.ai.provider.AiRole
+import com.axiom.aicoach.analytics.AnalyticsEvent
+import com.axiom.aicoach.analytics.AxiomAnalytics
 import com.axiom.aicoach.data.local.dao.CoachMessageDao
 import com.axiom.aicoach.data.local.entities.CoachMessageEntity
+import com.axiom.aicoach.security.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,15 +40,17 @@ data class ChatMessageUi(
     val timestamp: Long = System.currentTimeMillis(),
 )
 
-// Hardcoded for now; replace with real session/auth source when available.
-private const val CURRENT_USER_ID = "local_user"
 private const val CONVERSATION_ID = "default_conversation"
 
 @HiltViewModel
 class CoachViewModel @Inject constructor(
     private val coachMessageDao: CoachMessageDao,
     private val coachingEngine: CoachingEngine,
+    private val analytics: AxiomAnalytics,
+    private val userSession: UserSession,
 ) : ViewModel() {
+
+    private val currentUserId: String get() = userSession.userId
 
     private val introMessage = ChatMessageUi(
         id = "intro",
@@ -57,8 +62,9 @@ class CoachViewModel @Inject constructor(
     val uiState: StateFlow<CoachUiState> = _uiState.asStateFlow()
 
     init {
+        analytics.track(AnalyticsEvent.ScreenViewed("coach_chat"))
         viewModelScope.launch {
-            coachMessageDao.observeMessages(CURRENT_USER_ID).collect { entities ->
+            coachMessageDao.observeMessages(currentUserId).collect { entities ->
                 val mapped = entities
                     .sortedBy { it.timestamp }
                     .map { entity ->
@@ -88,6 +94,7 @@ class CoachViewModel @Inject constructor(
         val text = _uiState.value.inputText.trim()
         if (text.isEmpty()) return
         _uiState.update { it.copy(inputText = "") }
+        analytics.track(AnalyticsEvent.AiCoachMessageSent)
         dispatchMessage(text)
     }
 
@@ -101,7 +108,7 @@ class CoachViewModel @Inject constructor(
             val userEntity = CoachMessageEntity(
                 id = UUID.randomUUID().toString(),
                 conversationId = CONVERSATION_ID,
-                userId = CURRENT_USER_ID,
+                userId = currentUserId,
                 role = "USER",
                 content = text,
                 intent = null,
@@ -145,12 +152,13 @@ class CoachViewModel @Inject constructor(
                 }
             }
 
+            analytics.track(AnalyticsEvent.AiCoachResponseReceived(coachingEngine.preferredProvider.name))
             // Persist the completed response to Room
             if (fullResponse.isNotBlank()) {
                 val coachEntity = CoachMessageEntity(
                     id = streamingMessageId,
                     conversationId = CONVERSATION_ID,
-                    userId = CURRENT_USER_ID,
+                    userId = currentUserId,
                     role = "ASSISTANT",
                     content = fullResponse,
                     intent = null,

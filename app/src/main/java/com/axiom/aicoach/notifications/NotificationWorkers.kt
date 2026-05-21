@@ -2,12 +2,15 @@ package com.axiom.aicoach.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import com.axiom.aicoach.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
@@ -39,11 +42,12 @@ class WaterReminderWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         showNotification(
-            applicationContext,
-            CHANNEL_REMINDERS,
-            1001,
-            "💧 Time to hydrate!",
-            "You're at 60% of your water goal. Add a glass of water.",
+            context = applicationContext,
+            channelId = CHANNEL_REMINDERS,
+            id = 1001,
+            title = "Time to hydrate!",
+            message = "You're at 60% of your water goal. Add a glass of water.",
+            deepLinkUri = "axiom://water",
         )
         return Result.success()
     }
@@ -57,11 +61,12 @@ class WorkoutReminderWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         showNotification(
-            applicationContext,
-            CHANNEL_REMINDERS,
-            1002,
-            "🏋️ Workout time!",
-            "Your Upper Body Power session is scheduled for today. Let's go!",
+            context = applicationContext,
+            channelId = CHANNEL_REMINDERS,
+            id = 1002,
+            title = "Workout time!",
+            message = "Your session is scheduled for today. Tap to start.",
+            deepLinkUri = "axiom://workout",
         )
         return Result.success()
     }
@@ -75,17 +80,33 @@ class WeeklyProgressWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         showNotification(
-            applicationContext,
-            CHANNEL_COACH,
-            1003,
-            "📊 Weekly Progress Report",
-            "You completed 4 workouts and hit your calorie goal 5/7 days. Great week!",
+            context = applicationContext,
+            channelId = CHANNEL_COACH,
+            id = 1003,
+            title = "Weekly Progress Report",
+            message = "You completed 4 workouts and hit your calorie goal 5/7 days. Great week!",
+            deepLinkUri = "axiom://home",
         )
         return Result.success()
     }
 }
 
-private fun showNotification(context: Context, channelId: String, id: Int, title: String, message: String) {
+private fun showNotification(
+    context: Context,
+    channelId: String,
+    id: Int,
+    title: String,
+    message: String,
+    deepLinkUri: String,
+) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(deepLinkUri), context, MainActivity::class.java)
+    val pendingIntent = PendingIntent.getActivity(
+        context,
+        id,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
+
     val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val notification = NotificationCompat.Builder(context, channelId)
         .setContentTitle(title)
@@ -93,6 +114,7 @@ private fun showNotification(context: Context, channelId: String, id: Int, title
         .setSmallIcon(android.R.drawable.ic_dialog_info)
         .setAutoCancel(true)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setContentIntent(pendingIntent)
         .build()
     manager.notify(id, notification)
 }
@@ -112,13 +134,15 @@ class AxiomNotificationService : android.app.Service() {
 fun scheduleReminders(context: Context) {
     val workManager = WorkManager.getInstance(context)
 
-    // Water reminder every 2 hours
     val waterWork = PeriodicWorkRequestBuilder<WaterReminderWorker>(2, TimeUnit.HOURS)
         .setConstraints(Constraints.Builder().build())
         .build()
     workManager.enqueueUniquePeriodicWork("water_reminder", ExistingPeriodicWorkPolicy.KEEP, waterWork)
 
-    // Weekly progress every 7 days
+    val workoutWork = PeriodicWorkRequestBuilder<WorkoutReminderWorker>(1, TimeUnit.DAYS)
+        .build()
+    workManager.enqueueUniquePeriodicWork("workout_reminder", ExistingPeriodicWorkPolicy.KEEP, workoutWork)
+
     val weeklyWork = PeriodicWorkRequestBuilder<WeeklyProgressWorker>(7, TimeUnit.DAYS)
         .build()
     workManager.enqueueUniquePeriodicWork("weekly_progress", ExistingPeriodicWorkPolicy.KEEP, weeklyWork)
