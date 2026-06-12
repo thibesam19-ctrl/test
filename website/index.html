@@ -103,8 +103,9 @@ section{padding:110px 6%;position:relative;}
   box-shadow:0 4px 20px rgba(30,42,68,.04);
   transition:all .35s;}
 .srv-card:hover{transform:translateY(-8px);box-shadow:0 20px 44px rgba(30,42,68,.1);}
-.srv-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;
-  justify-content:center;font-size:1.6rem;margin-bottom:20px;background:var(--tint);}
+.srv-3d{width:110px;height:110px;border-radius:20px;margin-bottom:18px;background:var(--tint);
+  display:block;transition:transform .35s;}
+.srv-card:hover .srv-3d{transform:scale(1.08);}
 .srv-card h3{font-size:1.08rem;margin-bottom:8px;font-weight:700;}
 .srv-card p{color:var(--ink-soft);font-size:.9rem;line-height:1.65;}
 
@@ -215,14 +216,14 @@ footer{padding:46px 6%;display:flex;align-items:center;justify-content:space-bet
     <p>From a midnight emergency to monthly upkeep — handled by background-checked professionals.</p>
   </div>
   <div class="srv-grid">
-    <div class="srv-card"><div class="srv-icon" style="--tint:#e3edfd">🔧</div><h3>Plumbing</h3><p>Leaks, blockages and emergency burst-pipe response, day or night.</p></div>
-    <div class="srv-card"><div class="srv-icon" style="--tint:#fdf3e0">⚡</div><h3>Electrical</h3><p>Wiring faults, breaker trips and installations by certified electricians.</p></div>
-    <div class="srv-card"><div class="srv-icon" style="--tint:#e2f6f0">🧹</div><h3>Deep Cleaning</h3><p>Full property, kitchen or bathroom deep cleans — scheduled or same-day.</p></div>
-    <div class="srv-card"><div class="srv-icon" style="--tint:#ece7fb">❄️</div><h3>AC Service</h3><p>Servicing, gas top-ups and breakdown repair for all major brands.</p></div>
-    <div class="srv-card"><div class="srv-icon" style="--tint:#fce8f0">🎨</div><h3>Painting</h3><p>Interior and exterior painting with full prep and a clean finish.</p></div>
-    <div class="srv-card"><div class="srv-icon" style="--tint:#e3edfd">🔨</div><h3>Handyman</h3><p>Furniture assembly, mounting and all the small fixes around the house.</p></div>
-    <div class="srv-card"><div class="srv-icon" style="--tint:#e2f6f0">🌿</div><h3>Garden Care</h3><p>Lawn trimming, hedge shaping and seasonal garden maintenance.</p></div>
-    <div class="srv-card"><div class="srv-icon" style="--tint:#fdf3e0">🐜</div><h3>Pest Control</h3><p>Safe, certified treatment for termites, rodents and insects.</p></div>
+    <div class="srv-card"><canvas class="srv-3d" data-model="plumbing" style="--tint:#e3edfd"></canvas><h3>Plumbing</h3><p>Leaks, blockages and emergency burst-pipe response, day or night.</p></div>
+    <div class="srv-card"><canvas class="srv-3d" data-model="electrical" style="--tint:#fdf3e0"></canvas><h3>Electrical</h3><p>Wiring faults, breaker trips and installations by certified electricians.</p></div>
+    <div class="srv-card"><canvas class="srv-3d" data-model="cleaning" style="--tint:#e2f6f0"></canvas><h3>Deep Cleaning</h3><p>Full property, kitchen or bathroom deep cleans — scheduled or same-day.</p></div>
+    <div class="srv-card"><canvas class="srv-3d" data-model="ac" style="--tint:#ece7fb"></canvas><h3>AC Service</h3><p>Servicing, gas top-ups and breakdown repair for all major brands.</p></div>
+    <div class="srv-card"><canvas class="srv-3d" data-model="painting" style="--tint:#fce8f0"></canvas><h3>Painting</h3><p>Interior and exterior painting with full prep and a clean finish.</p></div>
+    <div class="srv-card"><canvas class="srv-3d" data-model="handyman" style="--tint:#e3edfd"></canvas><h3>Handyman</h3><p>Furniture assembly, mounting and all the small fixes around the house.</p></div>
+    <div class="srv-card"><canvas class="srv-3d" data-model="garden" style="--tint:#e2f6f0"></canvas><h3>Garden Care</h3><p>Lawn trimming, hedge shaping and seasonal garden maintenance.</p></div>
+    <div class="srv-card"><canvas class="srv-3d" data-model="pest" style="--tint:#fdf3e0"></canvas><h3>Pest Control</h3><p>Safe, certified treatment for termites, rodents and insects.</p></div>
   </div>
 </section>
 
@@ -584,6 +585,404 @@ addEventListener('resize',()=>{
   camera.updateProjectionMatrix();
   renderer.setSize(W(),H());
 });
+
+/* ══════════════════════════════════════════════════════
+   SERVICE CARDS — each icon is a real animated 3D model
+   ══════════════════════════════════════════════════════ */
+
+const PM = (c,r=.5,m=.05)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const steel  = PM(0x9fb4d8,.3,.6);
+const steelD = PM(0x6b7fa3,.35,.55);
+const blueP  = PM(0x6c9bf2,.45,.1);
+const mintP  = PM(0x9fdfcf,.5);
+const lavP   = PM(0xc3b8f0,.5);
+const peachP = PM(0xf8cdb4,.55);
+const roseP  = PM(0xf3b8cf,.55);
+const woodP  = PM(0xf3d9c3,.6);
+const amberP = PM(0xf5cf6e,.4,.2);
+const whiteP = PM(0xffffff,.5);
+const greenP = PM(0xa9dbb8,.55);
+
+// ── Model builders (all from primitives) ──
+const builders = {
+
+  // PLUMBING — pipe elbow with red valve wheel + water drop
+  plumbing(){
+    const g = new THREE.Group();
+    const pipeV = new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,1.1,24), steel);
+    pipeV.position.y = .25;
+    g.add(pipeV);
+    const pipeH = new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,1.0,24), steel);
+    pipeH.rotation.z = Math.PI/2;
+    pipeH.position.set(.45,-.35,0);
+    g.add(pipeH);
+    const joint = new THREE.Mesh(new THREE.SphereGeometry(.27,20,20), steelD);
+    joint.position.set(0,-.35,0);
+    g.add(joint);
+    // flanges
+    [[0,.82,0,0],[ .98,-.35,0,Math.PI/2]].forEach(([x,y,z,rz])=>{
+      const f = new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.1,24), steelD);
+      f.position.set(x,y,z); f.rotation.z = rz;
+      g.add(f);
+    });
+    // valve wheel
+    const wheel = new THREE.Mesh(new THREE.TorusGeometry(.3,.06,12,32), roseP);
+    wheel.rotation.x = Math.PI/2;
+    wheel.position.set(0,.35,.0);
+    g.add(wheel);
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.3,12), steelD);
+    stem.position.set(0,.35,0);
+    g.add(stem);
+    // water drop
+    const drop = new THREE.Mesh(new THREE.SphereGeometry(.12,16,16), PM(0xa8c8f8,.2,.3));
+    drop.scale.y = 1.35;
+    drop.position.set(.98,-.75,0);
+    g.userData.drop = drop;
+    g.add(drop);
+    return g;
+  },
+
+  // ELECTRICAL — lightning bolt + plug
+  electrical(){
+    const g = new THREE.Group();
+    // bolt from extruded shape
+    const s = new THREE.Shape();
+    s.moveTo(.05,.7); s.lineTo(-.3,.05); s.lineTo(-.02,.05);
+    s.lineTo(-.18,-.7); s.lineTo(.32,-.05); s.lineTo(.04,-.05); s.lineTo(.3,.7);
+    s.closePath();
+    const bolt = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(s,{depth:.18,bevelEnabled:true,bevelSize:.02,bevelThickness:.02}),
+      amberP
+    );
+    bolt.position.z = -.09;
+    g.add(bolt);
+    // small plug at base
+    const plugBody = new THREE.Mesh(new THREE.BoxGeometry(.34,.26,.26), blueP);
+    plugBody.position.set(-.55,-.55,0);
+    g.add(plugBody);
+    [[-.06],[.06]].forEach(([off])=>{
+      const pin = new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.18,10), steel);
+      pin.rotation.z = Math.PI/2;
+      pin.position.set(-.78,-.55+off*1.4,0);
+      g.add(pin);
+    });
+    return g;
+  },
+
+  // CLEANING — bucket with foam bubbles + broom
+  cleaning(){
+    const g = new THREE.Group();
+    const bucket = new THREE.Mesh(new THREE.CylinderGeometry(.34,.26,.5,24), mintP);
+    bucket.position.set(-.3,-.4,0);
+    g.add(bucket);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(.34,.035,10,28), PM(0x7ccdb8,.45));
+    rim.rotation.x = Math.PI/2;
+    rim.position.set(-.3,-.15,0);
+    g.add(rim);
+    // bubbles
+    [[-.42,.05,0,.1],[-.2,.12,.06,.08],[-.32,.22,-.05,.06],[-.12,.0,-.1,.07]].forEach(([x,y,z,r])=>{
+      const b = new THREE.Mesh(new THREE.SphereGeometry(r,12,12), PM(0xffffff,.2,.1));
+      b.material.transparent = true; b.material.opacity = .85;
+      b.position.set(x,y,z);
+      g.add(b);
+    });
+    // broom
+    const stick = new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,1.2,10), woodP);
+    stick.rotation.z = -.4;
+    stick.position.set(.35,.1,0);
+    g.add(stick);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(.34,.22,.16), peachP);
+    head.rotation.z = -.4;
+    head.position.set(.6,-.5,0);
+    g.add(head);
+    // bristles
+    const bristles = new THREE.Mesh(new THREE.BoxGeometry(.36,.18,.14), amberP);
+    bristles.rotation.z = -.4;
+    bristles.position.set(.68,-.68,0);
+    g.add(bristles);
+    return g;
+  },
+
+  // AC — wall unit with spinning fan + cool air swirls
+  ac(){
+    const g = new THREE.Group();
+    const unit = new THREE.Mesh(new THREE.BoxGeometry(1.2,.55,.4), whiteP);
+    unit.position.y = .3;
+    g.add(unit);
+    const grill = new THREE.Mesh(new THREE.BoxGeometry(1.05,.1,.42), lavP);
+    grill.position.set(0,.12,.0);
+    g.add(grill);
+    // fan (visible front circle)
+    const fan = new THREE.Group();
+    for(let i=0;i<4;i++){
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(.3,.07,.03), blueP);
+      blade.position.x = .15;
+      const holder = new THREE.Group();
+      holder.rotation.z = (i/4)*Math.PI*2;
+      holder.add(blade);
+      fan.add(holder);
+    }
+    const hub = new THREE.Mesh(new THREE.SphereGeometry(.07,12,12), steelD);
+    fan.add(hub);
+    fan.position.set(0,.32,.22);
+    g.userData.fan = fan;
+    g.add(fan);
+    // cool swirls
+    [[-.3,-.35],[.3,-.45]].forEach(([x,y],i)=>{
+      const sw = new THREE.Mesh(new THREE.TorusGeometry(.14,.025,8,24,Math.PI*1.4), PM(0xa8c8f8,.3));
+      sw.position.set(x,y,.1);
+      sw.rotation.z = i?-.6:.6;
+      g.add(sw);
+    });
+    // snowflake dot
+    const snow = new THREE.Mesh(new THREE.OctahedronGeometry(.08), PM(0xd7e8ff,.2,.3));
+    snow.position.set(0,-.45,.1);
+    g.userData.snow = snow;
+    g.add(snow);
+    return g;
+  },
+
+  // PAINTING — paint roller + paint stroke + drip
+  painting(){
+    const g = new THREE.Group();
+    // roller sleeve
+    const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.7,20), roseP);
+    sleeve.rotation.z = Math.PI/2;
+    sleeve.position.set(0,.35,0);
+    g.add(sleeve);
+    // frame
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.45,10), steel);
+    arm.position.set(.42,.12,0);
+    arm.rotation.z = .35;
+    g.add(arm);
+    const grip = new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.4,12), blueP);
+    grip.position.set(.55,-.3,0);
+    g.add(grip);
+    // paint stroke (flat box wall)
+    const stroke = new THREE.Mesh(new THREE.BoxGeometry(.75,.5,.04), PM(0xf3b8cf,.6));
+    stroke.position.set(-.35,-.25,-.15);
+    g.add(stroke);
+    // drips
+    [[-.55,-.56,.07],[-.2,-.62,.05]].forEach(([x,y,r])=>{
+      const d = new THREE.Mesh(new THREE.SphereGeometry(r,10,10), roseP);
+      d.scale.y = 1.6;
+      d.position.set(x,y,-.15);
+      g.add(d);
+    });
+    return g;
+  },
+
+  // HANDYMAN — hammer + nail + wood plank
+  handyman(){
+    const g = new THREE.Group();
+    // plank
+    const plank = new THREE.Mesh(new THREE.BoxGeometry(1.1,.18,.5), woodP);
+    plank.position.y = -.5;
+    g.add(plank);
+    // nail
+    const nail = new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.3,10), steel);
+    nail.position.set(.25,-.28,0);
+    g.add(nail);
+    const nailHead = new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.03,12), steelD);
+    nailHead.position.set(.25,-.12,0);
+    g.add(nailHead);
+    // hammer — pivots to hit nail
+    const hammer = new THREE.Group();
+    const hHandle = new THREE.Mesh(new THREE.CylinderGeometry(.05,.06,.85,12), woodP);
+    hHandle.position.y = -.32;
+    hammer.add(hHandle);
+    const hHead = new THREE.Mesh(new THREE.BoxGeometry(.45,.18,.18), steelD);
+    hammer.add(hHead);
+    const hFace = new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,.1,14), steel);
+    hFace.rotation.z = Math.PI/2;
+    hFace.position.x = -.27;
+    hammer.add(hFace);
+    hammer.position.set(.25,.45,0);
+    hammer.rotation.z = -.5;
+    g.userData.hammer = hammer;
+    g.add(hammer);
+    return g;
+  },
+
+  // GARDEN — potted plant + shears leaf
+  garden(){
+    const g = new THREE.Group();
+    // pot
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(.24,.18,.4,20), peachP);
+    pot.position.y = -.5;
+    g.add(pot);
+    const potRim = new THREE.Mesh(new THREE.CylinderGeometry(.27,.27,.09,20), PM(0xf0b394,.55));
+    potRim.position.y = -.3;
+    g.add(potRim);
+    // stem + leaves
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,.6,10), PM(0x8fcf9f,.6));
+    stem.position.y = 0;
+    g.add(stem);
+    const leaves = [];
+    [[-.22,.18,.5],[.22,.22,-.5],[0,.42,0]].forEach(([x,y,rz],i)=>{
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(.17,12,12), greenP);
+      leaf.scale.set(1.5,.7,.7);
+      leaf.position.set(x,y,0);
+      leaf.rotation.z = rz;
+      leaves.push(leaf);
+      g.add(leaf);
+    });
+    const bloom = new THREE.Mesh(new THREE.SphereGeometry(.12,14,14), roseP);
+    bloom.position.set(0,.62,0);
+    g.userData.bloom = bloom;
+    g.add(bloom);
+    // butterfly
+    const fly = new THREE.Group();
+    [[-.07,.4],[.07,-.4]].forEach(([x,ry])=>{
+      const wing = new THREE.Mesh(new THREE.SphereGeometry(.07,10,10), lavP);
+      wing.scale.set(1.4,.8,.3);
+      wing.position.x = x;
+      fly.add(wing);
+    });
+    fly.position.set(.45,.55,.15);
+    g.userData.fly = fly;
+    g.add(fly);
+    return g;
+  },
+
+  // PEST — cute bug under a "no" shield dome
+  pest(){
+    const g = new THREE.Group();
+    // bug body
+    const bug = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.SphereGeometry(.26,16,16), amberP);
+    body.scale.set(1.25,.85,1);
+    bug.add(body);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(.15,14,14), PM(0xe2b85a,.45));
+    head.position.set(.32,.05,0);
+    bug.add(head);
+    // eyes
+    [[.42,.12,.07],[.42,.12,-.07]].forEach(([x,y,z])=>{
+      const e = new THREE.Mesh(new THREE.SphereGeometry(.035,8,8), PM(0x1e2a44,.3));
+      e.position.set(x,y,z);
+      bug.add(e);
+    });
+    // spots
+    [[-.1,.18,.12],[.05,.2,-.1],[-.2,.12,-.08]].forEach(([x,y,z])=>{
+      const sp = new THREE.Mesh(new THREE.SphereGeometry(.05,8,8), PM(0x1e2a44,.5));
+      sp.position.set(x,y,z);
+      bug.add(sp);
+    });
+    // legs
+    for(let i=0;i<3;i++){
+      [[1],[-1]].forEach(([side])=>{
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.22,8), steelD);
+        leg.position.set(-.15+i*.15,-.22,side*.22);
+        leg.rotation.x = side*.5;
+        bug.add(leg);
+      });
+    }
+    bug.position.y = -.25;
+    g.userData.bug = bug;
+    g.add(bug);
+    // protective dome (glass shield)
+    const dome = new THREE.Mesh(
+      new THREE.SphereGeometry(.62,24,16,0,Math.PI*2,0,Math.PI/2),
+      new THREE.MeshStandardMaterial({color:0x9fdfcf,roughness:.15,metalness:.1,transparent:true,opacity:.3})
+    );
+    dome.position.y = -.45;
+    g.add(dome);
+    const domeRing = new THREE.Mesh(new THREE.TorusGeometry(.62,.03,10,32), mintP);
+    domeRing.rotation.x = Math.PI/2;
+    domeRing.position.y = -.45;
+    g.add(domeRing);
+    return g;
+  },
+};
+
+// ── Mini-scene runner: one renderer + scene per card ──
+const miniScenes = [];
+document.querySelectorAll('.srv-3d').forEach(cv=>{
+  const size = 110*Math.min(devicePixelRatio,2);
+  const r = new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+  r.setSize(110,110,false);
+  r.setPixelRatio(Math.min(devicePixelRatio,2));
+  r.toneMapping = THREE.ACESFilmicToneMapping;
+
+  const sc = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(38,1,.1,20);
+  cam.position.set(0,.4,3.2);
+  cam.lookAt(0,0,0);
+
+  sc.add(new THREE.AmbientLight(0xffffff,1.2));
+  const key = new THREE.DirectionalLight(0xfff6ea,2.0);
+  key.position.set(2,3,4);
+  sc.add(key);
+  const fill = new THREE.DirectionalLight(0xcfe2ff,.8);
+  fill.position.set(-3,1,2);
+  sc.add(fill);
+
+  const model = builders[cv.dataset.model]();
+  sc.add(model);
+  miniScenes.push({r,sc,cam,model,kind:cv.dataset.model,ph:Math.random()*6});
+});
+
+// ── Animate all mini models ──
+const mClock = new THREE.Clock();
+function animateMinis(){
+  requestAnimationFrame(animateMinis);
+  const t = mClock.getElapsedTime();
+
+  miniScenes.forEach(ms=>{
+    const m = ms.model, u = m.userData, k = ms.kind, p = ms.ph;
+
+    // base: gentle spin + bob for every model
+    m.rotation.y = t*.6 + p;
+    m.position.y = Math.sin(t*1.2+p)*.06;
+
+    // unique per-service action animations
+    if(k==='plumbing' && u.drop){
+      const cyc = (t*1.2+p)%1.5;
+      u.drop.position.y = -.75 - cyc*.5;
+      u.drop.material.opacity = 1-cyc/1.5;
+      u.drop.material.transparent = true;
+    }
+    if(k==='ac' && u.fan){
+      u.fan.rotation.z = t*6;
+      if(u.snow){u.snow.rotation.y=t*2; u.snow.position.y=-.45+Math.sin(t*2)*.08;}
+    }
+    if(k==='handyman' && u.hammer){
+      // hammer swings down to hit the nail
+      const swing = Math.abs(Math.sin(t*2.4+p));
+      u.hammer.rotation.z = -.9 + swing*.55;
+    }
+    if(k==='garden'){
+      if(u.bloom){u.bloom.scale.setScalar(1+Math.sin(t*2+p)*.15);}
+      if(u.fly){
+        u.fly.position.x = .45+Math.sin(t*1.6)*.12;
+        u.fly.position.y = .55+Math.sin(t*2.3)*.1;
+        u.fly.children.forEach((w,i)=>{w.rotation.y=(i?1:-1)*Math.sin(t*14)*.5;});
+      }
+    }
+    if(k==='pest' && u.bug){
+      u.bug.position.x = Math.sin(t*1.4+p)*.1;
+      u.bug.rotation.y = Math.sin(t*1.4+p)*.4;
+    }
+    if(k==='electrical'){
+      // bolt flicker glow
+      m.children[0].material.emissive = new THREE.Color(0xf5cf6e);
+      m.children[0].material.emissiveIntensity = .15+Math.abs(Math.sin(t*3+p))*.35;
+    }
+    if(k==='cleaning'){
+      // broom sweeps
+      const broomParts = m.children.slice(-3);
+      broomParts.forEach(part=>{part.rotation.z = -.4 + Math.sin(t*2.2+p)*.18;});
+    }
+    if(k==='painting'){
+      // roller rolls back and forth
+      m.children[0].rotation.x = t*2;
+      m.position.x = Math.sin(t*1.8+p)*.08;
+    }
+
+    ms.r.render(ms.sc,ms.cam);
+  });
+}
+animateMinis();
 </script>
 </body>
 </html>
