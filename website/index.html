@@ -169,10 +169,53 @@ footer{padding:46px 6%;display:flex;align-items:center;justify-content:space-bet
 .footer-links a:hover{color:var(--ink);}
 .copy{color:var(--ink-soft);font-size:.82rem;}
 
+/* ── RESPONSIVE ── */
+@media(max-width:980px){
+  section{padding:90px 5%;}
+  .srv-grid{grid-template-columns:repeat(2,1fr);}
+  .steps{grid-template-columns:repeat(2,1fr);}
+}
 @media(max-width:700px){
+  nav{padding:13px 5%;}
+  .logo{font-size:1.25rem;}
+  .nav-links{gap:14px;}
   .nav-links a:not(.btn){display:none;}
-  .stats{gap:26px;}
-  .cta-band{margin:0 4% 90px;padding:70px 6%;}
+  .nav-links .btn{padding:10px 20px;font-size:.85rem;}
+
+  .hero{height:auto;min-height:100svh;align-items:flex-end;padding:110px 6% 90px;}
+  .hero-content{max-width:100%;}
+  h1{font-size:clamp(2.1rem,9vw,2.8rem);}
+  .hero p{font-size:1rem;margin-bottom:28px;}
+  .hero-cta{margin-bottom:38px;}
+  .hero-cta .btn{padding:13px 24px;font-size:.88rem;}
+  .stats{gap:22px;}
+  .stat .n{font-size:1.4rem;}
+  .stat .l{font-size:.74rem;}
+  .scroll-cue{display:none;}
+
+  section{padding:70px 5%;}
+  .sh{margin-bottom:42px;}
+
+  .srv-grid{grid-template-columns:repeat(2,1fr);gap:14px;}
+  .srv-card{padding:22px 16px;border-radius:18px;}
+  .srv-3d{width:84px;height:84px;border-radius:16px;margin-bottom:14px;}
+  .srv-card h3{font-size:.98rem;}
+  .srv-card p{font-size:.82rem;}
+
+  .steps{grid-template-columns:1fr;gap:16px;}
+  .step{padding:30px 22px;}
+
+  .price-grid{grid-template-columns:1fr;gap:30px;}
+  .pc{padding:38px 26px;}
+  .pc .amount{font-size:2.3rem;}
+
+  .cta-band{margin:0 4% 70px;padding:60px 7%;border-radius:26px;}
+
+  footer{flex-direction:column;text-align:center;justify-content:center;gap:14px;padding:36px 6%;}
+}
+@media(max-width:380px){
+  .srv-grid{grid-template-columns:1fr;}
+  .srv-3d{width:100px;height:100px;}
 }
 </style>
 </head>
@@ -529,9 +572,30 @@ const motes=new THREE.Points(pGeo,new THREE.PointsMaterial({
   color:0xaec5ec,size:.07,transparent:true,opacity:.5,sizeAttenuation:true}));
 scene.add(motes);
 
+// ══ RESPONSIVE 3D LAYOUT ══
+// on phones the house sits centered above the text instead of off to the right
+let cx=2.8, camZ=13, camY=2.2;
+function layout3d(){
+  const mobile = W()<700;
+  cx = mobile ? 0 : 2.8;
+  camZ = mobile ? 18.5 : 13;
+  camY = mobile ? 3.4 : 2.2;
+  house.position.x = cx;
+  island.position.x = cx;
+  [t1,t2,t3].forEach((tr,i)=>{
+    const base=[[.2,1.6],[5.4,.6],[4.9,-1.4]][i];
+    tr.position.x = base[0]+(cx-2.8);
+  });
+}
+layout3d();
+
 // ══ INTERACTION ══
 let mX=0,mY=0,scrl=0;
 addEventListener('mousemove',e=>{mX=(e.clientX/W()-.5)*2;mY=(e.clientY/H()-.5)*2;});
+addEventListener('touchmove',e=>{
+  const tt=e.touches[0];
+  if(tt){mX=(tt.clientX/W()-.5)*1.2;mY=(tt.clientY/H()-.5)*1.2;}
+},{passive:true});
 addEventListener('scroll',()=>{scrl=window.scrollY;});
 
 // ══ ANIMATE ══
@@ -559,7 +623,7 @@ function animate(){
     const d=f.userData;
     const a=t*d.spd+d.ph;
     f.position.set(
-      2.8+Math.cos(a)*d.r,
+      cx+Math.cos(a)*d.r,
       d.y+bob*.5+Math.sin(t*.8+d.ph)*.3,
       Math.sin(a)*d.r*.5
     );
@@ -571,10 +635,10 @@ function animate(){
   motes.rotation.y=t*.006;
 
   // camera parallax
-  camera.position.x += (mX*.7-camera.position.x)*.04;
-  camera.position.y += (2.2-mY*.45-camera.position.y)*.04;
-  camera.position.z += (13+scrl*.0025-camera.position.z)*.06;
-  camera.lookAt(2.6,.5,0);
+  camera.position.x += (cx*.1+mX*.7-camera.position.x)*.04;
+  camera.position.y += (camY-mY*.45-camera.position.y)*.04;
+  camera.position.z += (camZ+scrl*.0025-camera.position.z)*.06;
+  camera.lookAt(cx-.2,W()<700?1.2:.5,0);
 
   renderer.render(scene,camera);
 }
@@ -584,6 +648,7 @@ addEventListener('resize',()=>{
   camera.aspect=W()/H();
   camera.updateProjectionMatrix();
   renderer.setSize(W(),H());
+  layout3d();
 });
 
 /* ══════════════════════════════════════════════════════
