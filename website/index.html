@@ -3,602 +3,764 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YAARL 360 — Sri Lanka's Home Services Super-App</title>
-<meta name="description" content="On-demand home repairs and scheduled maintenance. Plumbing, electrical, cleaning, AC repair — one app for everything.">
+<title>YAARL 360 — Home Services Sri Lanka</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#040d1f;
+  --blue:#3b82f6;
+  --cyan:#06b6d4;
+  --violet:#8b5cf6;
+  --amber:#f59e0b;
+  --green:#10b981;
+  --pink:#ec4899;
+  --white:#f0f6ff;
+  --muted:#8899bb;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;}
 
-  :root {
-    --navy: #0a1633;
-    --navy-2: #122251;
-    --blue: #2563eb;
-    --cyan: #22d3ee;
-    --amber: #fbbf24;
-    --white: #f8fafc;
-    --muted: #94a3b8;
-  }
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 5%;
+  background:rgba(4,13,31,0.6);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(59,130,246,0.15);
+}
+.logo{font-size:1.6rem;font-weight:900;letter-spacing:2px;
+  background:linear-gradient(90deg,#06b6d4,#3b82f6,#8b5cf6);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.93rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--white);}
+.btn{display:inline-block;padding:11px 26px;border-radius:50px;font-weight:700;font-size:.9rem;
+  text-decoration:none;cursor:pointer;border:none;transition:all .25s;}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#fff;
+  box-shadow:0 6px 24px rgba(6,182,212,.4);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(6,182,212,.6);}
+.btn-outline{background:transparent;color:var(--white);border:1.5px solid rgba(255,255,255,.2);}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-3px);}
 
-  html { scroll-behavior: smooth; }
+/* HERO */
+.hero{position:relative;height:100vh;display:flex;align-items:center;padding:0 5%;}
+#canvas3d{position:absolute;inset:0;z-index:1;}
+.hero-content{position:relative;z-index:2;max-width:580px;}
 
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--navy);
-    color: var(--white);
-    overflow-x: hidden;
-  }
+.pill{display:inline-flex;align-items:center;gap:8px;
+  padding:8px 18px;border-radius:50px;margin-bottom:24px;
+  background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);
+  color:var(--cyan);font-size:.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.pill .dot{width:7px;height:7px;background:var(--cyan);border-radius:50%;
+  animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(6,182,212,.6);}50%{box-shadow:0 0 0 8px rgba(6,182,212,0);}}
 
-  /* ───── NAV ───── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 6%;
-    background: rgba(10, 22, 51, 0.7);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
+h1{font-size:clamp(2.6rem,5.5vw,4.4rem);line-height:1.08;font-weight:900;margin-bottom:20px;}
+.line1{color:var(--white);}
+.line2{
+  background:linear-gradient(90deg,#06b6d4 0%,#3b82f6 40%,#8b5cf6 70%,#ec4899 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  background-size:200%;animation:shimmer 4s linear infinite;}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
 
-  .logo {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-  }
-  .logo span { color: var(--cyan); }
+.hero p{color:var(--muted);font-size:1.1rem;line-height:1.75;margin-bottom:34px;max-width:500px;}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
 
-  .nav-links { display: flex; gap: 32px; align-items: center; }
-  .nav-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: color .25s;
-  }
-  .nav-links a:hover { color: var(--white); }
+.stats{display:flex;gap:40px;flex-wrap:wrap;}
+.stat .n{font-size:1.9rem;font-weight:900;}
+.stat:nth-child(1) .n{color:var(--cyan);}
+.stat:nth-child(2) .n{color:var(--violet);}
+.stat:nth-child(3) .n{color:var(--amber);}
+.stat .l{color:var(--muted);font-size:.82rem;margin-top:3px;}
 
-  .btn {
-    display: inline-block;
-    padding: 12px 28px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 0.95rem;
-    text-decoration: none;
-    cursor: pointer;
-    border: none;
-    transition: transform .25s, box-shadow .25s;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--blue), var(--cyan));
-    color: #fff;
-    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.45);
-  }
-  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(34, 211, 238, 0.5); }
-  .btn-ghost {
-    background: rgba(255,255,255,0.07);
-    color: var(--white);
-    border: 1px solid rgba(255,255,255,0.18);
-  }
-  .btn-ghost:hover { background: rgba(255,255,255,0.14); transform: translateY(-3px); }
+.scroll-cue{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--muted);font-size:.72rem;letter-spacing:2px;text-transform:uppercase;}
+.scroll-line{width:1.5px;height:44px;background:linear-gradient(to bottom,var(--cyan),transparent);
+  animation:grow 1.8s ease-in-out infinite;}
+@keyframes grow{0%{transform:scaleY(0);opacity:1;}100%{transform:scaleY(1);opacity:0;}}
 
-  /* ───── HERO ───── */
-  .hero {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    padding: 0 6%;
-  }
+/* SECTIONS */
+section{padding:100px 5%;position:relative;z-index:2;}
+.sh{text-align:center;max-width:600px;margin:0 auto 60px;}
+.sh .pill{justify-content:center;}
+.sh h2{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:900;margin:14px 0;}
+.sh p{color:var(--muted);font-size:1rem;line-height:1.7;}
 
-  #scene3d {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-  }
+/* SERVICES */
+#services{background:linear-gradient(180deg,transparent,rgba(59,130,246,.04),transparent);}
+.srv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;max-width:1200px;margin:0 auto;}
+.srv-card{
+  position:relative;overflow:hidden;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:20px;padding:32px 24px;
+  transition:all .35s;}
+.srv-card::before{
+  content:'';position:absolute;inset:0;
+  background:var(--glow);opacity:0;
+  border-radius:20px;transition:opacity .35s;filter:blur(30px);}
+.srv-card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.18);}
+.srv-card:hover::before{opacity:.12;}
+.srv-icon{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;
+  justify-content:center;font-size:1.6rem;margin-bottom:18px;
+  background:var(--glow);box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.srv-card h3{font-size:1.05rem;margin-bottom:8px;font-weight:700;}
+.srv-card p{color:var(--muted);font-size:.88rem;line-height:1.6;}
+.srv-tag{display:inline-block;margin-top:12px;padding:4px 12px;border-radius:50px;
+  font-size:.72rem;font-weight:700;letter-spacing:1px;background:var(--glow);opacity:.8;}
 
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 640px;
-    animation: fadeUp 1.2s ease both;
-  }
+/* HOW */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:0;max-width:1100px;margin:0 auto;position:relative;}
+.steps::before{content:'';position:absolute;top:50px;left:10%;right:10%;height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink));
+  opacity:.25;z-index:0;}
+.step{text-align:center;padding:20px 24px;position:relative;z-index:1;}
+.step .bubble{
+  width:66px;height:66px;margin:0 auto 20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:900;background:var(--bg);
+  border:2px solid;position:relative;}
+.step:nth-child(1) .bubble{border-color:var(--cyan);color:var(--cyan);
+  box-shadow:0 0 24px rgba(6,182,212,.4);}
+.step:nth-child(2) .bubble{border-color:var(--blue);color:var(--blue);
+  box-shadow:0 0 24px rgba(59,130,246,.4);}
+.step:nth-child(3) .bubble{border-color:var(--violet);color:var(--violet);
+  box-shadow:0 0 24px rgba(139,92,246,.4);}
+.step:nth-child(4) .bubble{border-color:var(--green);color:var(--green);
+  box-shadow:0 0 24px rgba(16,185,129,.4);}
+.step h3{font-size:1.05rem;margin-bottom:10px;font-weight:700;}
+.step p{color:var(--muted);font-size:.9rem;line-height:1.6;}
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(40px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+/* PRICING */
+#pricing{background:linear-gradient(180deg,transparent,rgba(139,92,246,.04),transparent);}
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:24px;max-width:860px;margin:0 auto;}
+.pc{
+  border-radius:24px;padding:44px 36px;position:relative;overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.025);transition:transform .35s;}
+.pc:hover{transform:translateY(-10px);}
+.pc.best{
+  border-color:rgba(139,92,246,.5);
+  background:linear-gradient(160deg,rgba(139,92,246,.1),rgba(6,182,212,.06));}
+.pc .glow-ring{
+  position:absolute;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,.18),transparent 70%);
+  top:-80px;right:-80px;pointer-events:none;}
+.pc .top-tag{
+  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(90deg,var(--violet),var(--cyan));
+  color:#fff;padding:6px 22px;border-radius:0 0 14px 14px;
+  font-size:.72rem;font-weight:800;letter-spacing:1.5px;}
+.pc h3{font-size:1.2rem;font-weight:700;margin-bottom:6px;}
+.pc .sub{color:var(--muted);font-size:.9rem;margin-bottom:18px;}
+.pc .amount{font-size:3rem;font-weight:900;line-height:1;}
+.pc .amount em{font-size:1rem;font-style:normal;color:var(--muted);font-weight:500;}
+.pc ul{list-style:none;margin:28px 0 32px;}
+.pc li{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);
+  color:var(--muted);font-size:.93rem;display:flex;gap:10px;align-items:flex-start;}
+.pc li .ck{color:var(--cyan);font-size:1rem;flex-shrink:0;}
+.pc.best li .ck{color:var(--violet);}
 
-  .badge {
-    display: inline-block;
-    padding: 8px 18px;
-    border-radius: 50px;
-    background: rgba(34, 211, 238, 0.12);
-    border: 1px solid rgba(34, 211, 238, 0.35);
-    color: var(--cyan);
-    font-size: 0.82rem;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 24px;
-  }
+/* CTA BAND */
+.cta-band{
+  text-align:center;padding:100px 5%;
+  background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(139,92,246,.1));
+  border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.cta-band h2{font-size:clamp(1.9rem,4vw,2.8rem);font-weight:900;margin-bottom:16px;}
+.cta-band p{color:var(--muted);margin-bottom:32px;font-size:1.05rem;}
 
-  h1 {
-    font-size: clamp(2.4rem, 5.5vw, 4.2rem);
-    line-height: 1.1;
-    font-weight: 800;
-    margin-bottom: 22px;
-  }
-  h1 .grad {
-    background: linear-gradient(90deg, var(--cyan), var(--blue), var(--amber));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
+/* FOOTER */
+footer{padding:50px 5%;display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:20px;border-top:1px solid rgba(255,255,255,.05);}
+.footer-links{display:flex;gap:24px;}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:.87rem;transition:color .2s;}
+.footer-links a:hover{color:var(--white);}
+.copy{color:var(--muted);font-size:.82rem;}
 
-  .hero p {
-    font-size: 1.15rem;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-bottom: 36px;
-    max-width: 540px;
-  }
-
-  .hero-cta { display: flex; gap: 18px; flex-wrap: wrap; }
-
-  .hero-stats {
-    display: flex;
-    gap: 48px;
-    margin-top: 64px;
-    flex-wrap: wrap;
-  }
-  .stat .num {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--cyan);
-  }
-  .stat .lbl { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
-
-  .scroll-hint {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-    color: var(--muted);
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    animation: bob 2s ease-in-out infinite;
-  }
-  @keyframes bob {
-    0%, 100% { transform: translate(-50%, 0); }
-    50% { transform: translate(-50%, 10px); }
-  }
-
-  /* ───── SECTIONS ───── */
-  section { padding: 110px 6%; position: relative; z-index: 2; }
-
-  .section-head { text-align: center; max-width: 620px; margin: 0 auto 64px; }
-  .section-head .badge { margin-bottom: 16px; }
-  .section-head h2 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 800; margin-bottom: 14px; }
-  .section-head p { color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
-
-  /* Services */
-  .services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .card {
-    background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 36px 28px;
-    transition: transform .35s, border-color .35s, box-shadow .35s;
-  }
-  .card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(34, 211, 238, 0.4);
-    box-shadow: 0 24px 50px rgba(0,0,0,0.4);
-  }
-  .card .icon {
-    width: 58px; height: 58px;
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.7rem;
-    background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(34,211,238,0.25));
-    margin-bottom: 20px;
-  }
-  .card h3 { font-size: 1.15rem; margin-bottom: 10px; }
-  .card p { color: var(--muted); font-size: 0.93rem; line-height: 1.65; }
-
-  /* How it works */
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .step { text-align: center; padding: 20px; }
-  .step .n {
-    width: 64px; height: 64px;
-    margin: 0 auto 20px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--blue), var(--cyan));
-    box-shadow: 0 10px 30px rgba(37,99,235,0.4);
-  }
-  .step h3 { margin-bottom: 10px; font-size: 1.1rem; }
-  .step p { color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
-
-  /* Pricing */
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 28px;
-    max-width: 880px;
-    margin: 0 auto;
-  }
-  .price-card {
-    background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 24px;
-    padding: 44px 36px;
-    position: relative;
-    transition: transform .35s;
-  }
-  .price-card:hover { transform: translateY(-8px); }
-  .price-card.featured {
-    border-color: var(--amber);
-    background: linear-gradient(160deg, rgba(251,191,36,0.08), rgba(255,255,255,0.02));
-  }
-  .price-card .tag {
-    position: absolute;
-    top: -14px; left: 50%;
-    transform: translateX(-50%);
-    background: var(--amber);
-    color: var(--navy);
-    padding: 6px 20px;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-  }
-  .price-card h3 { font-size: 1.25rem; margin-bottom: 8px; }
-  .price-card .price { font-size: 2.6rem; font-weight: 800; margin: 18px 0 4px; }
-  .price-card .price span { font-size: 1rem; color: var(--muted); font-weight: 500; }
-  .price-card ul { list-style: none; margin: 28px 0 32px; }
-  .price-card li {
-    padding: 9px 0;
-    color: var(--muted);
-    font-size: 0.95rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-  .price-card li::before { content: '✓  '; color: var(--cyan); font-weight: 700; }
-
-  /* CTA */
-  .cta-band {
-    text-align: center;
-    background: linear-gradient(135deg, rgba(37,99,235,0.18), rgba(34,211,238,0.1));
-    border-top: 1px solid rgba(255,255,255,0.06);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .cta-band h2 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); margin-bottom: 18px; }
-  .cta-band p { color: var(--muted); margin-bottom: 32px; font-size: 1.05rem; }
-
-  /* Footer */
-  footer {
-    padding: 50px 6%;
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.88rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
-  }
-  footer .logo { font-size: 1.2rem; margin-bottom: 12px; }
-
-  @media (max-width: 720px) {
-    .nav-links a:not(.btn) { display: none; }
-    .hero-stats { gap: 28px; }
-  }
+@media(max-width:700px){
+  .nav-links a:not(.btn){display:none;}
+  .stats{gap:24px;}
+  .steps::before{display:none;}
+  footer{flex-direction:column;text-align:center;}
+}
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
-  <div class="logo">YAARL<span>360</span></div>
+  <div class="logo">YAARL 360</div>
   <div class="nav-links">
     <a href="#services">Services</a>
     <a href="#how">How It Works</a>
     <a href="#pricing">Plans</a>
-    <a href="#download" class="btn btn-primary">Get the App</a>
+    <a href="#contact" class="btn btn-primary">Book Now</a>
   </div>
 </nav>
 
-<!-- ───────── HERO with 3D ───────── -->
+<!-- HERO -->
 <header class="hero">
-  <div id="scene3d"></div>
-
+  <canvas id="canvas3d"></canvas>
   <div class="hero-content">
-    <div class="badge">Sri Lanka's First Home Services Super-App</div>
-    <h1>Every Home Fix,<br><span class="grad">One Tap Away.</span></h1>
-    <p>Emergency plumber at 2 AM or a scheduled deep clean next month — YAARL 360 connects you with verified professionals across Sri Lanka, live-tracked to your door.</p>
+    <div class="pill"><span class="dot"></span>Now Available in Sri Lanka</div>
+    <h1>
+      <div class="line1">Your Home.</div>
+      <div class="line2">Perfectly Maintained.</div>
+    </h1>
+    <p>Emergency repairs in minutes or scheduled maintenance all year round. Verified professionals. Live GPS tracking. One app for everything your home needs.</p>
     <div class="hero-cta">
-      <a href="#download" class="btn btn-primary">Book a Service</a>
-      <a href="#how" class="btn btn-ghost">How It Works</a>
+      <a href="#contact" class="btn btn-primary">Book a Service Today</a>
+      <a href="#how" class="btn btn-outline">See How It Works</a>
     </div>
-    <div class="hero-stats">
-      <div class="stat"><div class="num">8+</div><div class="lbl">Service Categories</div></div>
-      <div class="stat"><div class="num">&lt;5 min</div><div class="lbl">Avg. Response Time</div></div>
-      <div class="stat"><div class="num">100%</div><div class="lbl">Verified Workers</div></div>
+    <div class="stats">
+      <div class="stat"><div class="n">8+</div><div class="l">Service Types</div></div>
+      <div class="stat"><div class="n">&lt;5 min</div><div class="l">Response Time</div></div>
+      <div class="stat"><div class="n">100%</div><div class="l">Verified Pros</div></div>
     </div>
   </div>
-
-  <div class="scroll-hint">Scroll ↓</div>
+  <div class="scroll-cue">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
 </header>
 
-<!-- ───────── SERVICES ───────── -->
+<!-- SERVICES -->
 <section id="services">
-  <div class="section-head">
-    <div class="badge">What We Fix</div>
-    <h2>Eight Services. One Platform.</h2>
-    <p>From burst pipes to full-home deep cleans — every service is handled by background-checked, skill-certified professionals.</p>
+  <div class="sh">
+    <div class="pill">What We Do</div>
+    <h2>Every Home Service, One Platform</h2>
+    <p>From a burst pipe at midnight to a full deep clean every month — YAARL 360 has you covered across Sri Lanka.</p>
   </div>
-  <div class="services-grid">
-    <div class="card"><div class="icon">🔧</div><h3>Plumbing</h3><p>Leaks, blockages, fittings and emergency burst-pipe response — day or night.</p></div>
-    <div class="card"><div class="icon">⚡</div><h3>Electrical</h3><p>Wiring faults, breaker trips, installations — certified electricians only.</p></div>
-    <div class="card"><div class="icon">🧹</div><h3>Deep Cleaning</h3><p>Kitchens, bathrooms or full property — scheduled or on demand.</p></div>
-    <div class="card"><div class="icon">❄️</div><h3>AC Repair</h3><p>Servicing, gas refills and breakdown repair for all major brands.</p></div>
-    <div class="card"><div class="icon">🎨</div><h3>Painting</h3><p>Interior and exterior painting with surface prep and clean finish.</p></div>
-    <div class="card"><div class="icon">🔨</div><h3>Handyman</h3><p>Furniture assembly, curtain rails, small fixes — the everything-else crew.</p></div>
-    <div class="card"><div class="icon">🌿</div><h3>Garden Care</h3><p>Lawn trimming, hedge shaping and seasonal garden maintenance.</p></div>
-    <div class="card"><div class="icon">🐜</div><h3>Pest Control</h3><p>Safe, certified treatment for termites, rodents and insects.</p></div>
+  <div class="srv-grid">
+    <div class="srv-card" style="--glow:linear-gradient(135deg,rgba(6,182,212,.6),rgba(59,130,246,.6))">
+      <div class="srv-icon" style="--glow:linear-gradient(135deg,rgba(6,182,212,.3),rgba(59,130,246,.3))">🔧</div>
+      <h3>Plumbing</h3>
+      <p>Leaks, blockages, fittings and emergency burst-pipe response — any time of day.</p>
+      <div class="srv-tag" style="--glow:rgba(6,182,212,.2);color:var(--cyan)">ON-DEMAND</div>
+    </div>
+    <div class="srv-card" style="--glow:linear-gradient(135deg,rgba(251,191,36,.6),rgba(245,158,11,.6))">
+      <div class="srv-icon" style="--glow:linear-gradient(135deg,rgba(251,191,36,.3),rgba(245,158,11,.3))">⚡</div>
+      <h3>Electrical</h3>
+      <p>Wiring faults, breaker trips, new installations — certified electricians only.</p>
+      <div class="srv-tag" style="--glow:rgba(251,191,36,.2);color:var(--amber)">CERTIFIED</div>
+    </div>
+    <div class="srv-card" style="--glow:linear-gradient(135deg,rgba(16,185,129,.6),rgba(5,150,105,.6))">
+      <div class="srv-icon" style="--glow:linear-gradient(135deg,rgba(16,185,129,.3),rgba(5,150,105,.3))">🧹</div>
+      <h3>Deep Cleaning</h3>
+      <p>Full property, kitchen or bathroom deep cleans — scheduled or same-day.</p>
+      <div class="srv-tag" style="--glow:rgba(16,185,129,.2);color:var(--green)">SCHEDULED</div>
+    </div>
+    <div class="srv-card" style="--glow:linear-gradient(135deg,rgba(139,92,246,.6),rgba(109,40,217,.6))">
+      <div class="srv-icon" style="--glow:linear-gradient(135deg,rgba(139,92,246,.3),rgba(109,40,217,.3))">❄️</div>
+      <h3>AC Service</h3>
+      <p>Servicing, gas top-ups and breakdown repair for all major brands and models.</p>
+      <div class="srv-tag" style="--glow:rgba(139,92,246,.2);color:var(--violet)">ALL BRANDS</div>
+    </div>
+    <div class="srv-card" style="--glow:linear-gradient(135deg,rgba(236,72,153,.6),rgba(219,39,119,.6))">
+      <div class="srv-icon" style="--glow:linear-gradient(135deg,rgba(236,72,153,.3),rgba(219,39,119,.3))">🎨</div>
+      <h3>Painting</h3>
+      <p>Interior and exterior painting with full surface prep and clean, neat finish.</p>
+      <div class="srv-tag" style="--glow:rgba(236,72,153,.2);color:var(--pink)">INTERIOR & EXTERIOR</div>
+    </div>
+    <div class="srv-card" style="--glow:linear-gradient(135deg,rgba(59,130,246,.6),rgba(37,99,235,.6))">
+      <div class="srv-icon" style="--glow:linear-gradient(135deg,rgba(59,130,246,.3),rgba(37,99,235,.3))">🔨</div>
+      <h3>Handyman</h3>
+      <p>Furniture assembly, curtain rails, wall mounts and all the small fixes.</p>
+      <div class="srv-tag" style="--glow:rgba(59,130,246,.2);color:var(--blue)">ON-DEMAND</div>
+    </div>
+    <div class="srv-card" style="--glow:linear-gradient(135deg,rgba(16,185,129,.6),rgba(6,182,212,.6))">
+      <div class="srv-icon" style="--glow:linear-gradient(135deg,rgba(16,185,129,.3),rgba(6,182,212,.3))">🌿</div>
+      <h3>Garden Care</h3>
+      <p>Lawn trimming, hedge shaping and seasonal garden maintenance visits.</p>
+      <div class="srv-tag" style="--glow:rgba(16,185,129,.2);color:var(--green)">SCHEDULED</div>
+    </div>
+    <div class="srv-card" style="--glow:linear-gradient(135deg,rgba(245,158,11,.6),rgba(239,68,68,.6))">
+      <div class="srv-icon" style="--glow:linear-gradient(135deg,rgba(245,158,11,.3),rgba(239,68,68,.3))">🐜</div>
+      <h3>Pest Control</h3>
+      <p>Safe, certified treatment for termites, rodents and insects — home or office.</p>
+      <div class="srv-tag" style="--glow:rgba(245,158,11,.2);color:var(--amber)">CERTIFIED</div>
+    </div>
   </div>
 </section>
 
-<!-- ───────── HOW IT WORKS ───────── -->
+<!-- HOW IT WORKS -->
 <section id="how">
-  <div class="section-head">
-    <div class="badge">Simple as 1-2-3-4</div>
-    <h2>How YAARL 360 Works</h2>
-    <p>Built like a ride-hailing app — but for your home.</p>
+  <div class="sh">
+    <div class="pill">Simple Process</div>
+    <h2>How It Works</h2>
+    <p>Built like a ride-hailing app — but for your home. Request, track, and done.</p>
   </div>
   <div class="steps">
-    <div class="step"><div class="n">1</div><h3>Request</h3><p>Pick a service, add a photo of the problem, confirm your location.</p></div>
-    <div class="step"><div class="n">2</div><h3>Match</h3><p>The nearest verified worker accepts within 30 seconds.</p></div>
-    <div class="step"><div class="n">3</div><h3>Track</h3><p>Watch your professional arrive live on the map, just like a ride.</p></div>
-    <div class="step"><div class="n">4</div><h3>Done</h3><p>Pay securely in-app. Rate the job. Get a digital invoice instantly.</p></div>
+    <div class="step">
+      <div class="bubble">1</div>
+      <h3>Request</h3>
+      <p>Choose a service, describe the problem, and confirm your location in seconds.</p>
+    </div>
+    <div class="step">
+      <div class="bubble">2</div>
+      <h3>Get Matched</h3>
+      <p>The nearest verified professional accepts your job within 30 seconds.</p>
+    </div>
+    <div class="step">
+      <div class="bubble">3</div>
+      <h3>Live Track</h3>
+      <p>Watch your technician arrive on a live GPS map — just like ordering a ride.</p>
+    </div>
+    <div class="step">
+      <div class="bubble">4</div>
+      <h3>Job Done</h3>
+      <p>Pay securely in-app, rate the service, get a digital invoice instantly.</p>
+    </div>
   </div>
 </section>
 
-<!-- ───────── PRICING ───────── -->
+<!-- PRICING -->
 <section id="pricing">
-  <div class="section-head">
-    <div class="badge">Maintenance Plans</div>
-    <h2>Never Think About Upkeep Again</h2>
-    <p>Subscribe once. We keep your home running all year.</p>
+  <div class="sh">
+    <div class="pill">Subscription Plans</div>
+    <h2>Never Think About Maintenance Again</h2>
+    <p>Subscribe to a monthly plan and let YAARL 360 keep your home running all year.</p>
   </div>
-  <div class="pricing-grid">
-    <div class="price-card">
-      <h3>Basic</h3>
-      <div class="price">Rs. 3,500<span>/month</span></div>
+  <div class="price-grid">
+    <div class="pc">
+      <h3>Basic Plan</h3>
+      <div class="sub">Perfect for apartments & small homes</div>
+      <div class="amount" style="color:var(--cyan)">Rs. 3,500 <em>/month</em></div>
       <ul>
-        <li>1 deep clean (bathroom or kitchen) monthly</li>
-        <li>2 handyman checkups per month</li>
-        <li>12-month visit calendar</li>
-        <li>Standard dispatch queue</li>
+        <li><span class="ck">✓</span>1 deep clean per month (bathroom or kitchen)</li>
+        <li><span class="ck">✓</span>2 complimentary handyman checkups</li>
+        <li><span class="ck">✓</span>12-month advance scheduling calendar</li>
+        <li><span class="ck">✓</span>Standard dispatch queue</li>
+        <li><span class="ck">✓</span>Secure auto-renewal billing</li>
       </ul>
-      <a href="#download" class="btn btn-ghost" style="width:100%; text-align:center;">Choose Basic</a>
+      <a href="#contact" class="btn btn-outline" style="width:100%;text-align:center;display:block;">Get Started</a>
     </div>
-    <div class="price-card featured">
-      <div class="tag">MOST POPULAR</div>
+    <div class="pc best">
+      <div class="glow-ring"></div>
+      <div class="top-tag">MOST POPULAR</div>
       <h3>Premium / Villa</h3>
-      <div class="price">Rs. 8,500<span>/month</span></div>
+      <div class="sub">For larger homes, villas & families</div>
+      <div class="amount" style="color:var(--violet)">Rs. 8,500 <em>/month</em></div>
       <ul>
-        <li>Full property deep clean every 6 weeks</li>
-        <li>Unlimited priority 24/7 checkups</li>
-        <li>Visitation fees waived on all calls</li>
-        <li>Top-of-queue priority dispatch</li>
+        <li><span class="ck">✓</span>Full property deep clean every 6 weeks</li>
+        <li><span class="ck">✓</span>Unlimited 24/7 priority checkups</li>
+        <li><span class="ck">✓</span>Visitation fees waived on all on-demand calls</li>
+        <li><span class="ck">✓</span>Top-of-queue priority dispatch</li>
+        <li><span class="ck">✓</span>Monthly or annual billing — save 15%</li>
       </ul>
-      <a href="#download" class="btn btn-primary" style="width:100%; text-align:center;">Choose Premium</a>
+      <a href="#contact" class="btn btn-primary" style="width:100%;text-align:center;display:block;">Get Premium</a>
     </div>
   </div>
 </section>
 
-<!-- ───────── CTA ───────── -->
-<section class="cta-band" id="download">
-  <h2>Your Home Deserves a Super-App.</h2>
-  <p>Join the launch list — be first when YAARL 360 goes live in your city.</p>
-  <a href="#" class="btn btn-primary">Join the Waitlist</a>
-</section>
+<!-- CTA -->
+<div class="cta-band" id="contact">
+  <h2>Your Home Deserves the Best.</h2>
+  <p>Join the waitlist — be first when YAARL 360 launches in your city.</p>
+  <a href="tel:+94000000000" class="btn btn-primary">Join the Waitlist</a>
+</div>
 
+<!-- FOOTER -->
 <footer>
-  <div class="logo">YAARL<span>360</span></div>
-  <p>Building Sri Lanka's Home Services Future · © 2026 YAARL 360 (Pvt) Ltd</p>
+  <div class="logo">YAARL 360</div>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#pricing">Plans</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="copy">© 2026 YAARL 360 (Pvt) Ltd · Sri Lanka</div>
 </footer>
 
-<!-- ───────── THREE.JS 3D SCENE ───────── -->
-<script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
-</script>
+<!-- ══════ 3D CANVAS — Modern Floating House ══════ -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 <script type="module">
 import * as THREE from 'three';
 
-const container = document.getElementById('scene3d');
+const canvas = document.getElementById('canvas3d');
+const W = () => innerWidth, H = () => innerHeight;
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(W(),H());
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.4;
+
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x0a1633, 0.035);
+scene.fog = new THREE.Fog(0x040d1f, 20, 55);
 
-const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
-camera.position.set(0, 1.2, 11);
+const camera = new THREE.PerspectiveCamera(52, W()/H(), .1, 100);
+camera.position.set(0, 2, 13);
+camera.lookAt(2.5, .5, 0);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-container.appendChild(renderer.domElement);
+// ── LIGHTS ──────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0x8899ff, .8));
 
-// ── Lights ──
-scene.add(new THREE.AmbientLight(0x334477, 1.2));
-const keyLight = new THREE.PointLight(0x22d3ee, 80, 40);
-keyLight.position.set(6, 6, 6);
-scene.add(keyLight);
-const warmLight = new THREE.PointLight(0xfbbf24, 50, 30);
-warmLight.position.set(-6, 3, 4);
-scene.add(warmLight);
-const blueLight = new THREE.PointLight(0x2563eb, 60, 35);
-blueLight.position.set(0, -4, 6);
-scene.add(blueLight);
+// Sun / key light
+const sun = new THREE.DirectionalLight(0xffffff, 2.5);
+sun.position.set(8, 12, 8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.near = 1; sun.shadow.camera.far = 60;
+sun.shadow.camera.left = -12; sun.shadow.camera.right = 12;
+sun.shadow.camera.top = 12; sun.shadow.camera.bottom = -12;
+scene.add(sun);
 
-// ── 3D House (hero centerpiece, offset right) ──
-const house = new THREE.Group();
+// Cyan rim
+const rimC = new THREE.PointLight(0x06b6d4, 120, 28);
+rimC.position.set(-6, 5, 4);
+scene.add(rimC);
 
-const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, metalness: 0.35, roughness: 0.4 });
-const roofMat = new THREE.MeshStandardMaterial({ color: 0x22d3ee, metalness: 0.55, roughness: 0.3, emissive: 0x0e7490, emissiveIntensity: 0.25 });
-const glowMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 1.4 });
+// Violet fill
+const rimV = new THREE.PointLight(0x8b5cf6, 80, 22);
+rimV.position.set(7, 3, 3);
+scene.add(rimV);
 
-// body
-const body = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.8, 2.2), wallMat);
-house.add(body);
-// roof
-const roof = new THREE.Mesh(new THREE.ConeGeometry(2.15, 1.4, 4), roofMat);
-roof.position.y = 1.6;
-roof.rotation.y = Math.PI / 4;
-house.add(roof);
-// door
-const door = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.9, 0.06), glowMat);
-door.position.set(0, -0.45, 1.13);
-house.add(door);
-// windows
-[[-0.8, 0.25], [0.8, 0.25]].forEach(([x, y]) => {
-  const w = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.06), glowMat);
-  w.position.set(x, y, 1.13);
-  house.add(w);
+// Amber bounce
+const bounce = new THREE.PointLight(0xf59e0b, 50, 20);
+bounce.position.set(2, -2, 5);
+scene.add(bounce);
+
+// Window glow lights (placed inside house later)
+const winGlowL = new THREE.PointLight(0xfbbf24, 14, 3);
+const winGlowR = new THREE.PointLight(0xfbbf24, 14, 3);
+scene.add(winGlowL, winGlowR);
+
+// ── MATERIALS ───────────────────────────────────────────
+const M = (c,m=.3,r=.4,e=null,ei=0) => {
+  const mat = new THREE.MeshStandardMaterial({color:c,metalness:m,roughness:r});
+  if(e){mat.emissive=new THREE.Color(e);mat.emissiveIntensity=ei;}
+  return mat;
+};
+
+const wallMat  = M(0x1a2f6e, .4, .35);
+const wall2Mat = M(0x0f1f50, .35, .4);
+const roofMat  = M(0x06b6d4, .7, .2, 0x06b6d4, .35);
+const glassMat = new THREE.MeshStandardMaterial({
+  color:0x93c5fd, metalness:.9, roughness:.05,
+  transparent:true, opacity:.65,
+  envMapIntensity:2
 });
+const frameMat = M(0xffffff, .5, .3);
+const doorMat  = M(0x1e3a8a, .6, .25);
+const handleMat= M(0xfbbf24, .95, .05, 0xfbbf24, .6);
+const groundMat= M(0x0d1a3d, .1, .9);
+const glowYellow = M(0xfbbf24,.2,.6, 0xfbbf24, 2.5);
+const glowCyan   = M(0x06b6d4,.2,.6, 0x06b6d4, 2.2);
 
-house.position.set(3.4, 0.4, 0);
-house.scale.setScalar(1.15);
+// ── HOUSE GROUP ─────────────────────────────────────────
+const house = new THREE.Group();
+house.position.set(2.5, .2, 0);
+
+// — Main body (two-storey)
+const body = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.4, 2.4), wallMat);
+body.castShadow = body.receiveShadow = true;
+house.add(body);
+
+// — Side wing (garage-style lower extension)
+const wing = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.5, 2.4), wall2Mat);
+wing.position.set(2.25, -.45, 0);
+wing.castShadow = wing.receiveShadow = true;
+house.add(wing);
+
+// — Flat roof on wing
+const wingRoof = new THREE.Mesh(new THREE.BoxGeometry(1.5, .1, 2.5), roofMat);
+wingRoof.position.set(2.25, .3, 0);
+wingRoof.castShadow = true;
+house.add(wingRoof);
+
+// — Main pitched roof
+const roofGeo = new THREE.BufferGeometry();
+const hw = 1.7, hd = 1.3, rh = 1.3;
+const rv = new Float32Array([
+  -hw,-hd,0,  hw,-hd,0,  0,rh,0,  // front tri
+  -hw, hd,0,  hw, hd,0,  0,rh,0,  // back tri
+  -hw,-hd,0, -hw, hd,0,  0,rh,0,  // left side
+   hw,-hd,0,  hw, hd,0,  0,rh,0,  // right side
+  -hw,-hd,0,  hw,-hd,0, -hw, hd,0,
+   hw,-hd,0,  hw, hd,0, -hw, hd,0,
+]);
+roofGeo.setAttribute('position', new THREE.BufferAttribute(rv,3));
+roofGeo.computeVertexNormals();
+const roofMesh = new THREE.Mesh(roofGeo, roofMat);
+roofMesh.position.set(-.3, 1.2, 0);
+roofMesh.castShadow = true;
+house.add(roofMesh);
+
+// — Roof ridge cap
+const ridge = new THREE.Mesh(new THREE.BoxGeometry(3.4, .12, .14), M(0x0ea5e9,.7,.2,0x0ea5e9,.5));
+ridge.position.set(-.3, 2.52, 0);
+house.add(ridge);
+
+// — Chimney
+const chimney = new THREE.Mesh(new THREE.BoxGeometry(.35, .8, .35), wall2Mat);
+chimney.position.set(.8, 2.6, .5);
+chimney.castShadow = true;
+house.add(chimney);
+const chimneyTop = new THREE.Mesh(new THREE.BoxGeometry(.42,.08,.42), M(0x06b6d4,.8,.1,0x06b6d4,.4));
+chimneyTop.position.set(.8, 3.0, .5);
+house.add(chimneyTop);
+
+// — WINDOWS (front face, upper floor)
+const mkWin = (x,y,z,rx=0) => {
+  const g = new THREE.Group();
+  // Frame
+  const fr = new THREE.Mesh(new THREE.BoxGeometry(.72,.72,.07), frameMat);
+  g.add(fr);
+  // Glass pane
+  const gl = new THREE.Mesh(new THREE.BoxGeometry(.55,.55,.05), glassMat);
+  gl.position.z = .02;
+  g.add(gl);
+  // Cross dividers
+  const hBar = new THREE.Mesh(new THREE.BoxGeometry(.56,.04,.06), frameMat);
+  g.add(hBar);
+  const vBar = new THREE.Mesh(new THREE.BoxGeometry(.04,.56,.06), frameMat);
+  g.add(vBar);
+  g.position.set(x,y,z);
+  if(rx) g.rotation.y = rx;
+  return g;
+};
+
+// Upper floor windows — front
+house.add(mkWin(-1,  .7, 1.21));
+house.add(mkWin( 1,  .7, 1.21));
+// Lower floor windows — front
+house.add(mkWin(-1, -.3, 1.21));
+house.add(mkWin( 1, -.3, 1.21));
+// Side windows
+house.add(mkWin(0,  .5, 1.21, Math.PI/2)); // right side (repurpose as side)
+
+// Set glow positions (from window 1 and 2)
+winGlowL.position.set(house.position.x - 1, house.position.y + .7, 1.8);
+winGlowR.position.set(house.position.x + 1, house.position.y + .7, 1.8);
+
+// — DOOR
+const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(.78,1.15,.07), frameMat);
+doorFrame.position.set(0,-.63,1.21);
+house.add(doorFrame);
+const doorPanel = new THREE.Mesh(new THREE.BoxGeometry(.64,1.0,.06), doorMat);
+doorPanel.position.set(0,-.63,1.24);
+house.add(doorPanel);
+// Door glass upper
+const doorGlass = new THREE.Mesh(new THREE.BoxGeometry(.5,.3,.05), glassMat);
+doorGlass.position.set(0,-.25,1.26);
+house.add(doorGlass);
+// Handle
+const dHandle = new THREE.Mesh(new THREE.CapsuleGeometry(.03,.18,4,8), handleMat);
+dHandle.rotation.z = Math.PI/2;
+dHandle.position.set(.2,-.65,1.28);
+house.add(dHandle);
+
+// — Front step
+const step1 = new THREE.Mesh(new THREE.BoxGeometry(1.0,.12,.55), M(0x1e3a8a,.3,.7));
+step1.position.set(0,-1.26,1.45); step1.receiveShadow=true;
+house.add(step1);
+const step2 = new THREE.Mesh(new THREE.BoxGeometry(.82,.1,.4), M(0x243b6e,.3,.6));
+step2.position.set(0,-1.18,1.62); step2.receiveShadow=true;
+house.add(step2);
+
+// — Garage door (on wing)
+const gDoor = new THREE.Mesh(new THREE.BoxGeometry(1.2,.95,.05), M(0x1e3a8a,.5,.3));
+gDoor.position.set(2.25,-.3,1.22);
+house.add(gDoor);
+// Garage door panels
+for(let i=0;i<3;i++){
+  const strip = new THREE.Mesh(new THREE.BoxGeometry(1.18,.04,.07), M(0x2563eb,.6,.2));
+  strip.position.set(2.25, -.02 + i*-.32, 1.24);
+  house.add(strip);
+}
+
+// — Glowing accent strip (roofline)
+const accent = new THREE.Mesh(new THREE.BoxGeometry(3.22,.06,.06), M(0x06b6d4,.3,.3,0x06b6d4,1.8));
+accent.position.set(-.3, 1.2, 1.21);
+house.add(accent);
+const accentBot = new THREE.Mesh(new THREE.BoxGeometry(3.22,.04,.04), M(0x8b5cf6,.3,.3,0x8b5cf6,1.2));
+accentBot.position.set(-.3,-1.2,1.21);
+house.add(accentBot);
+
+// — Solar panels on roof
+for(let i=0;i<3;i++){
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(.6,.04,.4), M(0x1d4ed8,.8,.1,0x3b82f6,.3));
+  panel.position.set(-1+i*.6, 2.0, .3);
+  panel.rotation.x = -.3;
+  house.add(panel);
+}
+
 scene.add(house);
 
-// ── Wireframe orbit rings around house ──
-const rings = [];
-for (let i = 0; i < 3; i++) {
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(3.1 + i * 0.55, 0.012, 8, 120),
-    new THREE.MeshBasicMaterial({ color: i === 1 ? 0xfbbf24 : 0x22d3ee, transparent: true, opacity: 0.35 })
+// ── FLOATING PLATFORM ───────────────────────────────────
+const platform = new THREE.Mesh(
+  new THREE.CylinderGeometry(3.8, 3.4, .18, 64),
+  new THREE.MeshStandardMaterial({color:0x0d1a3d, metalness:.5, roughness:.4,
+    emissive:0x1d4ed8, emissiveIntensity:.08})
+);
+platform.position.set(2.5, -1.35, 0);
+platform.receiveShadow = true;
+scene.add(platform);
+
+// Platform edge glow ring
+const edgeRing = new THREE.Mesh(
+  new THREE.TorusGeometry(3.6, .04, 8, 100),
+  M(0x06b6d4,.3,.3,0x06b6d4,2.0)
+);
+edgeRing.rotation.x = Math.PI/2;
+edgeRing.position.set(2.5,-1.27,0);
+scene.add(edgeRing);
+
+// Inner glow ring
+const innerRing = new THREE.Mesh(
+  new THREE.TorusGeometry(2.0, .025, 8, 80),
+  M(0x8b5cf6,.3,.3,0x8b5cf6,1.6)
+);
+innerRing.rotation.x = Math.PI/2;
+innerRing.position.set(2.5,-1.27,0);
+scene.add(innerRing);
+
+// ── ORBIT HALO RINGS ────────────────────────────────────
+const halos = [];
+[[4.5,.016,0x06b6d4,.4],[5.4,.01,0x8b5cf6,.3],[6.0,.008,0xf59e0b,.25]].forEach(([r,t,c,o],i)=>{
+  const h = new THREE.Mesh(
+    new THREE.TorusGeometry(r,t,8,140),
+    new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:o})
   );
-  ring.position.copy(house.position);
-  ring.rotation.x = Math.PI / 2.2 + i * 0.18;
-  rings.push(ring);
-  scene.add(ring);
-}
-
-// ── Floating service icons (small glowing shapes orbiting) ──
-const orbiters = [];
-const orbitGeos = [
-  new THREE.OctahedronGeometry(0.22),
-  new THREE.IcosahedronGeometry(0.2),
-  new THREE.TetrahedronGeometry(0.25),
-  new THREE.BoxGeometry(0.28, 0.28, 0.28),
-  new THREE.TorusKnotGeometry(0.14, 0.05, 48, 8),
-  new THREE.SphereGeometry(0.18, 16, 16),
-];
-for (let i = 0; i < 6; i++) {
-  const mat = new THREE.MeshStandardMaterial({
-    color: [0x22d3ee, 0xfbbf24, 0x60a5fa][i % 3],
-    emissive: [0x22d3ee, 0xfbbf24, 0x60a5fa][i % 3],
-    emissiveIntensity: 0.7,
-    metalness: 0.6, roughness: 0.3,
-  });
-  const m = new THREE.Mesh(orbitGeos[i], mat);
-  m.userData = { angle: (i / 6) * Math.PI * 2, radius: 3.3 + (i % 3) * 0.5, speed: 0.25 + (i % 3) * 0.08, yOff: (i % 2 ? 0.6 : -0.4) };
-  orbiters.push(m);
-  scene.add(m);
-}
-
-// ── Particle starfield ──
-const pCount = 900;
-const positions = new Float32Array(pCount * 3);
-for (let i = 0; i < pCount; i++) {
-  positions[i * 3]     = (Math.random() - 0.5) * 50;
-  positions[i * 3 + 1] = (Math.random() - 0.5) * 30;
-  positions[i * 3 + 2] = (Math.random() - 0.5) * 30 - 5;
-}
-const pGeo = new THREE.BufferGeometry();
-pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({
-  color: 0x7dd3fc, size: 0.05, transparent: true, opacity: 0.7, sizeAttenuation: true
-}));
-scene.add(particles);
-
-// ── Grid floor ──
-const grid = new THREE.GridHelper(60, 60, 0x1d4ed8, 0x16275a);
-grid.position.y = -2.6;
-grid.material.transparent = true;
-grid.material.opacity = 0.35;
-scene.add(grid);
-
-// ── Mouse parallax ──
-let mouseX = 0, mouseY = 0;
-addEventListener('mousemove', e => {
-  mouseX = (e.clientX / innerWidth - 0.5) * 2;
-  mouseY = (e.clientY / innerHeight - 0.5) * 2;
+  h.position.copy(new THREE.Vector3(2.5,.2,0));
+  h.rotation.x = .4+i*.22;
+  h.rotation.z = i*.15;
+  halos.push(h);
+  scene.add(h);
 });
 
-// ── Scroll fade ──
-let scrollY = 0;
-addEventListener('scroll', () => { scrollY = window.scrollY; });
+// ── FLOATING SERVICE ICONS ───────────────────────────────
+const icons = [];
+const iconData = [
+  {geo:new THREE.OctahedronGeometry(.3),   color:0x06b6d4, emit:0x06b6d4, r:4.6, spd:.22, y: .6, phase:0},
+  {geo:new THREE.IcosahedronGeometry(.26),  color:0x8b5cf6, emit:0x8b5cf6, r:5.0, spd:.18, y:-.3, phase:1.1},
+  {geo:new THREE.TetrahedronGeometry(.32),  color:0xf59e0b, emit:0xf59e0b, r:4.3, spd:.28, y: .2, phase:2.2},
+  {geo:new THREE.TorusKnotGeometry(.16,.05,60,8), color:0xec4899, emit:0xec4899, r:5.3, spd:.15, y: .5, phase:3.3},
+  {geo:new THREE.SphereGeometry(.22,16,16), color:0x10b981, emit:0x10b981, r:4.8, spd:.20, y:-.5, phase:4.4},
+  {geo:new THREE.BoxGeometry(.32,.32,.32),  color:0x3b82f6, emit:0x3b82f6, r:4.2, spd:.25, y: .8, phase:5.5},
+];
+iconData.forEach(d=>{
+  const m = new THREE.Mesh(d.geo,
+    new THREE.MeshStandardMaterial({
+      color:d.color, emissive:new THREE.Color(d.emit),
+      emissiveIntensity:.9, metalness:.5, roughness:.25
+    })
+  );
+  m.userData = d;
+  // Small point light per icon
+  const lgt = new THREE.PointLight(d.color, 8, 4);
+  m.add(lgt);
+  icons.push(m);
+  scene.add(m);
+});
 
-// ── Animate ──
+// ── PARTICLES ────────────────────────────────────────────
+const mkParticles = (count, spread, color, size) => {
+  const pos = new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+    pos[i*3]   = (Math.random()-.5)*spread;
+    pos[i*3+1] = (Math.random()-.5)*spread*.5;
+    pos[i*3+2] = (Math.random()-.5)*spread*.6-2;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  return new THREE.Points(g, new THREE.PointsMaterial({
+    color, size, transparent:true, opacity:.75, sizeAttenuation:true
+  }));
+};
+const stars   = mkParticles(1200, 70, 0x7dd3fc, .06);
+const sparkle = mkParticles(300, 20, 0xfbbf24, .05);
+const violet  = mkParticles(200, 18, 0xc4b5fd, .04);
+scene.add(stars, sparkle, violet);
+
+// ── GROUND REFLECTIVE PLANE ──────────────────────────────
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(60,60), groundMat);
+ground.rotation.x = -Math.PI/2;
+ground.position.y = -3.4;
+ground.receiveShadow = true;
+scene.add(ground);
+scene.add(new THREE.GridHelper(60,60,0x1d4ed8,0x0d1a3d));
+
+// ── MOUSE + SCROLL ───────────────────────────────────────
+let mX=0,mY=0, scrollY=0;
+addEventListener('mousemove',e=>{mX=(e.clientX/W()-.5)*2;mY=(e.clientY/H()-.5)*2;});
+addEventListener('scroll',()=>{scrollY=window.scrollY;});
+
+// ── ANIMATE ──────────────────────────────────────────────
 const clock = new THREE.Clock();
-function animate() {
+const hBase = new THREE.Vector3(2.5,.2,0);
+
+function animate(){
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
 
-  // house gentle float + rotate
-  house.rotation.y = t * 0.3;
-  house.position.y = 0.4 + Math.sin(t * 0.8) * 0.18;
+  // house float + gentle sway
+  house.position.y = hBase.y + Math.sin(t*.7)*.22;
+  house.rotation.y = Math.sin(t*.25)*.12;
 
-  // rings
-  rings.forEach((r, i) => {
-    r.rotation.z = t * (0.15 + i * 0.06);
-    r.position.y = house.position.y;
+  // platform follows house y slightly
+  platform.position.y = house.position.y - 1.55;
+  edgeRing.position.y = house.position.y - 1.47;
+  innerRing.position.y = house.position.y - 1.47;
+
+  // halo rings
+  halos.forEach((h,i)=>{
+    h.rotation.z = t*(.1+i*.04);
+    h.rotation.x = .4+i*.22 + Math.sin(t*.3)*0.05;
+    h.position.y = hBase.y + house.position.y*.15;
   });
 
-  // orbiters
-  orbiters.forEach(o => {
-    const d = o.userData;
-    d.angle += d.speed * 0.012;
-    o.position.set(
-      house.position.x + Math.cos(d.angle) * d.radius,
-      house.position.y + d.yOff + Math.sin(t * 1.2 + d.angle) * 0.25,
-      Math.sin(d.angle) * d.radius * 0.6
+  // orbiting icons
+  icons.forEach((m,i)=>{
+    const d=m.userData;
+    const a = t*d.spd + d.phase;
+    m.position.set(
+      hBase.x + Math.cos(a)*d.r,
+      house.position.y + d.y + Math.sin(t*.9+d.phase)*.3,
+      Math.sin(a)*d.r*.55
     );
-    o.rotation.x = t * 0.8;
-    o.rotation.y = t * 0.6;
+    m.rotation.x = t*.7;
+    m.rotation.y = t*.5;
+    // pulse emissive
+    m.material.emissiveIntensity = .7 + Math.sin(t*2+d.phase)*.4;
   });
+
+  // glow lights pulse
+  winGlowL.intensity = 12 + Math.sin(t*1.8)*4;
+  winGlowR.intensity = 12 + Math.sin(t*1.8+1)*4;
+  rimC.intensity     = 110 + Math.sin(t*.9)*20;
+  rimV.intensity     = 75  + Math.sin(t*1.1)*15;
 
   // particles drift
-  particles.rotation.y = t * 0.015;
+  stars.rotation.y   = t*.008;
+  sparkle.rotation.y = t*.014;
+  violet.rotation.x  = t*.006;
 
-  // camera parallax
-  camera.position.x += (mouseX * 0.9 - camera.position.x) * 0.04;
-  camera.position.y += (1.2 - mouseY * 0.6 - camera.position.y) * 0.04;
-  camera.position.z = 11 + Math.min(scrollY * 0.004, 3);
-  camera.lookAt(1.5, 0.3, 0);
+  // camera parallax + scroll
+  const tgtX = mX*.8;
+  const tgtY = 2 - mY*.5;
+  const tgtZ = 13 + scrollY*.003;
+  camera.position.x += (tgtX - camera.position.x)*.04;
+  camera.position.y += (tgtY - camera.position.y)*.04;
+  camera.position.z += (tgtZ - camera.position.z)*.06;
+  camera.lookAt(2.5, .5, 0);
 
   renderer.render(scene, camera);
 }
 animate();
 
-addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight;
+addEventListener('resize',()=>{
+  camera.aspect=W()/H();
   camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
+  renderer.setSize(W(),H());
 });
 </script>
-
 </body>
 </html>
