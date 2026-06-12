@@ -166,7 +166,6 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging)
-    implementation(libs.firebase.remoteconfig)
 
     // RevenueCat
     implementation(libs.revenuecat)
