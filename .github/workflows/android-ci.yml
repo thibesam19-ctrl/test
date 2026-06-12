@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [ "main", "claude/review-axiom-prompt-9JSdQ", "develop" ]
+    branches: [ "main", "develop", "claude/**" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
