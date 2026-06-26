@@ -1,0 +1,53 @@
+:root {
+  --color-primary: #1E40AF;
+  --color-primary-dark: #1e3a8a;
+  --color-secondary: #3B82F6;
+  --color-accent: #EA580C;
+  --color-accent-light: #FED7AA;
+  --color-background: #EFF6FF;
+  --color-foreground: #1E3A8A;
+  --color-muted: #E9EEF6;
+  --color-border: #BFDBFE;
+  --color-white: #FFFFFF;
+  --color-gray-50: #F8FAFC;
+  --color-gray-600: #475569;
+  --color-gray-800: #1E293B;
+  --color-success: #16A34A;
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Open Sans', sans-serif;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+  --shadow-card: 0 4px 24px rgba(30, 64, 175, 0.08);
+  --shadow-hover: 0 8px 40px rgba(30, 64, 175, 0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-gray-800);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  line-height: 1.2;
+}
+
+a { text-decoration: none; color: inherit; }
+button { font-family: var(--font-body); cursor: pointer; border: none; outline: none; }
+button:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; }
+img { max-width: 100%; display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
