@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="YAARL 360 — Sri Lanka's #1 On-Demand Home Services Super App. Book verified plumbers, electricians, cleaners and more in under 5 minutes." />
+  <meta name="keywords" content="home services Sri Lanka, plumber, electrician, cleaning, YAARL 360, on-demand, booking" />
+  <meta property="og:title" content="YAARL 360 — Home Services Super App" />
+  <meta property="og:description" content="Book verified home service professionals in Sri Lanka in under 5 minutes." />
+  <meta property="og:type" content="website" />
+  <title>YAARL 360 — Sri Lanka's Home Services Super App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #1E40AF;
+      --primary-dark: #1e3a8a;
+      --secondary: #3B82F6;
+      --accent: #EA580C;
+      --bg: #EFF6FF;
+      --muted: #E9EEF6;
+      --border: #BFDBFE;
+      --gray600: #475569;
+      --gray800: #1E293B;
+      --success: #16A34A;
+      --white: #ffffff;
+      --font-h: 'Poppins', sans-serif;
+      --font-b: 'Open Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-b);
+      background: var(--bg);
+      color: var(--gray800);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    h1,h2,h3,h4 { font-family: var(--font-h); line-height: 1.2; }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: var(--font-b); cursor: pointer; border: none; outline: none; }
+    button:focus-visible { outline: 3px solid var(--secondary); outline-offset: 2px; }
+    input { font-family: var(--font-b); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      transition: all 220ms ease;
+    }
+    #navbar.scrolled {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      height: 72px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; }
+    .nav-logo-icon {
+      width: 40px; height: 40px; background: var(--primary); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-text { font-family: var(--font-h); font-weight: 700; font-size: 20px; color: white; transition: color 220ms; }
+    #navbar.scrolled .nav-logo-text { color: var(--primary); }
+    .nav-logo-text span { color: var(--accent); }
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-link {
+      font-weight: 500; font-size: 15px; color: rgba(255,255,255,0.9);
+      padding: 8px 16px; border-radius: 8px; transition: all 150ms ease; background: transparent;
+    }
+    #navbar.scrolled .nav-link { color: var(--gray800); }
+    .nav-link:hover { background: rgba(255,255,255,0.15); }
+    #navbar.scrolled .nav-link:hover { background: var(--muted); }
+    .nav-cta {
+      background: var(--accent); color: white; font-weight: 600; font-size: 15px;
+      padding: 10px 24px; border-radius: 10px; margin-left: 8px; transition: all 150ms ease; display: inline-block;
+    }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(234,88,12,0.4); }
+    .hamburger { display: none; background: transparent; color: white; padding: 8px; }
+    #navbar.scrolled .hamburger { color: var(--primary); }
+    .mobile-drawer { display: none; background: white; border-top: 1px solid var(--border); padding: 16px 24px 24px; }
+    .mobile-drawer.open { display: block; }
+    .drawer-link { display: block; font-weight: 500; font-size: 16px; color: var(--gray800); padding: 12px 0; border-bottom: 1px solid var(--muted); }
+    .drawer-cta {
+      display: block; background: var(--accent); color: white; font-weight: 600; font-size: 16px;
+      padding: 14px 24px; border-radius: 10px; margin-top: 16px; text-align: center;
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none !important; }
+      .hamburger { display: flex !important; }
+    }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative; min-height: 100dvh;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1E40AF 50%, #1d4ed8 100%);
+      display: flex; align-items: center; overflow: hidden;
+    }
+    #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero-blob1 {
+      position: absolute; top: 10%; right: 5%; width: 300px; height: 300px;
+      background: rgba(59,130,246,0.15); border-radius: 50%; filter: blur(60px); pointer-events: none;
+    }
+    .hero-blob2 {
+      position: absolute; bottom: 15%; left: 3%; width: 200px; height: 200px;
+      background: rgba(234,88,12,0.1); border-radius: 50%; filter: blur(40px); pointer-events: none;
+    }
+    .hero-content {
+      position: relative; z-index: 10; max-width: 1200px; margin: 0 auto;
+      padding: 120px 24px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+      align-items: center; width: 100%;
+    }
+    @media (max-width: 768px) { .hero-content { grid-template-columns: 1fr !important; } }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 100px; padding: 6px 16px; margin-bottom: 24px;
+    }
+    .hero-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ADE80; display: inline-block; box-shadow: 0 0 8px #4ADE80; }
+    .hero-badge span { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 500; }
+    .hero-h1 { font-size: clamp(36px,5vw,64px); font-weight: 800; color: white; margin-bottom: 20px; letter-spacing: -0.02em; }
+    .hero-h1 span { color: var(--accent); }
+    .hero-p { font-size: 18px; color: rgba(255,255,255,0.8); max-width: 480px; line-height: 1.7; margin-bottom: 40px; }
+    .hero-stats { display: flex; gap: 32px; margin-bottom: 40px; flex-wrap: wrap; }
+    .hero-stat-n { font-size: 28px; font-weight: 700; color: white; font-family: var(--font-h); }
+    .hero-stat-l { font-size: 13px; color: rgba(255,255,255,0.65); }
+    .hero-form { display: flex; gap: 10px; max-width: 440px; flex-wrap: wrap; }
+    .hero-input {
+      flex: 1; min-width: 200px; padding: 14px 18px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.12);
+      color: white; font-size: 15px; backdrop-filter: blur(8px); font-family: var(--font-b);
+    }
+    .hero-input::placeholder { color: rgba(255,255,255,0.5); }
+    .hero-btn {
+      background: var(--accent); color: white; font-weight: 600; font-size: 15px;
+      padding: 14px 24px; border-radius: 10px; transition: transform 150ms ease; white-space: nowrap;
+    }
+    .hero-btn:hover { transform: scale(0.97); }
+    .hero-3d-space { height: 440px; position: relative; }
+    .scroll-cue {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      background: transparent; color: rgba(255,255,255,0.6); z-index: 10;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ── SECTION COMMONS ── */
+    .section-tag {
+      display: inline-block; font-weight: 600; font-size: 13px;
+      padding: 6px 16px; border-radius: 100px; margin-bottom: 16px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .section-h2 { font-size: clamp(28px,4vw,44px); font-weight: 700; color: var(--primary-dark); margin-bottom: 16px; }
+    .section-sub { font-size: 17px; color: var(--gray600); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+    /* ── SERVICES ── */
+    #services { padding: 96px 24px; background: white; }
+    .services-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;
+    }
+    .svc-card {
+      background: white; border: 2px solid var(--border); border-radius: 20px;
+      overflow: hidden; cursor: pointer; transition: all 220ms ease;
+      box-shadow: 0 4px 24px rgba(30,64,175,0.08);
+    }
+    .svc-card:hover { transform: translateY(-6px); }
+    .svc-canvas-wrap { height: 160px; background: #F8FAFC; transition: background 220ms ease; }
+    .svc-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
+    .svc-body { padding: 20px 24px 24px; }
+    .svc-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .svc-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .svc-title { font-size: 17px; font-weight: 600; color: var(--primary-dark); }
+    .svc-desc { font-size: 14px; color: var(--gray600); line-height: 1.6; }
+
+    /* ── HOW IT WORKS ── */
+    #how-it-works { padding: 96px 24px; background: var(--bg); }
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; position: relative; }
+    .step-card {
+      position: relative; background: white; border-radius: 20px; padding: 36px 28px;
+      box-shadow: 0 4px 24px rgba(30,64,175,0.08); border: 1px solid var(--border);
+    }
+    .step-num {
+      position: absolute; top: -18px; left: 28px; background: var(--primary); color: white;
+      font-family: var(--font-h); font-weight: 700; font-size: 13px;
+      padding: 6px 14px; border-radius: 100px; letter-spacing: 0.04em;
+    }
+    .step-icon {
+      width: 56px; height: 56px; background: var(--bg); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--primary); margin-bottom: 20px;
+    }
+    .step-title { font-size: 18px; font-weight: 600; color: var(--primary-dark); margin-bottom: 10px; }
+    .step-desc { font-size: 14px; color: var(--gray600); line-height: 1.65; }
+    .step-arrow {
+      position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+      z-index: 2; color: var(--secondary);
+    }
+    @media (max-width: 768px) { .step-arrow { display: none !important; } }
+
+    /* ── PRICING ── */
+    #pricing { padding: 96px 24px; background: white; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; align-items: start; max-width: 900px; margin: 0 auto; }
+    .plan-card {
+      position: relative; border-radius: 24px; padding: 40px 32px;
+    }
+    .plan-card.basic { background: white; border: 2px solid var(--border); box-shadow: 0 4px 24px rgba(30,64,175,0.08); }
+    .plan-card.premium { background: var(--primary); border: 2px solid var(--primary); box-shadow: 0 20px 60px rgba(30,64,175,0.25); transform: scale(1.03); }
+    @media (max-width: 640px) { .plan-card.premium { transform: none !important; } }
+    .plan-badge {
+      position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: white; font-weight: 700; font-size: 12px;
+      padding: 6px 18px; border-radius: 100px; white-space: nowrap; letter-spacing: 0.04em;
+    }
+    .plan-name { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+    .plan-name.basic { color: var(--gray600); }
+    .plan-name.premium { color: rgba(255,255,255,0.7); }
+    .plan-price { font-family: var(--font-h); font-size: 40px; font-weight: 800; }
+    .plan-price.basic { color: var(--primary-dark); }
+    .plan-price.premium { color: white; }
+    .plan-period.basic { font-size: 15px; color: var(--gray600); }
+    .plan-period.premium { font-size: 15px; color: rgba(255,255,255,0.7); }
+    .plan-tagline { font-size: 14px; margin-bottom: 32px; margin-top: 4px; }
+    .plan-tagline.basic { color: var(--gray600); }
+    .plan-tagline.premium { color: rgba(255,255,255,0.75); }
+    .plan-features { list-style: none; margin-bottom: 36px; display: flex; flex-direction: column; gap: 14px; }
+    .plan-feature { display: flex; align-items: flex-start; gap: 12px; }
+    .feature-check {
+      width: 22px; height: 22px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .feature-check.basic { background: var(--bg); }
+    .feature-check.premium { background: rgba(255,255,255,0.2); }
+    .feature-text { font-size: 14px; line-height: 1.5; }
+    .feature-text.basic { color: var(--gray800); }
+    .feature-text.premium { color: rgba(255,255,255,0.9); }
+    .plan-btn {
+      display: block; text-align: center; font-weight: 700; font-size: 15px;
+      padding: 14px 24px; border-radius: 12px; transition: transform 150ms ease;
+    }
+    .plan-btn.basic { background: var(--primary); color: white; }
+    .plan-btn.premium { background: white; color: var(--primary); }
+    .plan-btn:hover { transform: translateY(-2px); }
+    .pricing-note { text-align: center; font-size: 14px; color: var(--gray600); margin-top: 40px; }
+
+    /* ── WAITLIST ── */
+    #waitlist {
+      padding: 96px 24px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1E40AF 100%);
+      position: relative; overflow: hidden;
+    }
+    .wl-blob1 {
+      position: absolute; top: -20%; right: -10%; width: 500px; height: 500px;
+      background: rgba(59,130,246,0.15); border-radius: 50%; filter: blur(80px); pointer-events: none;
+    }
+    .wl-blob2 {
+      position: absolute; bottom: -15%; left: -8%; width: 400px; height: 400px;
+      background: rgba(234,88,12,0.1); border-radius: 50%; filter: blur(60px); pointer-events: none;
+    }
+    .wl-inner { max-width: 640px; margin: 0 auto; position: relative; z-index: 1; text-align: center; }
+    .wl-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 100px; padding: 6px 18px; margin-bottom: 24px;
+    }
+    .wl-dot { width: 8px; height: 8px; border-radius: 50%; background: #FDE047; display: inline-block; }
+    .wl-badge span { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 500; }
+    .wl-h2 { font-size: clamp(28px,4vw,46px); font-weight: 800; color: white; margin-bottom: 16px; line-height: 1.2; }
+    .wl-h2 span { color: #FCA5A5; }
+    .wl-p { font-size: 17px; color: rgba(255,255,255,0.75); margin-bottom: 48px; line-height: 1.7; }
+    .wl-p strong { color: white; }
+    .wl-form { display: flex; flex-direction: column; gap: 14px; }
+    .wl-input {
+      padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.1); color: white; font-size: 16px;
+      backdrop-filter: blur(8px); font-family: var(--font-b); width: 100%;
+    }
+    .wl-input::placeholder { color: rgba(255,255,255,0.5); }
+    .wl-submit {
+      background: var(--accent); color: white; font-weight: 700; font-size: 16px;
+      padding: 16px 32px; border-radius: 12px; transition: all 150ms ease;
+      display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+    }
+    .wl-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(234,88,12,0.4); }
+    .wl-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+    .wl-note { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 20px; }
+    .wl-success { padding: 40px 0; }
+    .wl-check-circle {
+      width: 72px; height: 72px; background: rgba(74,222,128,0.2); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;
+    }
+    .wl-success-h { font-size: 32px; font-weight: 700; color: white; margin-bottom: 12px; }
+    .wl-success-p { font-size: 17px; color: rgba(255,255,255,0.75); line-height: 1.7; }
+    .wl-success-p strong { color: white; }
+    @keyframes spin2 { to { transform: rotate(360deg); } }
+    .spin { animation: spin2 0.8s linear infinite; }
+
+    /* ── FOOTER ── */
+    footer { background: #0f172a; color: rgba(255,255,255,0.7); padding: 64px 24px 32px; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 48px; margin-bottom: 56px; }
+    .footer-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .footer-logo-icon {
+      width: 38px; height: 38px; background: var(--primary); border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .footer-logo-text { font-family: var(--font-h); font-weight: 700; font-size: 18px; color: white; }
+    .footer-logo-text span { color: var(--accent); }
+    .footer-brand-p { font-size: 14px; line-height: 1.7; max-width: 240px; }
+    .footer-h4 { color: white; font-weight: 600; font-size: 15px; margin-bottom: 20px; }
+    .footer-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-list a { font-size: 14px; transition: color 150ms; }
+    .footer-list a:hover { color: white; }
+    .footer-contact { display: flex; flex-direction: column; gap: 14px; }
+    .footer-contact-item { display: flex; gap: 12px; align-items: flex-start; }
+    .footer-contact-item span { font-size: 14px; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.08); padding-top: 28px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .footer-bottom p { font-size: 13px; }
+    .footer-legal { display: flex; gap: 24px; }
+    .footer-legal a { font-size: 13px; transition: color 150ms; }
+    .footer-legal a:hover { color: white; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════ -->
+<header id="navbar">
+  <nav class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V9.5Z" fill="white"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">YAARL <span>360</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+    </div>
+    <button class="hamburger" id="hamburger-btn" aria-label="Open menu">
+      <svg id="ham-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </nav>
+  <div class="mobile-drawer" id="mobile-drawer">
+    <a href="#services" class="drawer-link">Services</a>
+    <a href="#how-it-works" class="drawer-link">How It Works</a>
+    <a href="#pricing" class="drawer-link">Pricing</a>
+    <a href="#waitlist" class="drawer-cta">Join Waitlist</a>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section id="hero">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-blob1" aria-hidden="true"></div>
+  <div class="hero-blob2" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <div>
+      <div class="hero-badge">
+        <span class="hero-dot"></span>
+        <span>Now available in Sri Lanka</span>
+      </div>
+      <h1 class="hero-h1">Your Home,<br><span>Perfectly Serviced.</span></h1>
+      <p class="hero-p">Book verified home service professionals in under 5 minutes. Plumbers, electricians, cleaners and more — on-demand or scheduled, right at your doorstep.</p>
+      <div class="hero-stats">
+        <div><div class="hero-stat-n">500+</div><div class="hero-stat-l">Verified Workers</div></div>
+        <div><div class="hero-stat-n">8</div><div class="hero-stat-l">Service Types</div></div>
+        <div><div class="hero-stat-n">&lt; 5 min</div><div class="hero-stat-l">Booking Time</div></div>
+      </div>
+      <form class="hero-form" id="hero-form">
+        <input type="email" placeholder="Enter your email" class="hero-input" aria-label="Email address" required />
+        <button type="submit" class="hero-btn">Get Early Access</button>
+      </form>
+    </div>
+    <div class="hero-3d-space" aria-hidden="true"></div>
+  </div>
+
+  <button class="scroll-cue" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})" aria-label="Scroll to services">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SERVICES
+══════════════════════════════════════════ -->
+<section id="services" style="padding:96px 24px;background:white;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:64px;">
+      <span class="section-tag" style="background:var(--muted);color:var(--primary);">Our Services</span>
+      <h2 class="section-h2">Everything Your Home Needs</h2>
+      <p class="section-sub">From emergency repairs to routine maintenance — all in one app, delivered by verified professionals.</p>
+    </div>
+    <div class="services-grid" id="services-grid"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════ -->
+<section id="how-it-works">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:64px;">
+      <span class="section-tag" style="background:var(--primary);color:white;">How It Works</span>
+      <h2 class="section-h2">Booked in Under 5 Minutes</h2>
+      <p class="section-sub">Four simple steps from need to done — no phone calls, no waiting.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </div>
+        <h3 class="step-title">Choose a Service</h3>
+        <p class="step-desc">Browse 8 home service categories and select what you need — from emergency plumbing to routine garden care.</p>
+        <div class="step-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <h3 class="step-title">Book Instantly</h3>
+        <p class="step-desc">Pick a time that works — on-demand within the hour, or schedule in advance. Add your location and job notes.</p>
+        <div class="step-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+          </svg>
+        </div>
+        <h3 class="step-title">Track in Real-Time</h3>
+        <p class="step-desc">Watch your verified professional on the map as they head to you. Get push alerts at every stage.</p>
+        <div class="step-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <div class="step-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+            <line x1="6" y1="15" x2="10" y2="15"/>
+          </svg>
+        </div>
+        <h3 class="step-title">Pay &amp; Review</h3>
+        <p class="step-desc">Pay securely in-app. Get your digital invoice instantly and rate your professional to help the community.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PRICING
+══════════════════════════════════════════ -->
+<section id="pricing">
+  <div style="max-width:1200px;margin:0 auto;text-align:center;">
+    <span class="section-tag" style="background:var(--muted);color:var(--primary);">Subscription Plans</span>
+    <h2 class="section-h2">Simple, Transparent Pricing</h2>
+    <p class="section-sub" style="margin-bottom:64px;">Subscribe once and never worry about home maintenance again.</p>
+
+    <div class="pricing-grid">
+      <!-- Basic -->
+      <div class="plan-card basic">
+        <div class="plan-name basic">Basic</div>
+        <div><span class="plan-price basic">Rs. 3,500</span><span class="plan-period basic">/month</span></div>
+        <div class="plan-tagline basic">Essential home care</div>
+        <ul class="plan-features">
+          <li class="plan-feature"><div class="feature-check basic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text basic">1 deep clean per month</span></li>
+          <li class="plan-feature"><div class="feature-check basic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text basic">2 handyman checkups</span></li>
+          <li class="plan-feature"><div class="feature-check basic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text basic">12-month service calendar</span></li>
+          <li class="plan-feature"><div class="feature-check basic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text basic">Auto-renew subscription</span></li>
+          <li class="plan-feature"><div class="feature-check basic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text basic">Priority booking</span></li>
+          <li class="plan-feature"><div class="feature-check basic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text basic">Digital invoices</span></li>
+        </ul>
+        <a href="#waitlist" class="plan-btn basic">Get Started — Basic</a>
+      </div>
+
+      <!-- Premium -->
+      <div class="plan-card premium">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name premium">Premium</div>
+        <div><span class="plan-price premium">Rs. 8,500</span><span class="plan-period premium">/month</span></div>
+        <div class="plan-tagline premium">Complete villa care</div>
+        <ul class="plan-features">
+          <li class="plan-feature"><div class="feature-check premium"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text premium">Full property clean every 6 weeks</span></li>
+          <li class="plan-feature"><div class="feature-check premium"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text premium">Unlimited 24/7 priority checkups</span></li>
+          <li class="plan-feature"><div class="feature-check premium"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text premium">Visitation fees waived</span></li>
+          <li class="plan-feature"><div class="feature-check premium"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text premium">Top-of-queue dispatch</span></li>
+          <li class="plan-feature"><div class="feature-check premium"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text premium">Dedicated account manager</span></li>
+          <li class="plan-feature"><div class="feature-check premium"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div><span class="feature-text premium">Annual home health report</span></li>
+        </ul>
+        <a href="#waitlist" class="plan-btn premium">Get Started — Premium</a>
+      </div>
+    </div>
+    <p class="pricing-note">All plans include in-app payments, digital invoices and 24/7 customer support. Cancel anytime.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     WAITLIST
+══════════════════════════════════════════ -->
+<section id="waitlist">
+  <div class="wl-blob1" aria-hidden="true"></div>
+  <div class="wl-blob2" aria-hidden="true"></div>
+  <div class="wl-inner">
+    <div id="wl-form-wrap">
+      <div class="wl-badge">
+        <span class="wl-dot"></span>
+        <span>Launching Soon in Sri Lanka</span>
+      </div>
+      <h2 class="wl-h2">Be the First to Experience<br><span>YAARL 360</span></h2>
+      <p class="wl-p">Join the waitlist and get <strong>50% off your first booking</strong> when we launch. Be part of Sri Lanka's home services revolution.</p>
+      <form class="wl-form" id="waitlist-form">
+        <input type="email" required placeholder="Your email address" class="wl-input" id="wl-email" aria-label="Email address" />
+        <input type="tel" placeholder="Phone number (optional)" class="wl-input" aria-label="Phone number" />
+        <button type="submit" class="wl-submit" id="wl-btn">
+          <span id="wl-btn-text">Join the Waitlist — Get 50% Off</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+      <p class="wl-note">No spam. We'll only contact you about your early access.</p>
+    </div>
+    <div id="wl-success" style="display:none;" class="wl-success">
+      <div class="wl-check-circle">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h3 class="wl-success-h">You're on the list!</h3>
+      <p class="wl-success-p">Thanks for joining! We'll notify you at <strong id="wl-confirm-email"></strong> the moment YAARL 360 launches. Your 50% discount is reserved.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer>
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <div class="footer-logo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V9.5Z" fill="white"/>
+            </svg>
+          </div>
+          <span class="footer-logo-text">YAARL <span>360</span></span>
+        </div>
+        <p class="footer-brand-p">Sri Lanka's on-demand home services super app. Book verified professionals for any home need in under 5 minutes.</p>
+      </div>
+      <div>
+        <h4 class="footer-h4">Services</h4>
+        <ul class="footer-list">
+          <li><a href="#services">Plumbing</a></li><li><a href="#services">Electrical</a></li>
+          <li><a href="#services">Deep Cleaning</a></li><li><a href="#services">AC Service</a></li>
+          <li><a href="#services">Painting</a></li><li><a href="#services">Handyman</a></li>
+          <li><a href="#services">Garden Care</a></li><li><a href="#services">Pest Control</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-h4">Company</h4>
+        <ul class="footer-list">
+          <li><a href="#">About Us</a></li><li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#pricing">Pricing</a></li><li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li><li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-h4">Contact</h4>
+        <div class="footer-contact">
+          <div class="footer-contact-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>hello@yaarl360.lk</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5a19.79 19.79 0 01-3.07-8.67A2 2 0 012.18 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.09a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            <span>+94 11 234 5678</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Colombo, Sri Lanka</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© <span id="footer-year"></span> YAARL 360 (Pvt) Ltd · Sri Lanka · All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════
+     THREE.JS via CDN
+══════════════════════════════════════════ -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+// ─── Reduced motion ───────────────────────────────────────────────────────────
+const motionMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+let noMotion = motionMQ.matches;
+motionMQ.addEventListener('change', e => { noMotion = e.matches; });
+
+// ─── HERO SCENE ───────────────────────────────────────────────────────────────
+(function buildHero() {
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  cam.position.set(0, 3, 8);
+  cam.lookAt(0, 0, 0);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const dir = new THREE.DirectionalLight(0xffffff, 1.2);
+  dir.position.set(5, 8, 5); dir.castShadow = true; dir.shadow.mapSize.set(1024, 1024);
+  scene.add(dir);
+  const fill = new THREE.DirectionalLight(0x3B82F6, 0.4);
+  fill.position.set(-5, 2, -3); scene.add(fill);
+
+  const group = new THREE.Group();
+
+  // Island
+  const island = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.2, 0.6, 32), new THREE.MeshLambertMaterial({ color: 0x22C55E }));
+  island.position.y = -0.3; island.receiveShadow = true;
+  const earth = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 1.8, 0.5, 32), new THREE.MeshLambertMaterial({ color: 0x92400E }));
+  earth.position.y = -0.85;
+  group.add(island, earth);
+
+  // House
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.4, 1.4), new THREE.MeshLambertMaterial({ color: 0xFEF3C7 }));
+  body.position.y = 0.7; body.castShadow = true; body.receiveShadow = true;
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.9, 4), new THREE.MeshLambertMaterial({ color: 0x1E40AF }));
+  roof.position.y = 1.85; roof.rotation.y = Math.PI / 4; roof.castShadow = true;
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.6, 0.05), new THREE.MeshLambertMaterial({ color: 0xEA580C }));
+  door.position.set(0, 0.3, 0.73);
+  const winMat = new THREE.MeshLambertMaterial({ color: 0x93C5FD });
+  const win1 = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.05), winMat);
+  win1.position.set(-0.55, 0.75, 0.73);
+  const win2 = win1.clone(); win2.position.set(0.55, 0.75, 0.73);
+  group.add(body, roof, door, win1, win2);
+
+  // Trees
+  [[- 1.8, 1.2], [1.9, 0.8], [-1.0, -1.8]].forEach(([x, z]) => {
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 0.4, 8), new THREE.MeshLambertMaterial({ color: 0x92400E }));
+    trunk.position.set(x, 0.2, z);
+    const top = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.6, 8), new THREE.MeshLambertMaterial({ color: 0x16A34A }));
+    top.position.set(x, 0.7, z);
+    group.add(trunk, top);
+  });
+
+  // Particles
+  const pGeo = new THREE.BufferGeometry();
+  const pPos = new Float32Array(60 * 3);
+  for (let i = 0; i < 60; i++) { pPos[i*3]=(Math.random()-.5)*12; pPos[i*3+1]=(Math.random()-.5)*8; pPos[i*3+2]=(Math.random()-.5)*8-2; }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0x93C5FD, size: 0.06, transparent: true, opacity: 0.7 }));
+  scene.add(particles);
+
+  scene.add(group);
+
+  function resize() {
+    const w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  let t = 0;
+  (function tick() {
+    requestAnimationFrame(tick); t += 0.01;
+    if (!noMotion) { group.rotation.y = t * 0.25; group.position.y = Math.sin(t * 0.8) * 0.12; particles.rotation.y = t * 0.04; }
+    renderer.render(scene, cam);
+  })();
+})();
+
+// ─── SERVICE CARDS 3D ─────────────────────────────────────────────────────────
+const SERVICES = [
+  { id: 'plumbing',    title: 'Plumbing',      desc: 'Leaks, blockages and emergency burst-pipe response by certified plumbers.', color: '#3B82F6', accent: 0x3B82F6 },
+  { id: 'electrical',  title: 'Electrical',     desc: 'Wiring faults, breaker trips and certified electrical installations.', color: '#EAB308', accent: 0xEAB308 },
+  { id: 'cleaning',    title: 'Deep Cleaning',  desc: 'Full property, kitchen or bathroom deep cleans by trained professionals.', color: '#22C55E', accent: 0x22C55E },
+  { id: 'ac',          title: 'AC Service',     desc: 'AC servicing, gas top-ups and breakdown repair — same day.', color: '#06B6D4', accent: 0x06B6D4 },
+  { id: 'painting',    title: 'Painting',       desc: 'Interior and exterior painting with quality finishes and clean work.', color: '#A855F7', accent: 0xA855F7 },
+  { id: 'handyman',    title: 'Handyman',       desc: 'Furniture assembly, wall mounting and general home fixes.', color: '#F59E0B', accent: 0xF59E0B },
+  { id: 'garden',      title: 'Garden Care',    desc: 'Lawn trimming, hedge shaping and seasonal maintenance.', color: '#16A34A', accent: 0x16A34A },
+  { id: 'pest',        title: 'Pest Control',   desc: 'Safe certified treatment for termites, rodents and insects.', color: '#EF4444', accent: 0xEF4444 },
+];
+
+function buildServiceScene(id, group) {
+  switch(id) {
+    case 'plumbing': {
+      const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1.4,16), new THREE.MeshLambertMaterial({color:0x6B7280}));
+      const elbow = new THREE.Mesh(new THREE.TorusGeometry(0.3,0.12,12,16,Math.PI/2), new THREE.MeshLambertMaterial({color:0x3B82F6}));
+      elbow.position.set(0.3,0.7,0); elbow.rotation.z=Math.PI/2;
+      const drop = new THREE.Mesh(new THREE.SphereGeometry(0.14,12,12), new THREE.MeshLambertMaterial({color:0x93C5FD}));
+      drop.position.set(0.3,0.4,0);
+      group.add(pipe,elbow,drop); break;
+    }
+    case 'electrical': {
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.5,16,16), new THREE.MeshLambertMaterial({color:0xFEF08A,emissive:0xFEF08A,emissiveIntensity:0.4}));
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.22,0.3,12), new THREE.MeshLambertMaterial({color:0x9CA3AF}));
+      base.position.y=-0.6;
+      group.add(bulb,base); break;
+    }
+    case 'cleaning': {
+      const bucket = new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.28,0.7,16,1,true), new THREE.MeshLambertMaterial({color:0x3B82F6,side:THREE.DoubleSide}));
+      bucket.position.y=-0.3;
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.35,0.04,8,24), new THREE.MeshLambertMaterial({color:0x1D4ED8}));
+      rim.position.y=0.05;
+      [[-0.3,0.5,0],[0.2,0.7,0.1],[0,0.9,-0.1]].forEach(([x,y,z])=>{
+        const b=new THREE.Mesh(new THREE.SphereGeometry(0.1,8,8),new THREE.MeshLambertMaterial({color:0xBAE6FD,transparent:true,opacity:0.8}));
+        b.position.set(x,y,z); group.add(b);
+      });
+      group.add(bucket,rim); break;
+    }
+    case 'ac': {
+      const unit = new THREE.Mesh(new THREE.BoxGeometry(1.4,0.7,0.5), new THREE.MeshLambertMaterial({color:0xF1F5F9}));
+      for(let i=0;i<4;i++){const v=new THREE.Mesh(new THREE.BoxGeometry(1.2,0.08,0.05),new THREE.MeshLambertMaterial({color:0x06B6D4}));v.position.set(0,-0.15+i*0.1,0.28);group.add(v);}
+      group.add(unit); break;
+    }
+    case 'painting': {
+      const roller = new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.8,16), new THREE.MeshLambertMaterial({color:0xA855F7}));
+      roller.rotation.z=Math.PI/2; roller.position.y=0.2;
+      const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.9,8), new THREE.MeshLambertMaterial({color:0x9CA3AF}));
+      handle.rotation.z=-Math.PI/4; handle.position.set(-0.5,-0.2,0);
+      [[-0.2,-0.5],[0,-0.6],[0.2,-0.5]].forEach(([x,y])=>{
+        const d=new THREE.Mesh(new THREE.CapsuleGeometry(0.05,0.15,4,8),new THREE.MeshLambertMaterial({color:0xA855F7}));
+        d.position.set(x,y,0); group.add(d);
+      });
+      group.add(roller,handle); break;
+    }
+    case 'handyman': {
+      const handle2 = new THREE.Mesh(new THREE.CapsuleGeometry(0.1,0.9,6,12), new THREE.MeshLambertMaterial({color:0x6B7280}));
+      handle2.rotation.z=Math.PI/4;
+      const head = new THREE.Mesh(new THREE.TorusGeometry(0.2,0.07,8,20,Math.PI*1.2), new THREE.MeshLambertMaterial({color:0xF59E0B}));
+      head.position.set(0.5,0.5,0); head.rotation.z=-0.5;
+      group.add(handle2,head); break;
+    }
+    case 'garden': {
+      const body2 = new THREE.Mesh(new THREE.BoxGeometry(1,0.5,0.7), new THREE.MeshLambertMaterial({color:0x16A34A}));
+      body2.position.y=0.1;
+      [-0.35,0.35].forEach(x=>[-0.25,0.25].forEach(z=>{
+        const w=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.08,16),new THREE.MeshLambertMaterial({color:0x374151}));
+        w.rotation.z=Math.PI/2; w.position.set(x,-0.2,z); group.add(w);
+      }));
+      const leaf=new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8),new THREE.MeshLambertMaterial({color:0x4ADE80}));
+      leaf.scale.set(1,0.5,1.5); leaf.position.set(0.5,0.6,0);
+      group.add(body2,leaf); break;
+    }
+    case 'pest': {
+      const bottle = new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.28,0.9,16), new THREE.MeshLambertMaterial({color:0xEF4444}));
+      bottle.position.y=-0.2;
+      const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,0.4,8), new THREE.MeshLambertMaterial({color:0x374151}));
+      nozzle.rotation.z=Math.PI/2; nozzle.position.set(0.4,0.35,0);
+      [[0.7,0.4],[0.85,0.5],[0.75,0.6]].forEach(([x,y])=>{
+        const d=new THREE.Mesh(new THREE.SphereGeometry(0.04,6,6),new THREE.MeshLambertMaterial({color:0xFCA5A5,transparent:true,opacity:0.7}));
+        d.position.set(x,y,0); group.add(d);
+      });
+      group.add(bottle,nozzle); break;
+    }
+  }
+}
+
+const grid = document.getElementById('services-grid');
+SERVICES.forEach(svc => {
+  const card = document.createElement('article');
+  card.className = 'svc-card';
+
+  const canvasWrap = document.createElement('div');
+  canvasWrap.className = 'svc-canvas-wrap';
+
+  const cvs = document.createElement('canvas');
+  cvs.style.width = '100%'; cvs.style.height = '100%';
+  canvasWrap.appendChild(cvs);
+
+  const body = document.createElement('div');
+  body.className = 'svc-body';
+  body.innerHTML = `
+    <div class="svc-title-row">
+      <div class="svc-dot" style="background:${svc.color}"></div>
+      <h3 class="svc-title">${svc.title}</h3>
+    </div>
+    <p class="svc-desc">${svc.desc}</p>`;
+
+  card.appendChild(canvasWrap);
+  card.appendChild(body);
+
+  card.addEventListener('mouseenter', () => {
+    card.style.borderColor = svc.color;
+    card.style.boxShadow = `0 12px 40px ${svc.color}30`;
+    canvasWrap.style.background = svc.color + '18';
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.borderColor = 'var(--border)';
+    card.style.boxShadow = '0 4px 24px rgba(30,64,175,0.08)';
+    canvasWrap.style.background = '#F8FAFC';
+  });
+
+  grid.appendChild(card);
+
+  // 3D renderer per card
+  const renderer = new THREE.WebGLRenderer({ canvas: cvs, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(50, 1, 0.1, 50);
+  cam.position.set(0, 0.5, 3.5); cam.lookAt(0, 0, 0);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+  const d = new THREE.DirectionalLight(0xffffff, 1); d.position.set(3,5,3); scene.add(d);
+  const f = new THREE.DirectionalLight(svc.accent, 0.5); f.position.set(-3,-1,-2); scene.add(f);
+
+  const group = new THREE.Group();
+  buildServiceScene(svc.id, group);
+  scene.add(group);
+
+  function resizeCard() {
+    const w = canvasWrap.clientWidth, h = canvasWrap.clientHeight;
+    if (w === 0 || h === 0) return;
+    renderer.setSize(w, h, false);
+    cam.aspect = w / h; cam.updateProjectionMatrix();
+  }
+  resizeCard();
+  window.addEventListener('resize', resizeCard);
+
+  let t = 0;
+  (function tick() {
+    requestAnimationFrame(tick); t += 0.016;
+    if (!noMotion) { group.rotation.y = t * 0.6; group.position.y = Math.sin(t * 1.2) * 0.06; }
+    renderer.render(scene, cam);
+  })();
+});
+
+// ─── NAVBAR SCROLL ────────────────────────────────────────────────────────────
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ─── HAMBURGER ────────────────────────────────────────────────────────────────
+const hamburger = document.getElementById('hamburger-btn');
+const drawer = document.getElementById('mobile-drawer');
+hamburger.addEventListener('click', () => {
+  drawer.classList.toggle('open');
+});
+drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => drawer.classList.remove('open')));
+
+// ─── HERO FORM ────────────────────────────────────────────────────────────────
+document.getElementById('hero-form').addEventListener('submit', e => {
+  e.preventDefault();
+  document.getElementById('waitlist').scrollIntoView({ behavior: 'smooth' });
+});
+
+// ─── WAITLIST FORM ────────────────────────────────────────────────────────────
+document.getElementById('waitlist-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = document.getElementById('wl-email').value;
+  const btn = document.getElementById('wl-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Joining…`;
+  setTimeout(() => {
+    document.getElementById('wl-form-wrap').style.display = 'none';
+    document.getElementById('wl-confirm-email').textContent = email;
+    document.getElementById('wl-success').style.display = 'block';
+  }, 1200);
+});
+
+// ─── FOOTER YEAR ─────────────────────────────────────────────────────────────
+document.getElementById('footer-year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
