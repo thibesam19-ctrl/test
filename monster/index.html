@@ -1,1363 +1,890 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Monster Energy — Unleash the Beast</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Monster Energy — Unleash the Beast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#39FF14;--g2:#00ff88;--g3:#a0ff60;
+  --bg:#030508;--bg2:#060a0f;
+  --s:#0d1117;--s2:#111827;
+  --t:rgba(255,255,255,0.9);--tm:rgba(255,255,255,0.5);--ts:rgba(255,255,255,0.25);
+  --holo1:#39FF14;--holo2:#00e5ff;--holo3:#ff00ff;--holo4:#ffea00;--holo5:#ff6600;
+  --fh:'Orbitron',sans-serif;--fb:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t);font-family:var(--fb);overflow-x:hidden;cursor:none}
 
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── CURSOR ── */
+#cursor{position:fixed;width:12px;height:12px;background:var(--g);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width 200ms,height 200ms,opacity 200ms;mix-blend-mode:difference}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(57,255,20,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform 80ms ease,width 200ms,height 200ms}
+body:hover #cursor{opacity:1}
 
-    :root {
-      --green: #39FF14;
-      --green-dim: #1aad00;
-      --green-glow: rgba(57,255,20,0.35);
-      --bg: #0A0A0F;
-      --bg2: #0F0F1A;
-      --bg3: #13131F;
-      --surface: #16161F;
-      --surface2: #1C1C2A;
-      --text: #E8E8F0;
-      --text-muted: rgba(232,232,240,0.55);
-      --white: #ffffff;
-      --font-head: 'Orbitron', sans-serif;
-      --font-body: 'JetBrains Mono', monospace;
-      --radius: 4px;
-      --radius-lg: 12px;
-    }
+/* ── NOISE OVERLAY ── */
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-    html { scroll-behavior: smooth; }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--g);border-radius:2px}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 15px;
-      line-height: 1.65;
-      overflow-x: hidden;
-    }
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(3,5,8,0);transition:background 400ms,backdrop-filter 400ms}
+nav.scrolled{background:rgba(3,5,8,0.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(57,255,20,0.1)}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-claw svg{filter:drop-shadow(0 0 10px var(--g))}
+.logo-txt{font-family:var(--fh);font-weight:900;font-size:17px;letter-spacing:0.15em;color:#fff}
+.logo-txt b{color:var(--g)}
+.nav-links{display:flex;gap:40px;list-style:none}
+.nav-links a{font-family:var(--fh);font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--tm);text-decoration:none;transition:color 150ms;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--g);transition:width 250ms}
+.nav-links a:hover{color:var(--g)}
+.nav-links a:hover::after{width:100%}
+.nav-btn{font-family:var(--fh);font-size:10px;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;color:#000;background:var(--g);border:none;padding:11px 24px;border-radius:3px;cursor:none;transition:box-shadow 200ms,transform 150ms;text-decoration:none;position:relative;overflow:hidden}
+.nav-btn::before{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:rgba(255,255,255,0.3);transform:skewX(-20deg);transition:left 400ms}
+.nav-btn:hover::before{left:120%}
+.nav-btn:hover{box-shadow:0 0 30px rgba(57,255,20,0.6),0 0 60px rgba(57,255,20,0.25);transform:translateY(-1px)}
 
-    /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 3px; }
+/* ── HERO ── */
+#hero{position:relative;height:100dvh;min-height:700px;display:flex;align-items:center;overflow:hidden}
+#hero-canvas{position:absolute;inset:0;z-index:0}
+.hero-overlay{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse 70% 80% at 60% 50%,transparent 20%,rgba(3,5,8,0.6) 70%,var(--bg) 100%)}
+.hero-grid{position:absolute;inset:0;z-index:1;background-image:linear-gradient(rgba(57,255,20,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(57,255,20,0.03) 1px,transparent 1px);background-size:80px 80px;perspective:600px;transform:rotateX(10deg) scale(1.2);transform-origin:50% 100%}
+.hero-content{position:relative;z-index:3;padding:0 80px;max-width:700px}
+.hero-tag{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(57,255,20,0.3);background:rgba(57,255,20,0.06);padding:7px 18px;border-radius:2px;margin-bottom:32px}
+.hero-tag-dot{width:8px;height:8px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero-tag-txt{font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--g)}
+.hero-h1{font-family:var(--fh);font-size:clamp(52px,8vw,110px);font-weight:900;line-height:0.9;letter-spacing:-0.02em;color:#fff;margin-bottom:8px}
+.hero-h1 .holo-text{background:linear-gradient(90deg,var(--holo1),var(--holo2),var(--holo3),var(--holo4),var(--holo1));background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:holo-shift 4s linear infinite;filter:drop-shadow(0 0 20px rgba(57,255,20,0.5))}
+@keyframes holo-shift{from{background-position:0%}to{background-position:300%}}
+.hero-sub{font-family:var(--fh);font-size:clamp(14px,2vw,22px);font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:var(--tm);margin-bottom:32px}
+.hero-desc{font-size:15px;color:rgba(255,255,255,0.6);line-height:1.8;max-width:460px;margin-bottom:48px}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.btn-glow{display:inline-flex;align-items:center;gap:10px;background:var(--g);color:#000;font-family:var(--fh);font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;padding:16px 32px;border-radius:3px;border:none;cursor:none;transition:box-shadow 250ms,transform 150ms;position:relative;overflow:hidden}
+.btn-glow::before{content:'';position:absolute;top:-50%;left:-60%;width:35%;height:200%;background:rgba(255,255,255,0.35);transform:skewX(-20deg);transition:left 350ms}
+.btn-glow:hover::before{left:130%}
+.btn-glow:hover{box-shadow:0 0 40px rgba(57,255,20,0.7),0 0 80px rgba(57,255,20,0.3);transform:translateY(-2px)}
+.btn-ghost{display:inline-flex;align-items:center;gap:10px;background:transparent;color:#fff;font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;padding:15px 30px;border:1px solid rgba(255,255,255,0.2);border-radius:3px;cursor:none;transition:border-color 200ms,color 200ms}
+.btn-ghost:hover{border-color:var(--g);color:var(--g)}
+.hero-scroll{position:absolute;bottom:40px;left:80px;z-index:3;display:flex;align-items:center;gap:16px}
+.scroll-line{width:60px;height:1px;background:linear-gradient(90deg,var(--g),transparent)}
+.scroll-txt{font-family:var(--fh);font-size:9px;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;color:var(--tm)}
+.hero-stats{position:absolute;right:80px;bottom:80px;z-index:3;display:flex;flex-direction:column;gap:36px}
+.h-stat-n{font-family:var(--fh);font-size:42px;font-weight:900;color:var(--g);line-height:1;text-shadow:0 0 25px rgba(57,255,20,0.5)}
+.h-stat-l{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--tm);margin-top:3px}
 
-    /* ── SELECTION ── */
-    ::selection { background: var(--green); color: #000; }
+/* ── ANIMATION 1: HOLOGRAPHIC TICKER ── */
+.holo-ticker{padding:18px 0;overflow:hidden;position:relative;background:linear-gradient(90deg,var(--bg),rgba(57,255,20,0.05),var(--bg));border-top:1px solid rgba(57,255,20,0.15);border-bottom:1px solid rgba(57,255,20,0.15)}
+.holo-ticker::before,.holo-ticker::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
+.holo-ticker::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.holo-ticker::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
+.ticker-track{display:flex;gap:0;animation:tick 28s linear infinite;width:max-content}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.t-item{display:inline-flex;align-items:center;gap:20px;padding:0 28px;white-space:nowrap}
+.t-item span{font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;background:linear-gradient(90deg,var(--holo1),var(--holo2),var(--holo3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.t-sep{width:5px;height:5px;border-radius:50%;background:var(--g);opacity:0.5;flex-shrink:0}
 
-    /* ── NAVBAR ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 40px;
-      height: 68px;
-      background: rgba(10,10,15,0.88);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(57,255,20,0.12);
-    }
-    .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none;
-    }
-    .nav-logo-claw {
-      width: 38px; height: 38px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .nav-logo-claw svg { filter: drop-shadow(0 0 6px var(--green)); }
-    .nav-logo-text {
-      font-family: var(--font-head);
-      font-weight: 800;
-      font-size: 18px;
-      letter-spacing: 0.12em;
-      color: var(--white);
-    }
-    .nav-logo-text span { color: var(--green); }
-    .nav-links {
-      display: flex; align-items: center; gap: 36px;
-      list-style: none;
-    }
-    .nav-links a {
-      font-family: var(--font-head);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 150ms;
-    }
-    .nav-links a:hover { color: var(--green); }
-    .nav-cta {
-      font-family: var(--font-head);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #000;
-      background: var(--green);
-      border: none;
-      padding: 10px 22px;
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: box-shadow 200ms, transform 150ms;
-      text-decoration: none;
-    }
-    .nav-cta:hover {
-      box-shadow: 0 0 18px var(--green-glow), 0 0 40px rgba(57,255,20,0.2);
-      transform: translateY(-1px);
-    }
-    .nav-hamburger {
-      display: none;
-      flex-direction: column; gap: 5px;
-      background: none; border: none; cursor: pointer; padding: 4px;
-    }
-    .nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: all 200ms; }
+/* ── PRODUCTS ── */
+#products{padding:120px 80px;background:var(--bg2);position:relative;overflow:hidden}
+#products::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(57,255,20,0.05),transparent 70%);pointer-events:none}
+.sec-eyebrow{font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:var(--g);margin-bottom:12px}
+.sec-title{font-family:var(--fh);font-size:clamp(28px,4vw,52px);font-weight:900;color:#fff;line-height:1.05;margin-bottom:16px}
+.sec-title .hl{background:linear-gradient(135deg,var(--holo1),var(--holo2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-desc{font-size:14px;color:var(--tm);line-height:1.8;max-width:480px}
+.products-hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:64px;flex-wrap:wrap;gap:24px}
+.products-carousel{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
 
-    /* ── HERO ── */
-    #hero {
-      position: relative;
-      min-height: 100dvh;
-      display: flex; align-items: center;
-      padding: 100px 40px 60px;
-      overflow: hidden;
-    }
-    #hero-canvas {
-      position: absolute; inset: 0;
-      z-index: 0;
-    }
-    .hero-bg-grid {
-      position: absolute; inset: 0; z-index: 0;
-      background-image:
-        linear-gradient(rgba(57,255,20,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(57,255,20,0.04) 1px, transparent 1px);
-      background-size: 60px 60px;
-    }
-    .hero-vignette {
-      position: absolute; inset: 0; z-index: 1;
-      background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 30%, var(--bg) 100%);
-    }
-    .hero-content {
-      position: relative; z-index: 2;
-      max-width: 680px;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(57,255,20,0.08);
-      border: 1px solid rgba(57,255,20,0.25);
-      border-radius: 2px;
-      padding: 6px 16px;
-      margin-bottom: 28px;
-    }
-    .hero-badge-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 8px var(--green);
-      animation: pulse-dot 2s ease-in-out infinite;
-    }
-    @keyframes pulse-dot {
-      0%,100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
-      50% { opacity: 0.5; box-shadow: 0 0 3px var(--green); }
-    }
-    .hero-badge-text {
-      font-family: var(--font-head);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--green);
-    }
-    .hero-title {
-      font-family: var(--font-head);
-      font-size: clamp(46px, 7vw, 90px);
-      font-weight: 900;
-      line-height: 0.95;
-      letter-spacing: -0.01em;
-      color: var(--white);
-      margin-bottom: 6px;
-    }
-    .hero-title-green {
-      color: var(--green);
-      text-shadow: 0 0 30px rgba(57,255,20,0.6), 0 0 60px rgba(57,255,20,0.3);
-    }
-    .hero-subtitle {
-      font-family: var(--font-head);
-      font-size: clamp(18px, 3vw, 30px);
-      font-weight: 600;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 28px;
-    }
-    .hero-desc {
-      font-size: 14px;
-      color: var(--text-muted);
-      max-width: 480px;
-      margin-bottom: 44px;
-      line-height: 1.8;
-    }
-    .hero-actions {
-      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-    }
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: var(--green);
-      color: #000;
-      font-family: var(--font-head);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      text-decoration: none;
-      padding: 16px 32px;
-      border-radius: var(--radius);
-      border: none; cursor: pointer;
-      transition: box-shadow 200ms, transform 150ms;
-    }
-    .btn-primary:hover {
-      box-shadow: 0 0 24px var(--green-glow), 0 0 60px rgba(57,255,20,0.2);
-      transform: translateY(-2px);
-    }
-    .btn-outline {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: transparent;
-      color: var(--text);
-      font-family: var(--font-head);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      text-decoration: none;
-      padding: 15px 30px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(232,232,240,0.2);
-      cursor: pointer;
-      transition: border-color 200ms, color 200ms;
-    }
-    .btn-outline:hover { border-color: var(--green); color: var(--green); }
-    .hero-stats {
-      position: absolute; right: 60px; bottom: 80px; z-index: 2;
-      display: flex; flex-direction: column; gap: 32px;
-    }
-    .hero-stat { text-align: right; }
-    .hero-stat-num {
-      font-family: var(--font-head);
-      font-size: 36px;
-      font-weight: 900;
-      color: var(--green);
-      line-height: 1;
-      text-shadow: 0 0 20px rgba(57,255,20,0.5);
-    }
-    .hero-stat-label {
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-    .hero-can-container {
-      position: absolute; right: 80px; top: 50%; transform: translateY(-50%);
-      z-index: 2;
-      width: 340px; height: 540px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    #can-canvas {
-      width: 100%; height: 100%;
-    }
+/* ANIMATION 2: HOLOGRAPHIC CARD TILT */
+.p-card{background:var(--s);border:1px solid rgba(255,255,255,0.05);border-radius:14px;overflow:hidden;cursor:none;transition:transform 400ms cubic-bezier(.23,1,.32,1),box-shadow 400ms;transform-style:preserve-3d;position:relative}
+.p-card::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,0.08) 0%,transparent 50%,rgba(57,255,20,0.04) 100%);opacity:0;transition:opacity 300ms;pointer-events:none;z-index:2}
+.p-card:hover::after{opacity:1}
+.p-card-glow{position:absolute;inset:0;border-radius:14px;opacity:0;transition:opacity 300ms;pointer-events:none;z-index:1}
+.p-img{height:260px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.p-can-wrap{position:relative;z-index:2;transition:transform 400ms cubic-bezier(.23,1,.32,1)}
+.p-card:hover .p-can-wrap{transform:translateY(-8px) scale(1.05)}
+.p-can{width:90px;height:175px;border-radius:12px;position:relative;display:flex;align-items:center;justify-content:center}
+.p-can-label{font-family:var(--fh);font-size:7px;font-weight:900;letter-spacing:0.18em;text-align:center;line-height:1.6;text-transform:uppercase}
+.p-can::before{content:'';position:absolute;top:8px;left:14px;right:14px;height:55%;background:linear-gradient(180deg,rgba(255,255,255,0.12),transparent);border-radius:8px;pointer-events:none}
+.p-can::after{content:'';position:absolute;inset:0;border-radius:12px;border:1px solid rgba(255,255,255,0.1)}
+.p-shine{position:absolute;inset:0;border-radius:14px;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.05) 50%,transparent 60%);z-index:3;pointer-events:none}
+.p-ground{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80px;height:20px;border-radius:50%;filter:blur(10px);opacity:0.6}
+.p-body{padding:20px 20px 24px;position:relative;z-index:4}
+.p-tag{display:inline-block;font-family:var(--fh);font-size:8px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;padding:3px 10px;border-radius:2px;margin-bottom:10px}
+.p-name{font-family:var(--fh);font-size:15px;font-weight:800;color:#fff;letter-spacing:0.05em;margin-bottom:6px}
+.p-desc{font-size:12px;color:var(--tm);line-height:1.6;margin-bottom:18px}
+.p-foot{display:flex;align-items:center;justify-content:space-between}
+.p-kcal{font-size:11px;color:var(--ts);letter-spacing:0.08em}
+.p-add{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--tm);display:flex;align-items:center;justify-content:center;cursor:none;transition:all 150ms}
+.p-add:hover{border-color:var(--g);color:var(--g);background:rgba(57,255,20,0.08)}
 
-    /* ── SECTION COMMON ── */
-    section { padding: 100px 40px; }
-    .section-label {
-      font-family: var(--font-head);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 14px;
-    }
-    .section-title {
-      font-family: var(--font-head);
-      font-size: clamp(28px, 4vw, 48px);
-      font-weight: 800;
-      color: var(--white);
-      line-height: 1.1;
-      margin-bottom: 20px;
-    }
-    .section-desc {
-      font-size: 14px;
-      color: var(--text-muted);
-      max-width: 520px;
-      line-height: 1.8;
-    }
-    .max-w { max-width: 1280px; margin: 0 auto; }
+/* ── HOLOGRAPHIC FEATURE ── */
+#holo-feature{padding:0;position:relative;overflow:hidden;background:var(--bg)}
+.hf-inner{display:grid;grid-template-columns:1fr 1fr;min-height:80vh}
+.hf-left{padding:120px 80px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+.hf-right{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* ANIMATION 3: HOLOGRAPHIC CAN REVEAL */
+#holo-canvas{width:100%;height:100%;display:block}
+.hf-holo-overlay{position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 30%,rgba(3,5,8,0.6) 100%)}
+.hf-scanlines{position:absolute;inset:0;pointer-events:none;z-index:3;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(57,255,20,0.015) 2px,rgba(57,255,20,0.015) 4px)}
+.holo-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.25);padding:6px 16px;border-radius:2px;margin-bottom:28px}
+.holo-tag-dot{width:7px;height:7px;border-radius:50%;background:#00e5ff;box-shadow:0 0 10px #00e5ff;animation:blink 1.8s ease-in-out infinite}
+.holo-tag-txt{font-family:var(--fh);font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#00e5ff}
+.holo-flavors{margin-top:44px;display:flex;flex-direction:column;gap:3px}
+.hf-row{display:flex;align-items:center;gap:18px;padding:14px 18px;border:1px solid transparent;border-radius:4px;cursor:none;transition:background 200ms,border-color 200ms}
+.hf-row:hover,.hf-row.active{background:rgba(255,255,255,0.04);border-color:rgba(57,255,20,0.2)}
+.hf-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.hf-name{font-family:var(--fh);font-size:12px;font-weight:700;color:#fff;letter-spacing:0.08em;flex:1}
+.hf-note{font-size:11px;color:var(--tm)}
+.hf-arrow{opacity:0;transition:opacity 200ms;color:var(--g)}
+.hf-row:hover .hf-arrow,.hf-row.active .hf-arrow{opacity:1}
 
-    /* ── TICKER ── */
-    .ticker-wrap {
-      background: var(--green);
-      overflow: hidden;
-      padding: 14px 0;
-    }
-    .ticker-inner {
-      display: flex; gap: 60px;
-      white-space: nowrap;
-      animation: ticker 22s linear infinite;
-    }
-    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-    .ticker-item {
-      display: inline-flex; align-items: center; gap: 14px;
-      font-family: var(--font-head);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #000;
-    }
-    .ticker-sep { font-size: 18px; opacity: 0.4; }
+/* ── ENERGY SPECS ── */
+#specs{padding:120px 80px;background:var(--s);position:relative;overflow:hidden}
+#specs::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(57,255,20,0.02) 0%,transparent 60%)}
+.specs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px;border:1px solid rgba(57,255,20,0.08);border-radius:16px;overflow:hidden}
+.spec-cell{background:var(--bg2);padding:44px 36px;border:1px solid rgba(57,255,20,0.04);position:relative;overflow:hidden;transition:background 300ms}
+.spec-cell:hover{background:var(--s2)}
+.spec-cell::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);opacity:0;transition:opacity 300ms}
+.spec-cell:hover::before{opacity:1}
+.spec-ico{width:52px;height:52px;border-radius:12px;background:rgba(57,255,20,0.06);border:1px solid rgba(57,255,20,0.12);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:24px}
+.spec-n{font-family:var(--fh);font-size:36px;font-weight:900;color:var(--g);line-height:1;text-shadow:0 0 20px rgba(57,255,20,0.35);margin-bottom:8px}
+.spec-l{font-family:var(--fh);font-size:12px;font-weight:700;color:#fff;letter-spacing:0.08em;margin-bottom:10px}
+.spec-d{font-size:12px;color:var(--tm);line-height:1.7}
 
-    /* ── PRODUCTS ── */
-    #products { background: var(--bg2); }
-    .products-header {
-      display: flex; justify-content: space-between; align-items: flex-end;
-      margin-bottom: 60px; flex-wrap: wrap; gap: 24px;
-    }
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 24px;
-    }
-    .product-card {
-      background: var(--surface);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms;
-      position: relative;
-    }
-    .product-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(57,255,20,0.3);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(57,255,20,0.1);
-    }
-    .product-card-img {
-      width: 100%; aspect-ratio: 3/4;
-      display: flex; align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
-    }
-    .product-can {
-      width: 110px; height: 200px;
-      border-radius: 14px;
-      position: relative;
-      transition: transform 350ms ease;
-    }
-    .product-card:hover .product-can { transform: scale(1.08) rotate(-3deg); }
-    .product-can::after {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
-    }
-    .product-can-shine {
-      position: absolute; top: 8px; left: 18px; right: 18px; height: 60%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%);
-      border-radius: 10px;
-    }
-    .product-glow {
-      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 80px; height: 40px;
-      border-radius: 50%;
-      filter: blur(18px);
-      transition: opacity 250ms;
-    }
-    .product-card:hover .product-glow { opacity: 1 !important; }
-    .product-card-body { padding: 20px 20px 24px; }
-    .product-tag {
-      display: inline-block;
-      font-size: 9px;
-      font-family: var(--font-head);
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 3px 10px;
-      border-radius: 2px;
-      margin-bottom: 10px;
-    }
-    .product-name {
-      font-family: var(--font-head);
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--white);
-      letter-spacing: 0.06em;
-      margin-bottom: 6px;
-    }
-    .product-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
-    .product-footer { display: flex; align-items: center; justify-content: space-between; }
-    .product-kcal { font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; }
-    .product-btn {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: transparent;
-      color: var(--text-muted);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      transition: border-color 150ms, color 150ms, background 150ms;
-    }
-    .product-btn:hover { border-color: var(--green); color: var(--green); background: rgba(57,255,20,0.08); }
+/* ── 3D SCROLL LIFESTYLE ── */
+#lifestyle{padding:0;overflow:hidden;background:var(--bg)}
+.lifestyle-hero-txt{padding:120px 80px 60px;max-width:1280px;margin:0 auto}
+.ls-mosaic{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:380px 280px;max-width:100%;gap:3px}
+.ls-tile{overflow:hidden;position:relative;cursor:none}
+.ls-tile:nth-child(1){grid-row:1/3}
+.ls-tile-bg{position:absolute;inset:-10%;background-size:cover;background-position:center;transition:transform 600ms cubic-bezier(.23,1,.32,1);filter:brightness(0.7)}
+.ls-tile:hover .ls-tile-bg{transform:scale(1.08);filter:brightness(0.9)}
+.ls-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,8,0.9) 0%,transparent 60%);transition:opacity 300ms}
+.ls-holo{position:absolute;inset:0;background:linear-gradient(135deg,rgba(57,255,20,0.0) 0%,rgba(0,229,255,0.0) 100%);transition:background 300ms;mix-blend-mode:screen}
+.ls-tile:hover .ls-holo{background:linear-gradient(135deg,rgba(57,255,20,0.08) 0%,rgba(0,229,255,0.05) 100%)}
+.ls-cnt{position:absolute;bottom:0;left:0;right:0;padding:28px;z-index:2}
+.ls-tag{display:inline-block;font-family:var(--fh);font-size:8px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#000;background:var(--g);padding:3px 10px;border-radius:2px;margin-bottom:10px}
+.ls-cnt h3{font-family:var(--fh);font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;margin-bottom:4px}
+.ls-cnt p{font-size:12px;color:var(--tm)}
+.ls-line{position:absolute;top:28px;right:28px;width:0;height:2px;background:var(--g);transition:width 400ms cubic-bezier(.23,1,.32,1)}
+.ls-tile:hover .ls-line{width:48px}
 
-    /* ── FLAVORS FEATURE ── */
-    #flavors {
-      background: var(--bg);
-      position: relative; overflow: hidden;
-    }
-    .flavors-inner {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
-    }
-    .flavors-visual {
-      position: relative; height: 500px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .flavor-orbit {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .flavor-ring {
-      position: absolute;
-      border: 1px solid rgba(57,255,20,0.08);
-      border-radius: 50%;
-      animation: orbit-spin 20s linear infinite;
-    }
-    @keyframes orbit-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .flavor-center-can {
-      width: 120px; height: 220px;
-      border-radius: 16px;
-      position: relative; z-index: 10;
-      box-shadow: 0 0 40px rgba(57,255,20,0.25), 0 0 80px rgba(57,255,20,0.1);
-      transition: box-shadow 300ms;
-    }
-    .flavor-center-can::after {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: 16px;
-      background: linear-gradient(140deg, rgba(255,255,255,0.18) 0%, transparent 55%);
-    }
-    .flavor-node {
-      position: absolute;
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 9px;
-      font-family: var(--font-head);
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: transform 200ms, box-shadow 200ms;
-      background: var(--surface);
-    }
-    .flavor-node:hover { transform: scale(1.15); }
-    .flavors-content { position: relative; z-index: 1; }
-    .flavors-list { margin-top: 40px; display: flex; flex-direction: column; gap: 4px; }
-    .flavor-row {
-      display: flex; align-items: center; gap: 20px;
-      padding: 14px 20px;
-      border-radius: var(--radius);
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: background 200ms, border-color 200ms;
-    }
-    .flavor-row:hover { background: var(--surface); border-color: rgba(57,255,20,0.15); }
-    .flavor-row.active { background: var(--surface); border-color: rgba(57,255,20,0.3); }
-    .flavor-swatch { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-    .flavor-row-name {
-      font-family: var(--font-head);
-      font-size: 13px; font-weight: 700;
-      color: var(--white); letter-spacing: 0.06em;
-      flex: 1;
-    }
-    .flavor-row-tag { font-size: 10px; color: var(--text-muted); letter-spacing: 0.12em; }
+/* ── ATHLETES ── */
+#athletes{padding:120px 80px;background:var(--bg2)}
+.ath-scroll{display:flex;gap:18px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;margin-top:56px}
+.ath-scroll::-webkit-scrollbar{height:2px}
+.ath-scroll::-webkit-scrollbar-thumb{background:var(--g)}
+.ath-card{flex-shrink:0;width:250px;scroll-snap-align:start;background:var(--s);border:1px solid rgba(255,255,255,0.04);border-radius:14px;overflow:hidden;cursor:none;transition:border-color 250ms,transform 250ms}
+.ath-card:hover{border-color:rgba(57,255,20,0.3);transform:translateY(-4px)}
+.ath-img{height:210px;position:relative;overflow:hidden}
+.ath-img-bg{position:absolute;inset:0;background-size:cover;background-position:top;transition:transform 500ms}
+.ath-card:hover .ath-img-bg{transform:scale(1.06)}
+.ath-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:70%;background:linear-gradient(to top,var(--s),transparent)}
+.ath-sport{position:absolute;top:14px;left:14px;font-family:var(--fh);font-size:8px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#000;background:var(--g);padding:3px 10px;border-radius:2px;z-index:1}
+.ath-body{padding:18px 20px 22px}
+.ath-name{font-family:var(--fh);font-size:14px;font-weight:800;color:#fff;letter-spacing:0.05em;margin-bottom:4px}
+.ath-role{font-size:11px;color:var(--tm)}
 
-    /* ── ENERGY STATS ── */
-    #energy {
-      background: var(--bg2);
-      position: relative; overflow: hidden;
-    }
-    .energy-bg-line {
-      position: absolute; left: 0; right: 0;
-      height: 1px; background: linear-gradient(90deg, transparent, var(--green), transparent);
-      opacity: 0.15;
-    }
-    .energy-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2px;
-      margin-top: 60px;
-      border: 1px solid rgba(57,255,20,0.1);
-      border-radius: var(--radius-lg); overflow: hidden;
-    }
-    .energy-cell {
-      background: var(--surface);
-      padding: 40px 36px;
-      border: 1px solid rgba(57,255,20,0.06);
-      position: relative; overflow: hidden;
-      transition: background 250ms;
-    }
-    .energy-cell:hover { background: var(--surface2); }
-    .energy-cell::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--green), transparent);
-      opacity: 0;
-      transition: opacity 250ms;
-    }
-    .energy-cell:hover::before { opacity: 1; }
-    .energy-cell-icon {
-      width: 48px; height: 48px; border-radius: 10px;
-      background: rgba(57,255,20,0.08);
-      border: 1px solid rgba(57,255,20,0.15);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 20px;
-    }
-    .energy-cell-num {
-      font-family: var(--font-head);
-      font-size: 40px; font-weight: 900;
-      color: var(--green);
-      line-height: 1;
-      text-shadow: 0 0 20px rgba(57,255,20,0.4);
-      margin-bottom: 8px;
-    }
-    .energy-cell-label {
-      font-family: var(--font-head);
-      font-size: 13px; font-weight: 700;
-      color: var(--white); letter-spacing: 0.06em;
-      margin-bottom: 10px;
-    }
-    .energy-cell-desc { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+/* ── CTA ── */
+#cta{padding:140px 80px;text-align:center;position:relative;overflow:hidden;background:var(--bg)}
+.cta-bg{position:absolute;inset:0;pointer-events:none}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(57,255,20,0.1) 0%,transparent 70%)}
+.cta-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);border:1px solid rgba(57,255,20,0.06);border-radius:50%;animation:ring-spin 30s linear infinite}
+.cta-inner{position:relative;z-index:2;max-width:620px;margin:0 auto}
+.cta-h{font-family:var(--fh);font-size:clamp(30px,5vw,58px);font-weight:900;color:#fff;line-height:1.05;margin-bottom:18px}
+.cta-h .holo-text{background:linear-gradient(90deg,var(--holo1),var(--holo2),var(--holo3),var(--holo4),var(--holo1));background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:holo-shift 4s linear infinite}
+.cta-p{font-size:14px;color:var(--tm);margin-bottom:44px;line-height:1.8}
+.cta-form{display:flex;gap:10px;max-width:420px;margin:0 auto}
+.cta-inp{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;font-family:var(--fb);font-size:14px;padding:15px 18px;border-radius:3px;outline:none;transition:border-color 150ms}
+.cta-inp:focus{border-color:rgba(57,255,20,0.4)}
+.cta-inp::placeholder{color:var(--ts)}
+.cta-ok{display:none;font-family:var(--fh);font-size:12px;font-weight:700;color:var(--g);letter-spacing:0.1em;margin-top:14px}
+@keyframes ring-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-    /* ── LIFESTYLE ── */
-    #lifestyle {
-      background: var(--bg);
-      padding: 0;
-    }
-    .lifestyle-header { padding: 100px 40px 60px; max-width: 1280px; margin: 0 auto; }
-    .lifestyle-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      grid-template-rows: auto auto;
-      max-width: 1280px; margin: 0 auto;
-      gap: 3px;
-    }
-    .ls-block {
-      overflow: hidden; position: relative;
-      min-height: 320px;
-      display: flex; align-items: flex-end;
-    }
-    .ls-block:nth-child(1) { grid-row: 1 / 3; }
-    .ls-block-bg {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-    }
-    .ls-block-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
-    }
-    .ls-block-content { position: relative; z-index: 1; padding: 28px; }
-    .ls-block-content h3 {
-      font-family: var(--font-head);
-      font-size: 18px; font-weight: 800;
-      color: var(--white); letter-spacing: 0.04em;
-      margin-bottom: 6px;
-    }
-    .ls-block-content p { font-size: 12px; color: var(--text-muted); }
-    .ls-tag {
-      display: inline-block;
-      font-family: var(--font-head);
-      font-size: 9px; font-weight: 700;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: #000; background: var(--green);
-      padding: 3px 9px; border-radius: 2px;
-      margin-bottom: 10px;
-    }
+/* ── FOOTER ── */
+footer{background:var(--s);border-top:1px solid rgba(57,255,20,0.07);padding:72px 80px 36px}
+.ft-top{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:60px;margin-bottom:56px}
+.ft-brand-desc{font-size:13px;color:var(--tm);line-height:1.8;margin-top:14px;max-width:260px}
+.ft-h{font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#fff;margin-bottom:20px}
+.ft-ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.ft-ul a{font-size:13px;color:var(--tm);text-decoration:none;transition:color 150ms;cursor:none}
+.ft-ul a:hover{color:var(--g)}
+.ft-bot{border-top:1px solid rgba(255,255,255,0.04);padding-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.ft-copy{font-size:12px;color:rgba(255,255,255,0.3)}
+.ft-social{display:flex;gap:12px}
+.soc-btn{width:36px;height:36px;border-radius:4px;border:1px solid rgba(255,255,255,0.07);background:transparent;color:var(--ts);display:flex;align-items:center;justify-content:center;cursor:none;text-decoration:none;transition:border-color 150ms,color 150ms,background 150ms}
+.soc-btn:hover{border-color:var(--g);color:var(--g);background:rgba(57,255,20,0.06)}
+.ft-warn{font-size:10px;color:rgba(255,255,255,0.18);letter-spacing:0.05em;margin-top:14px;line-height:1.5}
 
-    /* ── ATHLETES ── */
-    #athletes { background: var(--bg2); }
-    .athletes-scroll {
-      display: flex; gap: 20px;
-      overflow-x: auto;
-      padding-bottom: 12px;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
-    .athletes-scroll::-webkit-scrollbar { height: 3px; }
-    .athletes-scroll::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 2px; }
-    .athlete-card {
-      flex-shrink: 0;
-      width: 260px;
-      scroll-snap-align: start;
-      background: var(--surface);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      transition: border-color 200ms, transform 200ms;
-    }
-    .athlete-card:hover { border-color: rgba(57,255,20,0.25); transform: translateY(-4px); }
-    .athlete-img {
-      width: 100%; height: 220px;
-      background-size: cover; background-position: top center;
-      position: relative;
-    }
-    .athlete-img::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
-      background: linear-gradient(to top, var(--surface), transparent);
-    }
-    .athlete-sport {
-      position: absolute; top: 14px; left: 14px;
-      font-family: var(--font-head); font-size: 9px; font-weight: 700;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: #000; background: var(--green);
-      padding: 3px 10px; border-radius: 2px; z-index: 1;
-    }
-    .athlete-body { padding: 18px 20px 22px; }
-    .athlete-name {
-      font-family: var(--font-head);
-      font-size: 15px; font-weight: 800;
-      color: var(--white); letter-spacing: 0.06em; margin-bottom: 4px;
-    }
-    .athlete-role { font-size: 11px; color: var(--text-muted); }
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity 700ms cubic-bezier(.23,1,.32,1),transform 700ms cubic-bezier(.23,1,.32,1)}
+.reveal.up{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:100ms}
+.reveal-delay-2{transition-delay:200ms}
+.reveal-delay-3{transition-delay:320ms}
+.reveal-delay-4{transition-delay:440ms}
 
-    /* ── CTA ── */
-    #cta {
-      background: var(--bg);
-      padding: 120px 40px;
-      position: relative; overflow: hidden;
-      text-align: center;
-    }
-    .cta-glow {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 600px; height: 400px;
-      background: radial-gradient(ellipse, rgba(57,255,20,0.12) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .cta-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
-    .cta-title {
-      font-family: var(--font-head);
-      font-size: clamp(32px, 5vw, 60px);
-      font-weight: 900; color: var(--white);
-      line-height: 1.05; margin-bottom: 20px;
-    }
-    .cta-title span { color: var(--green); text-shadow: 0 0 30px rgba(57,255,20,0.6); }
-    .cta-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 44px; line-height: 1.8; }
-    .cta-form { display: flex; gap: 10px; max-width: 440px; margin: 0 auto; }
-    .cta-input {
-      flex: 1;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 13px;
-      padding: 14px 18px;
-      border-radius: var(--radius);
-      outline: none;
-      transition: border-color 150ms;
-    }
-    .cta-input:focus { border-color: rgba(57,255,20,0.4); }
-    .cta-input::placeholder { color: var(--text-muted); }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--bg2);
-      border-top: 1px solid rgba(57,255,20,0.08);
-      padding: 64px 40px 36px;
-    }
-    .footer-inner {
-      max-width: 1280px; margin: 0 auto;
-    }
-    .footer-top {
-      display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 60px;
-      margin-bottom: 56px;
-    }
-    .footer-brand p { font-size: 13px; color: var(--text-muted); line-height: 1.8; margin-top: 16px; max-width: 260px; }
-    .footer-col h4 {
-      font-family: var(--font-head);
-      font-size: 11px; font-weight: 700;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--white); margin-bottom: 20px;
-    }
-    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .footer-col ul a { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 150ms; }
-    .footer-col ul a:hover { color: var(--green); }
-    .footer-bottom {
-      border-top: 1px solid rgba(255,255,255,0.05);
-      padding-top: 28px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;
-    }
-    .footer-copy { font-size: 12px; color: var(--text-muted); }
-    .footer-social { display: flex; gap: 14px; }
-    .social-btn {
-      width: 36px; height: 36px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(255,255,255,0.08);
-      background: transparent;
-      color: var(--text-muted);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; text-decoration: none;
-      transition: border-color 150ms, color 150ms, background 150ms;
-    }
-    .social-btn:hover { border-color: var(--green); color: var(--green); background: rgba(57,255,20,0.06); }
-    .footer-warning {
-      font-size: 10px; color: rgba(232,232,240,0.3);
-      letter-spacing: 0.06em; margin-top: 16px;
-    }
-
-    /* ── REVEAL ANIMATION ── */
-    .reveal {
-      opacity: 0; transform: translateY(30px);
-      transition: opacity 600ms ease, transform 600ms ease;
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      .hero-can-container { display: none; }
-      .hero-stats { right: 40px; bottom: 60px; }
-      .flavors-inner { grid-template-columns: 1fr; }
-      .flavors-visual { height: 300px; }
-      .lifestyle-grid { grid-template-columns: 1fr 1fr; }
-      .ls-block:nth-child(1) { grid-row: auto; grid-column: 1 / 3; }
-      .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
-    }
-    @media (max-width: 768px) {
-      nav { padding: 0 24px; }
-      .nav-links, .nav-cta { display: none; }
-      .nav-hamburger { display: flex; }
-      #hero { padding: 90px 24px 60px; }
-      .hero-stats { display: none; }
-      section { padding: 72px 24px; }
-      .products-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-      .lifestyle-grid { grid-template-columns: 1fr; }
-      .ls-block:nth-child(1) { grid-column: auto; }
-      .footer-top { grid-template-columns: 1fr; gap: 32px; }
-      .cta-form { flex-direction: column; }
-      footer { padding: 48px 24px 28px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-    }
-  </style>
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .hf-inner{grid-template-columns:1fr}
+  #holo-canvas{height:400px}
+  .hf-right{min-height:400px}
+  .specs-grid{grid-template-columns:1fr 1fr}
+  .ls-mosaic{grid-template-columns:1fr 1fr;grid-template-rows:280px 280px 280px}
+  .ls-tile:nth-child(1){grid-row:auto;grid-column:1/3}
+  .ft-top{grid-template-columns:1fr 1fr;gap:40px}
+}
+@media(max-width:768px){
+  nav{padding:0 24px}
+  .nav-links,.nav-btn{display:none}
+  #hero,.hf-left,#products,#specs,#lifestyle .lifestyle-hero-txt,#athletes,#cta,footer{padding-left:24px;padding-right:24px}
+  .hero-content{padding:0 24px}
+  .hero-stats{display:none}
+  .hero-scroll{left:24px}
+  .specs-grid{grid-template-columns:1fr}
+  .ft-top{grid-template-columns:1fr}
+  .cta-form{flex-direction:column}
+  .ls-mosaic{grid-template-columns:1fr;grid-template-rows:auto}
+  .ls-tile:nth-child(1){grid-column:auto}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
 </head>
 <body>
 
-<!-- ── NAVBAR ── -->
-<nav role="navigation" aria-label="Main navigation">
+<div id="cursor" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav id="nav" role="navigation" aria-label="Main navigation">
   <a href="#" class="nav-logo" aria-label="Monster Energy home">
-    <div class="nav-logo-claw" aria-hidden="true">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <path d="M10 4 L14 16 L8 16 L18 28 L16 18 L22 18 Z" fill="#39FF14"/>
-        <path d="M16 4 L20 16 L14 16 L24 28 L22 18 L28 18 Z" fill="#2dd900" opacity="0.7"/>
+    <div class="nav-claw" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+        <path d="M11 5 L15 17 L9 17 L20 30 L18 20 L24 20 Z" fill="#39FF14"/>
+        <path d="M17 5 L21 17 L15 17 L26 30 L24 20 L30 20 Z" fill="#39FF14" opacity="0.55"/>
       </svg>
     </div>
-    <span class="nav-logo-text">MONSTER <span>ENERGY</span></span>
+    <span class="logo-txt">MONSTER <b>ENERGY</b></span>
   </a>
   <ul class="nav-links" role="list">
     <li><a href="#products">Products</a></li>
-    <li><a href="#flavors">Flavors</a></li>
-    <li><a href="#energy">Energy Facts</a></li>
-    <li><a href="#athletes">Athletes</a></li>
-    <li><a href="#lifestyle">Lifestyle</a></li>
+    <li><a href="#holo-feature">Flavors</a></li>
+    <li><a href="#specs">Formula</a></li>
+    <li><a href="#lifestyle">Culture</a></li>
+    <li><a href="#athletes">Team</a></li>
   </ul>
-  <a href="#products" class="nav-cta">Shop Now</a>
-  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false" id="hamburger">
-    <span></span><span></span><span></span>
-  </button>
+  <a href="#products" class="nav-btn">Shop Now</a>
 </nav>
 
-<!-- ── HERO ── -->
-<section id="hero" aria-label="Hero">
-  <div class="hero-bg-grid" aria-hidden="true"></div>
-  <div class="hero-vignette" aria-hidden="true"></div>
+<!-- HERO -->
+<section id="hero" aria-label="Hero — Unleash the Beast">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="hero-overlay" aria-hidden="true"></div>
 
-  <div class="hero-content reveal">
-    <div class="hero-badge">
-      <div class="hero-badge-dot" aria-hidden="true"></div>
-      <span class="hero-badge-text">New Formula 2025</span>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <div class="hero-tag-dot" aria-hidden="true"></div>
+      <span class="hero-tag-txt">New Formula 2025</span>
     </div>
-    <h1 class="hero-title">
+    <h1 class="hero-h1">
       UNLEASH<br>
-      <span class="hero-title-green">THE BEAST</span>
+      <span class="holo-text">THE BEAST</span>
     </h1>
-    <p class="hero-subtitle">Monster Energy</p>
-    <p class="hero-desc">
-      160mg of caffeine. B-vitamins. Taurine. Ginseng. The original formula engineered to take you further — faster. Zero compromise.
-    </p>
-    <div class="hero-actions">
-      <a href="#products" class="btn-primary">
+    <p class="hero-sub">Monster Energy</p>
+    <p class="hero-desc">160mg caffeine. B-vitamins. Taurine. Ginseng. One legendary formula engineered to take you further — faster. Zero compromise.</p>
+    <div class="hero-btns">
+      <a href="#products" class="btn-glow" aria-label="Explore all products">
         Explore Products
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-      <a href="#energy" class="btn-outline">Energy Facts</a>
+      <a href="#specs" class="btn-ghost">The Formula</a>
     </div>
   </div>
 
-  <!-- 3D Can -->
-  <div class="hero-can-container" aria-hidden="true">
-    <canvas id="can-canvas" aria-hidden="true"></canvas>
+  <div class="hero-scroll" aria-hidden="true">
+    <div class="scroll-line"></div>
+    <span class="scroll-txt">Scroll to explore</span>
   </div>
 
-  <!-- Stats -->
-  <div class="hero-stats" aria-label="Key stats">
-    <div class="hero-stat">
-      <div class="hero-stat-num">160<span style="font-size:22px">mg</span></div>
-      <div class="hero-stat-label">Caffeine / can</div>
+  <div class="hero-stats" aria-label="Key facts">
+    <div>
+      <div class="h-stat-n">160<sup style="font-size:18px">mg</sup></div>
+      <div class="h-stat-l">Caffeine per can</div>
     </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">38+</div>
-      <div class="hero-stat-label">Flavor variants</div>
+    <div>
+      <div class="h-stat-n">38<sup style="font-size:18px">+</sup></div>
+      <div class="h-stat-l">Flavor variants</div>
     </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">#1</div>
-      <div class="hero-stat-label">Energy drink brand</div>
+    <div>
+      <div class="h-stat-n">#1</div>
+      <div class="h-stat-l">Energy brand global</div>
     </div>
   </div>
 </section>
 
-<!-- ── TICKER ── -->
-<div class="ticker-wrap" aria-hidden="true">
-  <div class="ticker-inner" id="ticker">
-    <span class="ticker-item">Monster Original <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Monster Zero Ultra <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Mango Loco <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Pipeline Punch <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Ultra Watermelon <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Juiced Monarch <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Ultra Paradise <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">The Doctor <span class="ticker-sep">✦</span></span>
-    <!-- duplicate for seamless loop -->
-    <span class="ticker-item">Monster Original <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Monster Zero Ultra <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Mango Loco <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Pipeline Punch <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Ultra Watermelon <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Juiced Monarch <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">Ultra Paradise <span class="ticker-sep">✦</span></span>
-    <span class="ticker-item">The Doctor <span class="ticker-sep">✦</span></span>
+<!-- TICKER (ANIMATION 1) -->
+<div class="holo-ticker" aria-hidden="true" role="marquee">
+  <div class="ticker-track" id="ticker">
+    <span class="t-item"><span>Monster Original</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Zero Ultra</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Mango Loco</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Pipeline Punch</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Ultra Paradise</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Ultra Watermelon</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>The Doctor</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Juiced Monarch</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Hydro Sport</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Java Monster</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Monster Original</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Zero Ultra</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Mango Loco</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Pipeline Punch</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Ultra Paradise</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Ultra Watermelon</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>The Doctor</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Juiced Monarch</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Hydro Sport</span><div class="t-sep"></div></span>
+    <span class="t-item"><span>Java Monster</span><div class="t-sep"></div></span>
   </div>
 </div>
 
-<!-- ── PRODUCTS ── -->
+<!-- PRODUCTS -->
 <section id="products">
-  <div class="max-w">
-    <div class="products-header">
+  <div style="max-width:1280px;margin:0 auto">
+    <div class="products-hdr">
       <div>
-        <p class="section-label">Our Range</p>
-        <h2 class="section-title reveal">The Full<br>Monster Lineup</h2>
+        <p class="sec-eyebrow reveal">Our Range</p>
+        <h2 class="sec-title reveal reveal-delay-1">The Full<br><span class="hl">Monster Lineup</span></h2>
       </div>
-      <p class="section-desc reveal" style="text-align:right">
-        38+ variants. One mission. Find the Monster built for your moment.
-      </p>
+      <p class="sec-desc reveal" style="text-align:right">38+ variants. One mission. Find the Monster built for your moment.</p>
     </div>
-
-    <div class="products-grid" id="products-grid">
-      <!-- JS renders cards -->
-    </div>
+    <div class="products-carousel" id="products-carousel"></div>
   </div>
 </section>
 
-<!-- ── FLAVORS ── -->
-<section id="flavors">
-  <div class="max-w flavors-inner">
-    <div class="flavors-visual" aria-hidden="true">
-      <div class="flavor-orbit">
-        <div class="flavor-ring" style="width:260px;height:260px;animation-duration:25s;animation-direction:reverse;"></div>
-        <div class="flavor-ring" style="width:360px;height:360px;animation-duration:35s;"></div>
-        <div class="flavor-ring" style="width:460px;height:460px;animation-duration:50s;animation-direction:reverse;"></div>
+<!-- HOLOGRAPHIC FEATURE (ANIMATION 2) -->
+<section id="holo-feature" aria-label="Flavor selector">
+  <div class="hf-inner">
+    <div class="hf-left">
+      <div class="holo-tag">
+        <div class="holo-tag-dot" aria-hidden="true"></div>
+        <span class="holo-tag-txt">Holographic Preview</span>
       </div>
-      <div class="flavor-center-can" id="flavor-can" style="background:linear-gradient(160deg,#111 0%,#1a1a1a 100%);"></div>
-      <!-- flavor nodes positioned by JS -->
-      <div id="flavor-nodes"></div>
+      <p class="sec-eyebrow reveal">Flavor Universe</p>
+      <h2 class="sec-title reveal reveal-delay-1">38 Flavors.<br><span class="hl">One Obsession.</span></h2>
+      <p class="sec-desc reveal reveal-delay-2">From the original green to tropical bursts and ultra-light whites. Tap a flavor to see it live.</p>
+      <div class="holo-flavors reveal reveal-delay-3" id="hf-list" role="list"></div>
     </div>
-
-    <div class="flavors-content">
-      <p class="section-label">Flavor Universe</p>
-      <h2 class="section-title reveal">38 Flavors.<br>One Obsession.</h2>
-      <p class="section-desc reveal">From the original green to tropical bursts and ultra-light whites — there's a Monster for every dimension of your day.</p>
-      <div class="flavors-list" id="flavors-list"></div>
+    <div class="hf-right">
+      <canvas id="holo-canvas" aria-hidden="true"></canvas>
+      <div class="hf-holo-overlay" aria-hidden="true"></div>
+      <div class="hf-scanlines" aria-hidden="true"></div>
     </div>
   </div>
 </section>
 
-<!-- ── ENERGY STATS ── -->
-<section id="energy">
-  <div class="max-w">
-    <p class="section-label">What's Inside</p>
-    <h2 class="section-title reveal">Engineered<br>For Performance</h2>
-    <p class="section-desc reveal">Every can is a precision-formulated energy system — not just caffeine.</p>
-    <div class="energy-grid" id="energy-grid"></div>
+<!-- SPECS -->
+<section id="specs">
+  <div style="max-width:1280px;margin:0 auto">
+    <p class="sec-eyebrow reveal">What's Inside</p>
+    <h2 class="sec-title reveal reveal-delay-1">Engineered<br><span class="hl">For Performance</span></h2>
+    <p class="sec-desc reveal reveal-delay-2">Every can is a precision-formulated energy system — not just caffeine.</p>
+    <div class="specs-grid" id="specs-grid"></div>
   </div>
 </section>
 
-<!-- ── LIFESTYLE ── -->
-<section id="lifestyle" style="padding:0">
-  <div class="lifestyle-header max-w">
-    <p class="section-label">Culture</p>
-    <h2 class="section-title reveal">Live the<br>Monster Life</h2>
+<!-- LIFESTYLE 3D SCROLL -->
+<section id="lifestyle">
+  <div class="lifestyle-hero-txt">
+    <p class="sec-eyebrow reveal">Culture</p>
+    <h2 class="sec-title reveal reveal-delay-1">Live the<br><span class="hl">Monster Life</span></h2>
   </div>
-  <div class="lifestyle-grid" id="lifestyle-grid"></div>
+  <div class="ls-mosaic" id="ls-mosaic"></div>
 </section>
 
-<!-- ── ATHLETES ── -->
+<!-- ATHLETES -->
 <section id="athletes">
-  <div class="max-w">
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;flex-wrap:wrap;gap:20px">
+  <div style="max-width:1280px;margin:0 auto">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px">
       <div>
-        <p class="section-label">Team Monster</p>
-        <h2 class="section-title reveal">Backed by<br>The Best</h2>
+        <p class="sec-eyebrow reveal">Team Monster</p>
+        <h2 class="sec-title reveal reveal-delay-1">Backed by<br><span class="hl">The Best</span></h2>
       </div>
-      <a href="#" class="btn-outline" style="font-size:11px">View All Athletes</a>
+      <a href="#" class="btn-ghost" style="font-size:10px">All Athletes</a>
     </div>
-    <div class="athletes-scroll" id="athletes-scroll" role="list"></div>
+    <div class="ath-scroll" id="ath-scroll" role="list"></div>
   </div>
 </section>
 
-<!-- ── CTA ── -->
+<!-- CTA -->
 <section id="cta">
-  <div class="cta-glow" aria-hidden="true"></div>
-  <div class="cta-inner reveal">
-    <p class="section-label" style="text-align:center">Stay In The Pack</p>
-    <h2 class="cta-title">Get Early Access to<br><span>New Drops</span></h2>
-    <p class="cta-sub">Be first to know about new flavors, limited editions, and monster athlete collabs. No spam — just the good stuff.</p>
-    <form class="cta-form" onsubmit="handleCta(event)" aria-label="Email signup">
-      <label for="cta-email" class="visually-hidden">Email address</label>
-      <input type="email" id="cta-email" class="cta-input" placeholder="Your email address" required />
-      <button type="submit" class="btn-primary" id="cta-btn">Join</button>
+  <div class="cta-bg" aria-hidden="true">
+    <div class="cta-glow"></div>
+    <div class="cta-ring" style="width:700px;height:700px"></div>
+    <div class="cta-ring" style="width:500px;height:500px;animation-duration:22s;animation-direction:reverse"></div>
+    <div class="cta-ring" style="width:300px;height:300px;animation-duration:15s"></div>
+  </div>
+  <div class="cta-inner">
+    <p class="sec-eyebrow reveal" style="text-align:center">Join the Pack</p>
+    <h2 class="cta-h reveal reveal-delay-1">Get Early Access<br>to <span class="holo-text">New Drops</span></h2>
+    <p class="cta-p reveal reveal-delay-2">Be first to know about new flavors, limited editions, and collab drops. Zero spam — just the good stuff.</p>
+    <form class="cta-form reveal reveal-delay-3" id="cta-form" onsubmit="ctaSub(event)" aria-label="Email signup">
+      <label for="cta-email" class="sr-only">Your email address</label>
+      <input type="email" id="cta-email" class="cta-inp" placeholder="Your email address" required/>
+      <button type="submit" class="btn-glow" id="cta-btn" style="white-space:nowrap">Join Free</button>
     </form>
-    <p id="cta-success" style="display:none;font-size:13px;color:var(--green);margin-top:14px;letter-spacing:0.06em">
-      ✓ You're in. Watch your inbox.
-    </p>
-    <p style="font-size:11px;color:var(--text-muted);margin-top:20px">No spam. Unsubscribe anytime.</p>
+    <p class="cta-ok" id="cta-ok" aria-live="polite">✓ You're in. Watch your inbox.</p>
+    <p style="font-size:11px;color:var(--ts);margin-top:16px">No spam. Unsubscribe anytime.</p>
   </div>
 </section>
 
-<!-- ── FOOTER ── -->
+<!-- FOOTER -->
 <footer>
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <a href="#" class="nav-logo" aria-label="Monster Energy home">
-          <div class="nav-logo-claw" aria-hidden="true">
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><path d="M10 4 L14 16 L8 16 L18 28 L16 18 L22 18 Z" fill="#39FF14"/></svg>
-          </div>
-          <span class="nav-logo-text">MONSTER <span>ENERGY</span></span>
-        </a>
-        <p>The world's #1 energy drink brand. Fueling athletes, artists, and everyday legends since 2002.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Products</h4>
-        <ul>
-          <li><a href="#products">Monster Original</a></li>
-          <li><a href="#products">Zero Ultra</a></li>
-          <li><a href="#products">Juice Monster</a></li>
-          <li><a href="#products">Hydro</a></li>
-          <li><a href="#products">Java Monster</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Company</h4>
-        <ul>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Team Monster</a></li>
-          <li><a href="#">Events</a></li>
-          <li><a href="#">Careers</a></li>
-          <li><a href="#">Press</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Support</h4>
-        <ul>
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="#">Store Locator</a></li>
-          <li><a href="#">Sponsorships</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms</a></li>
-        </ul>
-      </div>
+  <div class="ft-top">
+    <div>
+      <a href="#" class="nav-logo" aria-label="Monster Energy home">
+        <div class="nav-claw" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 34 34" fill="none"><path d="M11 5 L15 17 L9 17 L20 30 L18 20 L24 20 Z" fill="#39FF14"/></svg>
+        </div>
+        <span class="logo-txt" style="font-size:15px">MONSTER <b>ENERGY</b></span>
+      </a>
+      <p class="ft-brand-desc">The world's #1 energy drink brand. Fueling athletes, artists, and everyday legends since 2002.</p>
     </div>
-    <div class="footer-bottom">
-      <p class="footer-copy">© 2025 Monster Energy Company. All rights reserved.</p>
-      <div class="footer-social" aria-label="Social media links">
-        <a href="#" class="social-btn" aria-label="Instagram">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-        </a>
-        <a href="#" class="social-btn" aria-label="Twitter / X">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        </a>
-        <a href="#" class="social-btn" aria-label="YouTube">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.45A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.45a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg>
-        </a>
-        <a href="#" class="social-btn" aria-label="TikTok">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9a8.12 8.12 0 004.76 1.52V7.12a4.85 4.85 0 01-1-.43z"/></svg>
-        </a>
-      </div>
+    <div>
+      <h4 class="ft-h">Products</h4>
+      <ul class="ft-ul">
+        <li><a href="#">Monster Original</a></li>
+        <li><a href="#">Zero Ultra</a></li>
+        <li><a href="#">Juice Monster</a></li>
+        <li><a href="#">Monster Hydro</a></li>
+        <li><a href="#">Java Monster</a></li>
+      </ul>
     </div>
-    <p class="footer-warning">WARNING: NOT RECOMMENDED FOR CHILDREN, PREGNANT WOMEN, OR PEOPLE SENSITIVE TO CAFFEINE. CONTAINS 160MG CAFFEINE PER 16 FL OZ. LIMIT TO 1 CAN PER DAY.</p>
+    <div>
+      <h4 class="ft-h">Company</h4>
+      <ul class="ft-ul">
+        <li><a href="#">About</a></li>
+        <li><a href="#">Team Monster</a></li>
+        <li><a href="#">Events</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="ft-h">Support</h4>
+      <ul class="ft-ul">
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Store Locator</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Sponsorships</a></li>
+      </ul>
+    </div>
   </div>
+  <div class="ft-bot">
+    <p class="ft-copy">© 2025 Monster Energy Company. All rights reserved.</p>
+    <div class="ft-social" aria-label="Social media">
+      <a href="#" class="soc-btn" aria-label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#" class="soc-btn" aria-label="X / Twitter"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      <a href="#" class="soc-btn" aria-label="YouTube"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.45A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.45a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#" class="soc-btn" aria-label="TikTok"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9a8.12 8.12 0 004.76 1.52V7.12a4.85 4.85 0 01-1-.43z"/></svg></a>
+    </div>
+  </div>
+  <p class="ft-warn">WARNING: NOT RECOMMENDED FOR CHILDREN, PREGNANT WOMEN, OR PEOPLE SENSITIVE TO CAFFEINE. CONTAINS 160MG CAFFEINE PER 16 FL OZ CAN. LIMIT CONSUMPTION TO 1 CAN PER DAY.</p>
 </footer>
 
-<!-- visually hidden utility -->
-<style>.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"
-  }
-}
-</script>
-
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"}}</script>
 <script type="module">
 import * as THREE from 'three';
 
-/* ── DATA ── */
+/* ════ DATA ════ */
 const PRODUCTS = [
-  { name: 'Monster Original', tag: 'Classic', desc: '160mg caffeine. The one that started it all.', kcal: '210 kcal', bg: 'linear-gradient(160deg,#0a1a0a,#0f2010)', accent: '#39FF14', glow: 'rgba(57,255,20,0.6)', stripe: '#39FF14' },
-  { name: 'Zero Ultra', tag: 'Zero Sugar', desc: 'Light, crisp, zero sugar. Full monster energy.', kcal: '10 kcal', bg: 'linear-gradient(160deg,#1a1a1a,#2a2a2a)', accent: '#e8e8f0', glow: 'rgba(232,232,240,0.5)', stripe: '#ccc' },
-  { name: 'Mango Loco', tag: 'Juice', desc: 'Tropical mango juice with monster kick.', kcal: '230 kcal', bg: 'linear-gradient(160deg,#1a0f00,#2a1800)', accent: '#FF8C00', glow: 'rgba(255,140,0,0.6)', stripe: '#FF8C00' },
-  { name: 'Pipeline Punch', tag: 'Juice', desc: 'Passion fruit meets guava. Surf culture in a can.', kcal: '220 kcal', bg: 'linear-gradient(160deg,#1a0010,#2a0020)', accent: '#FF69B4', glow: 'rgba(255,105,180,0.5)', stripe: '#FF69B4' },
-  { name: 'Ultra Paradise', tag: 'Ultra', desc: 'Kiwi & lime. Zero sugar paradise vibes.', kcal: '10 kcal', bg: 'linear-gradient(160deg,#001a08,#002a10)', accent: '#00FF80', glow: 'rgba(0,255,128,0.5)', stripe: '#00FF80' },
-  { name: 'Ultra Watermelon', tag: 'Ultra', desc: 'Sweet summer melon, zero regrets.', kcal: '10 kcal', bg: 'linear-gradient(160deg,#1a0005,#2a000a)', accent: '#FF2060', glow: 'rgba(255,32,96,0.5)', stripe: '#FF2060' },
-  { name: 'The Doctor', tag: 'VR46', desc: "Valentino Rossi's official blend. Peach & cherry.', kcal: '160 kcal", bg: 'linear-gradient(160deg,#0d0d1a,#12123a)', accent: '#FFD700', glow: 'rgba(255,215,0,0.5)', stripe: '#FFD700' },
-  { name: 'Juiced Monarch', tag: 'Juiced', desc: 'Peach nectarine juice monster. Royally charged.', kcal: '210 kcal', bg: 'linear-gradient(160deg,#1a0a00,#2a1400)', accent: '#FF6030', glow: 'rgba(255,96,48,0.5)', stripe: '#FF6030' },
+  {name:'Monster Original',tag:'Classic',desc:'160mg caffeine. The one that started it all.',kcal:'210 kcal',bg:'linear-gradient(160deg,#050f05,#0d1f0d)',ac:'#39FF14',gw:'rgba(57,255,20,0.65)'},
+  {name:'Zero Ultra',tag:'Zero Sugar',desc:'Light, crisp, zero sugar. Full Monster energy.',kcal:'10 kcal',bg:'linear-gradient(160deg,#141414,#222)',ac:'#e0e0e0',gw:'rgba(224,224,224,0.5)'},
+  {name:'Mango Loco',tag:'Juice',desc:'Tropical mango juice meets Monster kick.',kcal:'230 kcal',bg:'linear-gradient(160deg,#1a0a00,#2e1600)',ac:'#FF8C00',gw:'rgba(255,140,0,0.65)'},
+  {name:'Pipeline Punch',tag:'Juice',desc:'Passion fruit and guava. Surf culture in a can.',kcal:'220 kcal',bg:'linear-gradient(160deg,#190010,#2e001e)',ac:'#FF3FA4',gw:'rgba(255,63,164,0.55)'},
+  {name:'Ultra Paradise',tag:'Ultra',desc:'Kiwi & lime. Zero sugar paradise.',kcal:'10 kcal',bg:'linear-gradient(160deg,#001a0a,#00280f)',ac:'#00FF80',gw:'rgba(0,255,128,0.6)'},
+  {name:'Ultra Watermelon',tag:'Ultra',desc:'Sweet melon. Zero regrets.',kcal:'10 kcal',bg:'linear-gradient(160deg,#1a0008,#2e000d)',ac:'#FF1050',gw:'rgba(255,16,80,0.6)'},
+  {name:'The Doctor',tag:'VR46',desc:"Valentino Rossi's signature. Peach & cherry.",kcal:'160 kcal',bg:'linear-gradient(160deg,#0e0e1e,#181836)',ac:'#FFD700',gw:'rgba(255,215,0,0.6)'},
+  {name:'Juiced Monarch',tag:'Juiced',desc:'Peach nectarine. Royal charge.',kcal:'210 kcal',bg:'linear-gradient(160deg,#180800,#2e1400)',ac:'#FF6020',gw:'rgba(255,96,32,0.6)'},
 ];
 
 const FLAVORS = [
-  { name: 'Monster Original', color: '#39FF14', notes: 'Classic energy blend' },
-  { name: 'Zero Ultra', color: '#e8e8e8', notes: 'Zero sugar • Light citrus' },
-  { name: 'Mango Loco', color: '#FF8C00', notes: 'Tropical juice • 30% juice' },
-  { name: 'Pipeline Punch', color: '#FF69B4', notes: 'Passion fruit & guava' },
-  { name: 'Ultra Paradise', color: '#00FF80', notes: 'Kiwi lime • Zero sugar' },
-  { name: 'Ultra Watermelon', color: '#FF2060', notes: 'Sweet melon • Zero sugar' },
+  {name:'Monster Original',c:'#39FF14',note:'Classic energy blend'},
+  {name:'Zero Ultra',c:'#d8d8d8',note:'Zero sugar · Light citrus'},
+  {name:'Mango Loco',c:'#FF8C00',note:'Tropical juice · 30% juice'},
+  {name:'Pipeline Punch',c:'#FF3FA4',note:'Passion fruit & guava'},
+  {name:'Ultra Paradise',c:'#00FF80',note:'Kiwi lime · Zero sugar'},
+  {name:'Ultra Watermelon',c:'#FF1050',note:'Sweet melon · Zero sugar'},
 ];
 
-const ENERGY_CELLS = [
-  { icon: '⚡', num: '160mg', label: 'Caffeine', desc: 'Per 16 fl oz can. Clinical focus and sustained energy without the crash.' },
-  { icon: '🧬', num: 'B2 B3 B6 B12', label: 'B-Vitamins', desc: 'Full B-vitamin complex for cellular energy metabolism and mental clarity.' },
-  { icon: '💎', num: '2000mg', label: 'Taurine', desc: 'Essential amino acid supporting cardiovascular function and neural performance.' },
-  { icon: '🌿', num: '400mg', label: 'Ginseng', desc: 'Panax ginseng extract for adaptogenic stress support and sustained endurance.' },
-  { icon: '🔥', num: '0g', label: 'Sugar (Ultra)', desc: 'Ultra line contains zero sugar, zero calories — full monster hit, zero compromise.' },
-  { icon: '💧', num: '16 fl oz', label: 'Per Serving', desc: 'One full can is one serving. No artificial serving size tricks.' },
+const SPECS = [
+  {ico:'⚡',n:'160mg',l:'Caffeine',d:'Per 16 fl oz can. Clinical focus and sustained energy without the crash.'},
+  {ico:'🧬',n:'B2·B3·B6·B12',l:'B-Vitamins',d:'Full B-vitamin complex for cellular energy metabolism and mental clarity.'},
+  {ico:'💎',n:'2000mg',l:'Taurine',d:'Essential amino acid for cardiovascular function and neural performance.'},
+  {ico:'🌿',n:'400mg',l:'Panax Ginseng',d:'Adaptogenic stress support and sustained physical endurance.'},
+  {ico:'🔥',n:'0g',l:'Sugar (Ultra)',d:'Zero sugar, zero calories — full Monster hit, zero compromise.'},
+  {ico:'💧',n:'16 fl oz',l:'Per Serving',d:'One full can is one serving. No artificial serving size tricks.'},
+];
+
+const LIFESTYLE = [
+  {tag:'Motorsport',h:'Built for the Track',p:'MotoGP · MXGP · Formula Drift',bg:'linear-gradient(160deg,#060e06,#0d1e0d)'},
+  {tag:'Skateboarding',h:'Street Ready',p:'From the curb to the stadium',bg:'linear-gradient(160deg,#0a0a0a,#181010)'},
+  {tag:'Surfing',h:'Ride the Beast',p:'Pipeline · Teahupoʻo · Jaws',bg:'linear-gradient(160deg,#000d1a,#000a22)'},
+  {tag:'Music',h:'Stage Energy',p:'Festivals · Collabs · Culture',bg:'linear-gradient(160deg,#0e0010,#180020)'},
+  {tag:'Gaming',h:'GG — No Crash',p:'Ultra line built for the long session',bg:'linear-gradient(160deg,#001010,#00181a)'},
 ];
 
 const ATHLETES = [
-  { name: 'Valentino Rossi', sport: 'MotoGP', role: 'The Doctor · 9x World Champion', hue: '50deg' },
-  { name: 'Nyjah Huston', sport: 'Skateboarding', role: 'Street · Olympic Gold Contender', hue: '130deg' },
-  { name: 'Ricky Carmichael', sport: 'Motocross', role: 'GOAT · 15x National Champion', hue: '350deg' },
-  { name: 'Kelly Slater', sport: 'Surfing', role: '11x World Surf League Champion', hue: '200deg' },
-  { name: 'Marc Marquez', sport: 'MotoGP', role: '8x World Champion · #93', hue: '0deg' },
-  { name: 'Tanner Foust', sport: 'Rallycross', role: '7x Global RallyCross Champion', hue: '280deg' },
+  {name:'Valentino Rossi',sport:'MotoGP',role:'The Doctor · 9× World Champion',hue:45},
+  {name:'Nyjah Huston',sport:'Skateboarding',role:'Street · Olympic Gold Contender',hue:130},
+  {name:'Ricky Carmichael',sport:'Motocross',role:'GOAT · 15× National Champion',hue:350},
+  {name:'Kelly Slater',sport:'Surfing',role:'11× World Surf League Champion',hue:200},
+  {name:'Marc Marquez',sport:'MotoGP',role:'8× World Champion · #93',hue:0},
+  {name:'Tanner Foust',sport:'Rallycross',role:'7× Global RallyCross Champion',hue:280},
 ];
 
-const LIFESTYLE_BLOCKS = [
-  { tag: 'Motorsport', title: 'Built for the Track', sub: 'MotoGP · MXGP · Formula Drift', bg: 'linear-gradient(160deg,#0a1200 0%,#1a2800 50%,#0a0a0a 100%)' },
-  { tag: 'Skateboarding', title: 'Street Ready', sub: 'From the curb to the stadium', bg: 'linear-gradient(160deg,#0a0a0a,#1a1010)' },
-  { tag: 'Surfing', title: 'Ride the Beast', sub: 'Pipeline · Teahupoʻo · Jaws', bg: 'linear-gradient(160deg,#001020,#000a20)' },
-  { tag: 'Music', title: 'Stage Energy', sub: 'Festivals · Collabs · Culture', bg: 'linear-gradient(160deg,#100010,#1a0020)' },
-  { tag: 'Gaming', title: 'GG — No Crash', sub: 'Ultra line built for the long session', bg: 'linear-gradient(160deg,#001010,#001a18)' },
-];
+/* ════ CURSOR ════ */
+const cur = document.getElementById('cursor');
+const curR = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function animCur(){requestAnimationFrame(animCur);rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;curR.style.left=rx+'px';curR.style.top=ry+'px'})();
+document.querySelectorAll('a,button,[role="button"]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='20px';cur.style.height='20px';curR.style.width='52px';curR.style.height='52px'});
+  el.addEventListener('mouseleave',()=>{cur.style.width='12px';cur.style.height='12px';curR.style.width='36px';curR.style.height='36px'});
+});
 
-/* ── RENDER PRODUCTS ── */
-function renderProducts() {
-  const grid = document.getElementById('products-grid');
-  grid.innerHTML = PRODUCTS.map(p => `
-    <article class="product-card reveal" style="--accent:${p.accent}">
-      <div class="product-card-img" style="background:${p.bg}">
-        <div class="product-can" style="background:${p.bg};box-shadow:0 0 40px ${p.glow};">
-          <div style="position:absolute;inset:0;border-radius:14px;border:2px solid ${p.stripe}22;"></div>
-          <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);width:2px;height:80%;background:linear-gradient(180deg,${p.stripe},transparent);opacity:0.4;"></div>
-          <div class="product-can-shine"></div>
-          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Orbitron',sans-serif;font-size:9px;font-weight:800;color:${p.stripe};letter-spacing:0.18em;text-align:center;line-height:1.4;text-transform:uppercase;">MONSTER<br>ENERGY</div>
+/* ════ NAV SCROLL ════ */
+window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',scrollY>60)},{passive:true});
+
+/* ════ REVEAL ════ */
+const revObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('up');revObs.unobserve(e.target)}});
+},{threshold:0.12});
+function observeReveals(){document.querySelectorAll('.reveal:not(.up)').forEach(el=>revObs.observe(el))}
+
+/* ════ RENDER PRODUCTS ════ */
+function renderProducts(){
+  const g=document.getElementById('products-carousel');
+  g.innerHTML=PRODUCTS.map(p=>`
+    <article class="p-card reveal" data-tilt>
+      <div class="p-img" style="background:${p.bg}">
+        <div class="p-can-wrap">
+          <div class="p-can" style="background:${p.bg};box-shadow:0 0 36px ${p.gw};border:1px solid ${p.ac}22">
+            <span class="p-can-label" style="color:${p.ac}">MONSTER<br>ENERGY</span>
+          </div>
         </div>
-        <div class="product-glow" style="background:${p.accent};opacity:0.5;"></div>
+        <div class="p-ground" style="background:${p.ac}"></div>
       </div>
-      <div class="product-card-body">
-        <span class="product-tag" style="background:${p.accent}22;color:${p.accent};border:1px solid ${p.accent}44">${p.tag}</span>
-        <h3 class="product-name">${p.name}</h3>
-        <p class="product-desc">${p.desc}</p>
-        <div class="product-footer">
-          <span class="product-kcal">${p.kcal}</span>
-          <button class="product-btn" aria-label="Add ${p.name} to cart">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      <div class="p-shine" aria-hidden="true"></div>
+      <div class="p-card-glow" style="background:radial-gradient(ellipse at 50% 0%,${p.ac}18,transparent 70%)"></div>
+      <div class="p-body">
+        <span class="p-tag" style="background:${p.ac}18;color:${p.ac};border:1px solid ${p.ac}33">${p.tag}</span>
+        <h3 class="p-name">${p.name}</h3>
+        <p class="p-desc">${p.desc}</p>
+        <div class="p-foot">
+          <span class="p-kcal">${p.kcal}</span>
+          <button class="p-add" aria-label="Add ${p.name} to cart">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           </button>
         </div>
       </div>
     </article>
   `).join('');
+  initTilt();
 }
 
-/* ── RENDER FLAVORS ── */
-function renderFlavors() {
-  const list = document.getElementById('flavors-list');
-  let activeIdx = 0;
-
-  list.innerHTML = FLAVORS.map((f, i) => `
-    <div class="flavor-row${i === 0 ? ' active' : ''}" role="button" tabindex="0" data-idx="${i}" aria-pressed="${i === 0}" style="--fcolor:${f.color}">
-      <div class="flavor-swatch" style="background:${f.color};box-shadow:0 0 8px ${f.color}88;"></div>
-      <span class="flavor-row-name">${f.name}</span>
-      <span class="flavor-row-tag">${f.notes}</span>
-    </div>
-  `).join('');
-
-  const can = document.getElementById('flavor-can');
-  function updateCan(idx) {
-    const f = FLAVORS[idx];
-    can.style.background = `linear-gradient(160deg,#111 0%,#1a1a1a 100%)`;
-    can.style.borderTop = `4px solid ${f.color}`;
-    can.style.boxShadow = `0 0 40px ${f.color}44, 0 0 80px ${f.color}22`;
-    can.innerHTML = `
-      <div style="position:absolute;inset:0;border-radius:16px;border:1px solid ${f.color}33;"></div>
-      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;font-family:'Orbitron',sans-serif;font-size:8px;font-weight:800;color:${f.color};letter-spacing:0.2em;line-height:1.6;text-transform:uppercase;">MONSTER<br>ENERGY<br><span style="font-size:6px;opacity:0.7">${f.name.toUpperCase()}</span></div>
-    `;
-  }
-  updateCan(0);
-
-  list.querySelectorAll('.flavor-row').forEach(row => {
-    const activate = () => {
-      const idx = +row.dataset.idx;
-      list.querySelectorAll('.flavor-row').forEach((r, i) => {
-        r.classList.toggle('active', i === idx);
-        r.setAttribute('aria-pressed', i === idx);
-      });
-      updateCan(idx);
-    };
-    row.addEventListener('click', activate);
-    row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
+/* ════ ANIMATION 2: 3D CARD TILT ════ */
+function initTilt(){
+  document.querySelectorAll('[data-tilt]').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-0.5;
+      const y=(e.clientY-r.top)/r.height-0.5;
+      card.style.transform=`perspective(800px) rotateY(${x*14}deg) rotateX(${-y*10}deg) scale(1.03)`;
+      card.style.boxShadow=`${-x*20}px ${y*20}px 40px rgba(0,0,0,0.4), 0 0 30px ${card.dataset.ac||'rgba(57,255,20,0.1)'}`;
+    });
+    card.addEventListener('mouseleave',()=>{card.style.transform='';card.style.boxShadow='';});
   });
 }
 
-/* ── RENDER ENERGY ── */
-function renderEnergy() {
-  const grid = document.getElementById('energy-grid');
-  grid.innerHTML = ENERGY_CELLS.map(c => `
-    <div class="energy-cell reveal">
-      <div class="energy-cell-icon" aria-hidden="true">
-        <span style="font-size:22px">${c.icon}</span>
-      </div>
-      <div class="energy-cell-num">${c.num}</div>
-      <div class="energy-cell-label">${c.label}</div>
-      <p class="energy-cell-desc">${c.desc}</p>
+/* ════ RENDER FLAVORS ════ */
+let holoScene,holoRenderer,holoCamera,holoCan,holoParticles,holoT=0,holoColor=new THREE.Color('#39FF14');
+function renderFlavors(){
+  const list=document.getElementById('hf-list');
+  list.innerHTML=FLAVORS.map((f,i)=>`
+    <div class="hf-row${i===0?' active':''}" role="button" tabindex="0" data-idx="${i}" aria-pressed="${i===0}">
+      <div class="hf-dot" style="background:${f.c};color:${f.c};box-shadow:0 0 10px ${f.c}"></div>
+      <span class="hf-name">${f.name}</span>
+      <span class="hf-note">${f.note}</span>
+      <svg class="hf-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </div>
+  `).join('');
+  list.querySelectorAll('.hf-row').forEach(row=>{
+    const act=()=>{
+      const i=+row.dataset.idx;
+      list.querySelectorAll('.hf-row').forEach((r,j)=>{r.classList.toggle('active',j===i);r.setAttribute('aria-pressed',j===i)});
+      holoColor.set(FLAVORS[i].c);
+      if(holoCan) holoCan.material.emissive=holoColor.clone().multiplyScalar(0.3);
+    };
+    row.addEventListener('click',act);
+    row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act()}});
+  });
+}
+
+/* ════ ANIMATION 3: HOLOGRAPHIC THREE.JS CAN ════ */
+function initHoloCanvas(){
+  const canvas=document.getElementById('holo-canvas');
+  if(!canvas) return;
+  const W=canvas.clientWidth,H=canvas.clientHeight;
+  holoRenderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  holoRenderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  holoRenderer.setSize(W,H);
+  holoRenderer.toneMapping=THREE.ACESFilmicToneMapping;
+  holoRenderer.toneMappingExposure=1.3;
+
+  holoScene=new THREE.Scene();
+  holoCamera=new THREE.PerspectiveCamera(38,W/H,0.1,100);
+  holoCamera.position.set(0,0.2,5);
+
+  /* Lights */
+  holoScene.add(new THREE.AmbientLight(0xffffff,0.2));
+  const key=new THREE.DirectionalLight(0xffffff,2.5);key.position.set(3,5,4);holoScene.add(key);
+  const fill=new THREE.PointLight(0x39ff14,3,12);fill.position.set(-3,0,2);holoScene.add(fill);
+  const rim=new THREE.PointLight(0x00e5ff,1.5,10);rim.position.set(2,-2,-3);holoScene.add(rim);
+  const bot=new THREE.PointLight(0xff00ff,0.8,8);bot.position.set(0,-3,1);holoScene.add(bot);
+
+  const R=0.58,Ht=2.2;
+  const grp=new THREE.Group();holoScene.add(grp);
+
+  /* Body — iridescent shader */
+  const bodyGeo=new THREE.CylinderGeometry(R,R*0.97,Ht,80,12);
+  const bodyMat=new THREE.MeshPhysicalMaterial({
+    color:0x080808,
+    metalness:1,roughness:0.05,
+    clearcoat:1,clearcoatRoughness:0.05,
+    iridescence:1,iridescenceIOR:1.8,
+    iridescenceThicknessRange:[100,800],
+    emissive:new THREE.Color(0x39ff14),emissiveIntensity:0.15,
+  });
+  const body=new THREE.Mesh(bodyGeo,bodyMat);body.castShadow=true;grp.add(body);
+  holoCan=body;
+
+  /* Stripe */
+  const strGeo=new THREE.CylinderGeometry(R+0.003,R*0.973,Ht*0.16,80);
+  const strMat=new THREE.MeshStandardMaterial({color:0x39ff14,metalness:0.2,roughness:0.3,emissive:0x39ff14,emissiveIntensity:0.6});
+  const stripe=new THREE.Mesh(strGeo,strMat);stripe.position.y=-Ht*0.3;grp.add(stripe);
+
+  /* Top/bot caps */
+  const capMat=new THREE.MeshPhysicalMaterial({color:0xbbbbbb,metalness:1,roughness:0.08,clearcoat:0.8});
+  const topGeo=new THREE.CylinderGeometry(R*0.82,R,0.14,80);
+  const top=new THREE.Mesh(topGeo,capMat);top.position.y=Ht/2+0.07;grp.add(top);
+  const botGeo=new THREE.CylinderGeometry(R*0.97,R*0.87,0.1,80);
+  const botC=new THREE.Mesh(botGeo,capMat);botC.position.y=-Ht/2-0.05;grp.add(botC);
+
+  /* Pull tab */
+  const tabGeo=new THREE.TorusGeometry(0.13,0.024,8,22);
+  const tab=new THREE.Mesh(tabGeo,capMat);tab.position.set(0.14,Ht/2+0.22,0);tab.rotation.x=Math.PI/2;grp.add(tab);
+
+  /* Holographic rings */
+  const ringMat=new THREE.MeshBasicMaterial({color:0x39ff14,transparent:true,opacity:0.12,side:THREE.DoubleSide,wireframe:true});
+  for(let i=0;i<3;i++){
+    const rGeo=new THREE.TorusGeometry(1.2+i*0.5,0.004,4,80);
+    const rMesh=new THREE.Mesh(rGeo,ringMat.clone());rMesh.rotation.x=Math.PI/2;
+    rMesh.userData.speed=(i+1)*0.007*(i%2===0?1:-1);
+    holoScene.add(rMesh);
+  }
+
+  /* Particles */
+  const pc=80,pp=new Float32Array(pc*3);
+  for(let i=0;i<pc;i++){pp[i*3]=(Math.random()-.5)*6;pp[i*3+1]=(Math.random()-.5)*7;pp[i*3+2]=(Math.random()-.5)*3-1}
+  const pGeo=new THREE.BufferGeometry();pGeo.setAttribute('position',new THREE.BufferAttribute(pp,3));
+  const pMat=new THREE.PointsMaterial({color:0x39ff14,size:0.028,transparent:true,opacity:0.7});
+  holoParticles=new THREE.Points(pGeo,pMat);holoScene.add(holoParticles);
+
+  /* Ground glow */
+  const gGeo=new THREE.PlaneGeometry(4,4);
+  const gMat=new THREE.MeshBasicMaterial({color:0x39ff14,transparent:true,opacity:0.04,depthWrite:false});
+  const gPlane=new THREE.Mesh(gGeo,gMat);gPlane.rotation.x=-Math.PI/2;gPlane.position.y=-Ht/2-0.2;holoScene.add(gPlane);
+
+  function animHolo(){
+    requestAnimationFrame(animHolo);
+    holoT+=0.007;
+    grp.rotation.y=holoT*0.5;
+    grp.position.y=Math.sin(holoT*0.8)*0.14;
+    /* Update emissive from selected flavor color */
+    if(holoCan) holoCan.material.emissive.lerp(holoColor,0.04);
+    /* Pulse stripe */
+    stripe.material.emissiveIntensity=0.5+Math.sin(holoT*2)*0.25;
+    /* Spin rings */
+    holoScene.children.forEach(c=>{if(c.userData.speed)c.rotation.z+=c.userData.speed});
+    holoParticles.rotation.y=holoT*0.04;
+    holoRenderer.render(holoScene,holoCamera);
+  }
+  animHolo();
+
+  new ResizeObserver(()=>{
+    const w=canvas.clientWidth,h=canvas.clientHeight;
+    holoRenderer.setSize(w,h);holoCamera.aspect=w/h;holoCamera.updateProjectionMatrix();
+  }).observe(canvas.parentElement);
+}
+
+/* ════ ANIMATION 1: HERO THREE.JS PARTICLES + CAN ════ */
+function initHeroCanvas(){
+  const canvas=document.getElementById('hero-canvas');
+  if(!canvas) return;
+  const W=canvas.clientWidth,H=canvas.clientHeight;
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(50,W/H,0.1,100);
+  camera.position.set(0,0,6);
+
+  scene.add(new THREE.AmbientLight(0xffffff,0.15));
+  const kl=new THREE.DirectionalLight(0xffffff,2.2);kl.position.set(3,5,4);scene.add(kl);
+  const gl=new THREE.PointLight(0x39ff14,4,15);gl.position.set(-2,0,3);scene.add(gl);
+  const bl=new THREE.PointLight(0x00e5ff,2,12);bl.position.set(4,-2,-2);scene.add(bl);
+  const pl=new THREE.PointLight(0xff00ff,1.5,10);pl.position.set(-3,-3,0);scene.add(pl);
+
+  const R=0.6,Ht=2.3;
+  const cg=new THREE.Group();cg.position.set(2.2,0,0);scene.add(cg);
+
+  const bGeo=new THREE.CylinderGeometry(R,R*0.96,Ht,80,10);
+  const bMat=new THREE.MeshPhysicalMaterial({color:0x050505,metalness:1,roughness:0.04,clearcoat:1,clearcoatRoughness:0.04,iridescence:1,iridescenceIOR:1.9,iridescenceThicknessRange:[80,900],emissive:0x39ff14,emissiveIntensity:0.12});
+  cg.add(new THREE.Mesh(bGeo,bMat));
+
+  const sGeo=new THREE.CylinderGeometry(R+0.003,R*0.963,Ht*0.17,80);
+  const sMat=new THREE.MeshStandardMaterial({color:0x39ff14,metalness:0.2,roughness:0.3,emissive:0x39ff14,emissiveIntensity:0.7});
+  const sMesh=new THREE.Mesh(sGeo,sMat);sMesh.position.y=-Ht*0.29;cg.add(sMesh);
+
+  const cMat=new THREE.MeshPhysicalMaterial({color:0xaaaaaa,metalness:1,roughness:0.07,clearcoat:0.9});
+  const tGeo=new THREE.CylinderGeometry(R*0.83,R,0.13,80);
+  const tMesh=new THREE.Mesh(tGeo,cMat);tMesh.position.y=Ht/2+0.065;cg.add(tMesh);
+  const btGeo=new THREE.CylinderGeometry(R*0.96,R*0.86,0.1,80);
+  cg.add(Object.assign(new THREE.Mesh(btGeo,cMat),{position:new THREE.Vector3(0,-Ht/2-0.05,0)}));
+
+  /* Particle field */
+  const N=200,pp=new Float32Array(N*3),pc=new Float32Array(N*3);
+  const cols=[new THREE.Color(0x39ff14),new THREE.Color(0x00e5ff),new THREE.Color(0xff00ff),new THREE.Color(0xffea00)];
+  for(let i=0;i<N;i++){
+    pp[i*3]=(Math.random()-.5)*18;pp[i*3+1]=(Math.random()-.5)*12;pp[i*3+2]=(Math.random()-.5)*8-2;
+    const c=cols[Math.floor(Math.random()*cols.length)];pc[i*3]=c.r;pc[i*3+1]=c.g;pc[i*3+2]=c.b;
+  }
+  const ptGeo=new THREE.BufferGeometry();ptGeo.setAttribute('position',new THREE.BufferAttribute(pp,3));ptGeo.setAttribute('color',new THREE.BufferAttribute(pc,3));
+  const ptMat=new THREE.PointsMaterial({size:0.04,vertexColors:true,transparent:true,opacity:0.8});
+  scene.add(new THREE.Points(ptGeo,ptMat));
+
+  let t=0,mx2=0,my2=0;
+  document.addEventListener('mousemove',e=>{mx2=(e.clientX/innerWidth-.5)*2;my2=-(e.clientY/innerHeight-.5)*2},{passive:true});
+
+  (function anim(){
+    requestAnimationFrame(anim);t+=0.006;
+    cg.rotation.y=t*0.35;cg.position.y=Math.sin(t*0.7)*0.18;
+    cg.rotation.x+=(-my2*0.12-cg.rotation.x)*0.04;
+    cg.rotation.z+=(-mx2*0.05-cg.rotation.z)*0.04;
+    gl.position.x=-2+Math.sin(t)*0.8;gl.position.y=Math.cos(t*0.7)*1.5;
+    bl.position.x=3+Math.sin(t*0.9)*0.5;
+    sMesh.material.emissiveIntensity=0.5+Math.sin(t*2)*0.25;
+    renderer.render(scene,camera);
+  })();
+
+  new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()}).observe(canvas.parentElement||document.body);
+}
+
+/* ════ SPECS ════ */
+function renderSpecs(){
+  document.getElementById('specs-grid').innerHTML=SPECS.map(s=>`
+    <div class="spec-cell reveal">
+      <div class="spec-ico" aria-hidden="true">${s.ico}</div>
+      <div class="spec-n">${s.n}</div>
+      <div class="spec-l">${s.l}</div>
+      <p class="spec-d">${s.d}</p>
     </div>
   `).join('');
 }
 
-/* ── RENDER LIFESTYLE ── */
-function renderLifestyle() {
-  const grid = document.getElementById('lifestyle-grid');
-  grid.innerHTML = LIFESTYLE_BLOCKS.map(b => `
-    <div class="ls-block">
-      <div class="ls-block-bg" style="background:${b.bg};"></div>
-      <div class="ls-block-overlay"></div>
-      <div class="ls-block-content">
+/* ════ LIFESTYLE ════ */
+function renderLifestyle(){
+  document.getElementById('ls-mosaic').innerHTML=LIFESTYLE.map(b=>`
+    <div class="ls-tile">
+      <div class="ls-tile-bg" style="background:${b.bg}"></div>
+      <div class="ls-overlay"></div>
+      <div class="ls-holo"></div>
+      <div class="ls-line"></div>
+      <div class="ls-cnt">
         <span class="ls-tag">${b.tag}</span>
-        <h3>${b.title}</h3>
-        <p>${b.sub}</p>
+        <h3>${b.h}</h3>
+        <p>${b.p}</p>
       </div>
     </div>
   `).join('');
 }
 
-/* ── RENDER ATHLETES ── */
-function renderAthletes() {
-  const scroll = document.getElementById('athletes-scroll');
-  scroll.innerHTML = ATHLETES.map(a => `
-    <article class="athlete-card" role="listitem">
-      <div class="athlete-img" style="background:linear-gradient(160deg,hsl(${a.hue} 20% 8%),hsl(${a.hue} 30% 12%));">
-        <span class="athlete-sport">${a.sport}</span>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0.15;">${a.sport === 'MotoGP' ? '🏍' : a.sport === 'Skateboarding' ? '🛹' : a.sport === 'Surfing' ? '🏄' : a.sport === 'Rallycross' ? '🚗' : '⚡'}</div>
+/* ════ ATHLETES ════ */
+function renderAthletes(){
+  document.getElementById('ath-scroll').innerHTML=ATHLETES.map(a=>`
+    <article class="ath-card" role="listitem">
+      <div class="ath-img">
+        <div class="ath-img-bg" style="background:radial-gradient(ellipse at 50% 20%,hsl(${a.hue},40%,18%),hsl(${a.hue},20%,6%))"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px;opacity:0.12">${a.sport==='MotoGP'?'🏍':a.sport==='Skateboarding'?'🛹':a.sport==='Surfing'?'🏄':a.sport==='Rallycross'?'🚗':'⚡'}</div>
+        <span class="ath-sport">${a.sport}</span>
       </div>
-      <div class="athlete-body">
-        <div class="athlete-name">${a.name}</div>
-        <div class="athlete-role">${a.role}</div>
+      <div class="ath-body">
+        <div class="ath-name">${a.name}</div>
+        <div class="ath-role">${a.role}</div>
       </div>
     </article>
   `).join('');
 }
 
-/* ── CTA FORM ── */
-window.handleCta = (e) => {
+/* ════ PARALLAX SCROLL (3D SCROLL EFFECT) ════ */
+function initParallax(){
+  const tiles=document.querySelectorAll('.ls-tile-bg');
+  window.addEventListener('scroll',()=>{
+    const sy=scrollY;
+    tiles.forEach((tile,i)=>{
+      const rect=tile.closest('.ls-tile').getBoundingClientRect();
+      if(rect.bottom<0||rect.top>innerHeight) return;
+      const pct=(rect.top/innerHeight);
+      tile.style.transform=`translateY(${pct*30*(i%2===0?1:-1)}px) scale(1.15)`;
+    });
+  },{passive:true});
+}
+
+/* ════ CTA ════ */
+window.ctaSub=(e)=>{
   e.preventDefault();
-  const btn = document.getElementById('cta-btn');
-  const suc = document.getElementById('cta-success');
-  btn.disabled = true;
-  btn.textContent = '…';
-  setTimeout(() => {
-    e.target.style.display = 'none';
-    suc.style.display = 'block';
-  }, 900);
+  const btn=document.getElementById('cta-btn');
+  btn.disabled=true;btn.textContent='…';
+  setTimeout(()=>{
+    document.getElementById('cta-form').style.display='none';
+    document.getElementById('cta-ok').style.display='block';
+  },900);
 };
 
-/* ── THREE.JS CAN ── */
-function initCan() {
-  const canvas = document.getElementById('can-canvas');
-  if (!canvas) return;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-  renderer.shadowMap.enabled = true;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(40, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
-  camera.position.set(0, 0.3, 4.5);
-
-  // Lights
-  const amb = new THREE.AmbientLight(0xffffff, 0.3);
-  scene.add(amb);
-  const key = new THREE.DirectionalLight(0xffffff, 2.0);
-  key.position.set(2, 4, 3);
-  key.castShadow = true;
-  scene.add(key);
-  const fill = new THREE.DirectionalLight(0x39ff14, 0.8);
-  fill.position.set(-3, 0, 2);
-  scene.add(fill);
-  const rim = new THREE.DirectionalLight(0x39ff14, 0.4);
-  rim.position.set(0, -2, -3);
-  scene.add(rim);
-  const point = new THREE.PointLight(0x39ff14, 1.5, 8);
-  point.position.set(0, -2, 1);
-  scene.add(point);
-
-  // Can geometry
-  const CAN_R = 0.55;
-  const CAN_H = 2.1;
-  const group = new THREE.Group();
-  scene.add(group);
-
-  // Body
-  const bodyGeo = new THREE.CylinderGeometry(CAN_R, CAN_R * 0.96, CAN_H, 64, 8);
-  const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x0a0a0a,
-    metalness: 0.95,
-    roughness: 0.12,
-    envMapIntensity: 1,
-  });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.castShadow = true;
-  group.add(body);
-
-  // Green stripe
-  const stripeGeo = new THREE.CylinderGeometry(CAN_R + 0.002, CAN_R * 0.962, CAN_H * 0.18, 64);
-  const stripeMat = new THREE.MeshStandardMaterial({ color: 0x39ff14, metalness: 0.3, roughness: 0.4, emissive: 0x39ff14, emissiveIntensity: 0.4 });
-  const stripe = new THREE.Mesh(stripeGeo, stripeMat);
-  stripe.position.y = -CAN_H * 0.28;
-  group.add(stripe);
-
-  // Top cap
-  const topGeo = new THREE.CylinderGeometry(CAN_R * 0.8, CAN_R, 0.12, 64);
-  const metalMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 1, roughness: 0.1 });
-  const top = new THREE.Mesh(topGeo, metalMat);
-  top.position.y = CAN_H / 2 + 0.06;
-  group.add(top);
-
-  // Bottom cap
-  const botGeo = new THREE.CylinderGeometry(CAN_R * 0.96, CAN_R * 0.85, 0.1, 64);
-  const bot = new THREE.Mesh(botGeo, metalMat);
-  bot.position.y = -CAN_H / 2 - 0.05;
-  group.add(bot);
-
-  // Pull tab
-  const tabGeo = new THREE.TorusGeometry(0.12, 0.022, 8, 20);
-  const tab = new THREE.Mesh(tabGeo, metalMat);
-  tab.position.set(0.15, CAN_H / 2 + 0.2, 0);
-  tab.rotation.x = Math.PI / 2;
-  group.add(tab);
-
-  // Ground glow plane
-  const glowGeo = new THREE.PlaneGeometry(3, 3);
-  const glowMat = new THREE.MeshBasicMaterial({
-    color: 0x39ff14,
-    transparent: true, opacity: 0.06,
-    depthWrite: false,
-  });
-  const glowPlane = new THREE.Mesh(glowGeo, glowMat);
-  glowPlane.rotation.x = -Math.PI / 2;
-  glowPlane.position.y = -CAN_H / 2 - 0.15;
-  scene.add(glowPlane);
-
-  // Floating particles
-  const pCount = 40;
-  const pGeo = new THREE.BufferGeometry();
-  const pPos = new Float32Array(pCount * 3);
-  for (let i = 0; i < pCount; i++) {
-    pPos[i * 3]     = (Math.random() - 0.5) * 4;
-    pPos[i * 3 + 1] = (Math.random() - 0.5) * 5;
-    pPos[i * 3 + 2] = (Math.random() - 0.5) * 2 - 0.5;
-  }
-  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-  const pMat = new THREE.PointsMaterial({ color: 0x39ff14, size: 0.025, transparent: true, opacity: 0.6 });
-  const particles = new THREE.Points(pGeo, pMat);
-  scene.add(particles);
-
-  let t = 0;
-  function animate() {
-    requestAnimationFrame(animate);
-    t += 0.008;
-    group.rotation.y = t * 0.4;
-    group.position.y = Math.sin(t) * 0.12;
-    point.intensity = 1.5 + Math.sin(t * 2) * 0.3;
-    fill.intensity = 0.8 + Math.sin(t * 1.5) * 0.2;
-    particles.rotation.y = t * 0.05;
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  window.addEventListener('resize', () => {
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    camera.updateProjectionMatrix();
-  });
-}
-
-/* ── REVEAL OBSERVER ── */
-function initReveal() {
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-}
-
-/* ── HAMBURGER ── */
-function initHamburger() {
-  const btn = document.getElementById('hamburger');
-  if (!btn) return;
-  let open = false;
-  btn.addEventListener('click', () => {
-    open = !open;
-    btn.setAttribute('aria-expanded', open);
-  });
-}
-
-/* ── INIT ── */
+/* ════ INIT ════ */
 renderProducts();
 renderFlavors();
-renderEnergy();
+renderSpecs();
 renderLifestyle();
 renderAthletes();
-initReveal();
-initCan();
-initHamburger();
-
-// Re-observe after dynamic render
-setTimeout(() => {
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal:not(.visible)').forEach(el => obs.observe(el));
-}, 100);
+initHeroCanvas();
+initHoloCanvas();
+initParallax();
+setTimeout(observeReveals,100);
 </script>
 </body>
 </html>
