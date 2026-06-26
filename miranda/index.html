@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Miranda — A curated lifestyle and wellness brand for the modern woman. Beauty, self-care and intentional living." />
+  <meta property="og:title" content="Miranda — Curated Living" />
+  <meta property="og:description" content="Beauty, self-care and intentional living for the modern woman." />
+  <meta property="og:type" content="website" />
+  <title>Miranda — Curated Living</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --rose:       #C9848A;
+      --rose-dark:  #A0616A;
+      --rose-light: #E8B4B8;
+      --blush:      #F7E8E8;
+      --cream:      #FDF6F0;
+      --champagne:  #F2E6DA;
+      --gold:       #C9A96E;
+      --gold-light: #E8D5B0;
+      --mauve:      #B5838D;
+      --text:       #3B2A2A;
+      --text-soft:  #7A5C5C;
+      --white:      #FFFFFF;
+      --border:     #EDCFCF;
+      --shadow:     rgba(180, 100, 100, 0.10);
+      --font-h:     'Playfair Display', Georgia, serif;
+      --font-b:     'Lato', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-b);
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    h1,h2,h3,h4 { font-family: var(--font-h); line-height: 1.25; }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: var(--font-b); cursor: pointer; border: none; outline: none; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; border-radius: 4px; }
+    img { max-width: 100%; display: block; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      transition: all 300ms ease;
+    }
+    #navbar.scrolled {
+      background: rgba(253,246,240,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 20px var(--shadow);
+    }
+    .nav-inner {
+      max-width: 1160px; margin: 0 auto; padding: 0 28px;
+      height: 76px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-h); font-size: 26px; font-weight: 600;
+      color: white; letter-spacing: 0.04em; transition: color 300ms;
+    }
+    #navbar.scrolled .nav-logo { color: var(--rose-dark); }
+    .nav-logo span { font-style: italic; font-weight: 400; }
+    .nav-links { display: flex; align-items: center; gap: 6px; }
+    .nav-link {
+      font-size: 14px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(255,255,255,0.88); padding: 8px 16px; border-radius: 6px;
+      transition: all 200ms ease;
+    }
+    #navbar.scrolled .nav-link { color: var(--text-soft); }
+    .nav-link:hover { background: rgba(255,255,255,0.15); color: white; }
+    #navbar.scrolled .nav-link:hover { background: var(--blush); color: var(--rose-dark); }
+    .nav-cta {
+      font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      background: white; color: var(--rose-dark); padding: 10px 24px; border-radius: 50px;
+      margin-left: 10px; transition: all 200ms ease;
+    }
+    #navbar.scrolled .nav-cta { background: var(--rose); color: white; }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+    .hamburger { display: none; background: transparent; color: white; padding: 8px; }
+    #navbar.scrolled .hamburger { color: var(--rose-dark); }
+    .drawer { display: none; background: var(--cream); border-top: 1px solid var(--border); padding: 16px 28px 28px; }
+    .drawer.open { display: block; }
+    .drawer a { display: block; font-size: 16px; font-weight: 500; color: var(--text); padding: 13px 0; border-bottom: 1px solid var(--border); letter-spacing: 0.04em; }
+    .drawer-cta { display: block; background: var(--rose); color: white !important; font-weight: 700; font-size: 14px; padding: 14px 24px; border-radius: 50px; margin-top: 18px; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: none !important; }
+    @media (max-width: 860px) { .nav-links { display: none !important; } .hamburger { display: flex !important; } }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative; min-height: 100dvh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; text-align: center;
+      background: linear-gradient(160deg, #A0616A 0%, #C9848A 40%, #D4A5A5 70%, #E8B4B8 100%);
+    }
+    .hero-decor {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    }
+    /* Floating circles decoration */
+    .hero-decor::before {
+      content: ''; position: absolute;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      top: -200px; right: -200px;
+    }
+    .hero-decor::after {
+      content: ''; position: absolute;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      bottom: -100px; left: -100px;
+    }
+    .hero-inner {
+      position: relative; z-index: 2;
+      max-width: 760px; padding: 120px 28px 80px;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.75); margin-bottom: 28px;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; display: inline-block; width: 32px; height: 1px; background: rgba(255,255,255,0.5);
+    }
+    .hero-h1 {
+      font-size: clamp(44px, 7vw, 88px); font-weight: 500;
+      color: white; margin-bottom: 8px; letter-spacing: -0.01em;
+    }
+    .hero-h1 em { font-style: italic; font-weight: 400; }
+    .hero-tagline {
+      font-family: var(--font-h); font-style: italic; font-size: clamp(16px, 2.5vw, 22px);
+      color: rgba(255,255,255,0.8); margin-bottom: 40px; font-weight: 400;
+    }
+    .hero-p {
+      font-size: 17px; color: rgba(255,255,255,0.78); max-width: 520px;
+      margin: 0 auto 48px; line-height: 1.8; font-weight: 300;
+    }
+    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: white; color: var(--rose-dark); font-weight: 700; font-size: 13px;
+      letter-spacing: 0.1em; text-transform: uppercase; padding: 16px 36px; border-radius: 50px;
+      transition: all 220ms ease; display: inline-block;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+    .btn-outline {
+      background: transparent; color: white; font-weight: 600; font-size: 13px;
+      letter-spacing: 0.1em; text-transform: uppercase; padding: 16px 36px; border-radius: 50px;
+      border: 1.5px solid rgba(255,255,255,0.55); transition: all 220ms ease; display: inline-block;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+    .hero-scroll {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.55); animation: float 2.4s ease-in-out infinite; cursor: pointer; background: transparent;
+    }
+    @keyframes float { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(9px)} }
+
+    /* ── STRIP ── */
+    .strip {
+      background: var(--champagne);
+      padding: 20px 28px;
+      overflow: hidden;
+    }
+    .strip-inner {
+      max-width: 1160px; margin: 0 auto;
+      display: flex; gap: 48px; justify-content: center; align-items: center; flex-wrap: wrap;
+    }
+    .strip-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-soft);
+    }
+    .strip-item svg { color: var(--gold); }
+
+    /* ── ABOUT ── */
+    #about { padding: 100px 28px; background: white; }
+    .about-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr !important; gap: 48px !important; } }
+    .about-img-wrap {
+      position: relative; border-radius: 32px; overflow: hidden;
+    }
+    .about-img-bg {
+      width: 100%; aspect-ratio: 4/5; border-radius: 32px;
+      background: linear-gradient(135deg, var(--blush) 0%, var(--champagne) 50%, var(--gold-light) 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .about-img-bg::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(201,168,110,0.3) 0%, transparent 60%);
+    }
+    .about-monogram {
+      font-family: var(--font-h); font-size: 140px; font-weight: 500; font-style: italic;
+      color: rgba(201,132,138,0.25); line-height: 1; position: relative; z-index: 1; user-select: none;
+    }
+    .about-badge {
+      position: absolute; bottom: 28px; right: 28px;
+      background: white; border-radius: 16px; padding: 16px 20px;
+      box-shadow: 0 8px 32px var(--shadow);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .badge-circle {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--blush); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .badge-n { font-family: var(--font-h); font-size: 20px; font-weight: 600; color: var(--rose-dark); }
+    .badge-l { font-size: 11px; color: var(--text-soft); font-weight: 500; letter-spacing: 0.04em; }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--rose); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after { content: ''; flex: 1; max-width: 40px; height: 1px; background: var(--rose-light); }
+    .about-h2 { font-size: clamp(32px, 4vw, 48px); font-weight: 500; color: var(--text); margin-bottom: 24px; }
+    .about-h2 em { color: var(--rose-dark); }
+    .about-p { font-size: 16px; color: var(--text-soft); line-height: 1.85; margin-bottom: 16px; font-weight: 300; }
+    .about-sig { font-family: var(--font-h); font-style: italic; font-size: 22px; color: var(--rose-dark); margin-top: 32px; }
+
+    /* ── SERVICES ── */
+    #services { padding: 100px 28px; background: var(--cream); }
+    .services-header { text-align: center; max-width: 560px; margin: 0 auto 64px; }
+    .services-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px;
+    }
+    .svc-card {
+      background: white; border-radius: 24px; padding: 40px 32px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 24px var(--shadow);
+      transition: all 240ms ease;
+      text-align: center;
+    }
+    .svc-card:hover { transform: translateY(-8px); box-shadow: 0 16px 48px var(--shadow); border-color: var(--rose-light); }
+    .svc-icon {
+      width: 68px; height: 68px; border-radius: 20px;
+      background: var(--blush); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px; color: var(--rose-dark);
+      transition: background 240ms ease;
+    }
+    .svc-card:hover .svc-icon { background: var(--rose-light); }
+    .svc-h3 { font-family: var(--font-h); font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 12px; }
+    .svc-p { font-size: 14px; color: var(--text-soft); line-height: 1.75; font-weight: 300; }
+    .svc-link {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 20px;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--rose-dark); transition: gap 200ms ease;
+    }
+    .svc-link:hover { gap: 10px; }
+
+    /* ── GALLERY ── */
+    #gallery { padding: 100px 28px; background: white; }
+    .gallery-header { text-align: center; max-width: 560px; margin: 0 auto 56px; }
+    .gallery-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto;
+      gap: 20px;
+    }
+    .g-item {
+      border-radius: 20px; overflow: hidden;
+      background: linear-gradient(135deg, var(--blush), var(--champagne));
+      display: flex; align-items: center; justify-content: center;
+      position: relative; min-height: 200px;
+    }
+    .g-item:nth-child(1) { grid-column: span 7; min-height: 340px; }
+    .g-item:nth-child(2) { grid-column: span 5; min-height: 340px; }
+    .g-item:nth-child(3) { grid-column: span 4; min-height: 260px; }
+    .g-item:nth-child(4) { grid-column: span 4; min-height: 260px; background: linear-gradient(135deg, var(--champagne), var(--gold-light)); }
+    .g-item:nth-child(5) { grid-column: span 4; min-height: 260px; background: linear-gradient(135deg, var(--rose-light), var(--blush)); }
+    @media (max-width: 768px) {
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .g-item { grid-column: span 1 !important; min-height: 180px !important; }
+    }
+    .g-label {
+      font-family: var(--font-h); font-style: italic; font-size: 18px;
+      color: var(--rose-dark); opacity: 0.5; user-select: none;
+    }
+    .g-overlay {
+      position: absolute; inset: 0; background: rgba(160,97,106,0);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 300ms ease;
+    }
+    .g-item:hover .g-overlay { background: rgba(160,97,106,0.18); }
+    .g-overlay span {
+      font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: white; opacity: 0; transition: opacity 300ms ease;
+    }
+    .g-item:hover .g-overlay span { opacity: 1; }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials { padding: 100px 28px; background: var(--cream); }
+    .testimonials-header { text-align: center; max-width: 560px; margin: 0 auto 64px; }
+    .testi-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px;
+    }
+    .testi-card {
+      background: white; border-radius: 24px; padding: 36px 32px;
+      border: 1px solid var(--border); box-shadow: 0 4px 24px var(--shadow);
+      position: relative;
+    }
+    .testi-quote {
+      font-family: var(--font-h); font-size: 64px; line-height: 0.8;
+      color: var(--rose-light); position: absolute; top: 24px; left: 28px;
+    }
+    .testi-text {
+      font-family: var(--font-h); font-style: italic; font-size: 17px;
+      color: var(--text); line-height: 1.75; margin-bottom: 28px; padding-top: 28px;
+    }
+    .testi-stars { display: flex; gap: 4px; margin-bottom: 16px; }
+    .star { color: var(--gold); }
+    .testi-name { font-weight: 700; font-size: 14px; color: var(--text); }
+    .testi-role { font-size: 13px; color: var(--text-soft); font-weight: 300; }
+
+    /* ── CTA BANNER ── */
+    #cta {
+      padding: 100px 28px;
+      background: linear-gradient(135deg, #A0616A 0%, #C9848A 50%, #D4A5A5 100%);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    #cta::before {
+      content: ''; position: absolute; top: -50%; right: -20%;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .cta-eyebrow {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.65); margin-bottom: 20px;
+    }
+    .cta-h2 {
+      font-size: clamp(32px, 5vw, 60px); font-weight: 500; color: white;
+      margin-bottom: 20px; max-width: 640px; margin-left: auto; margin-right: auto;
+    }
+    .cta-h2 em { font-style: italic; font-weight: 400; }
+    .cta-p {
+      font-size: 16px; color: rgba(255,255,255,0.75); max-width: 460px;
+      margin: 0 auto 48px; font-weight: 300; line-height: 1.8;
+    }
+    .cta-form { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; max-width: 480px; margin: 0 auto; }
+    .cta-input {
+      flex: 1; min-width: 220px; padding: 16px 22px; border-radius: 50px;
+      border: 1.5px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.12);
+      color: white; font-size: 15px; font-family: var(--font-b);
+      backdrop-filter: blur(8px);
+    }
+    .cta-input::placeholder { color: rgba(255,255,255,0.5); }
+    .cta-btn {
+      background: white; color: var(--rose-dark); font-weight: 700; font-size: 13px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 16px 32px; border-radius: 50px;
+      transition: all 200ms ease; white-space: nowrap;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.15); }
+    .cta-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+    .cta-success { color: white; }
+    .cta-success-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .cta-success h3 { font-size: 28px; font-weight: 500; margin-bottom: 10px; }
+    .cta-success p { font-size: 16px; opacity: 0.78; font-weight: 300; }
+    @keyframes s { to { transform: rotate(360deg); } }
+    .spinning { animation: s 0.8s linear infinite; }
+
+    /* ── FOOTER ── */
+    footer { background: #2D1B1B; color: rgba(255,255,255,0.65); padding: 72px 28px 36px; }
+    .footer-top {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px;
+    }
+    @media (max-width: 900px) { .footer-top { grid-template-columns: 1fr 1fr !important; gap: 40px !important; } }
+    @media (max-width: 560px) { .footer-top { grid-template-columns: 1fr !important; } }
+    .footer-logo { font-family: var(--font-h); font-size: 26px; color: white; margin-bottom: 16px; }
+    .footer-logo em { font-style: italic; font-weight: 400; }
+    .footer-brand-p { font-size: 14px; line-height: 1.75; max-width: 260px; font-weight: 300; }
+    .footer-social { display: flex; gap: 12px; margin-top: 24px; }
+    .social-btn {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.6); transition: all 200ms ease;
+    }
+    .social-btn:hover { background: var(--rose); color: white; transform: translateY(-2px); }
+    .footer-h4 { color: white; font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
+    .footer-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-list a { font-size: 14px; font-weight: 300; transition: color 200ms; }
+    .footer-list a:hover { color: var(--rose-light); }
+    .footer-bottom {
+      max-width: 1100px; margin: 0 auto;
+      border-top: 1px solid rgba(255,255,255,0.08); padding-top: 28px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-bottom p { font-size: 13px; font-weight: 300; }
+    .footer-legal { display: flex; gap: 20px; }
+    .footer-legal a { font-size: 13px; font-weight: 300; transition: color 200ms; }
+    .footer-legal a:hover { color: var(--rose-light); }
+
+    /* ── SECTION HEADING helpers ── */
+    .sec-h2 { font-size: clamp(30px, 4vw, 46px); font-weight: 500; color: var(--text); margin-bottom: 16px; }
+    .sec-h2 em { color: var(--rose-dark); }
+    .sec-p { font-size: 16px; color: var(--text-soft); line-height: 1.8; font-weight: 300; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════ NAVBAR ════════════════ -->
+<header id="navbar">
+  <nav class="nav-inner">
+    <a href="#" class="nav-logo"><em>Miranda</em></a>
+    <div class="nav-links">
+      <a href="#about" class="nav-link">About</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#gallery" class="nav-link">Gallery</a>
+      <a href="#testimonials" class="nav-link">Stories</a>
+      <a href="#cta" class="nav-cta">Get in Touch</a>
+    </div>
+    <button class="hamburger" id="ham-btn" aria-label="Open menu">
+      <svg id="ham-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </nav>
+  <div class="drawer" id="drawer">
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#testimonials">Stories</a>
+    <a href="#cta" class="drawer-cta">Get in Touch</a>
+  </div>
+</header>
+
+<!-- ════════════════ HERO ════════════════ -->
+<section id="hero">
+  <div class="hero-decor" aria-hidden="true"></div>
+
+  <!-- Petal decorations -->
+  <svg aria-hidden="true" style="position:absolute;top:12%;left:6%;opacity:0.18;width:80px;" viewBox="0 0 80 120" fill="none">
+    <ellipse cx="40" cy="60" rx="28" ry="55" fill="white" transform="rotate(-15 40 60)"/>
+    <ellipse cx="40" cy="60" rx="28" ry="55" fill="white" transform="rotate(15 40 60)"/>
+  </svg>
+  <svg aria-hidden="true" style="position:absolute;bottom:14%;right:7%;opacity:0.15;width:100px;" viewBox="0 0 80 120" fill="none">
+    <ellipse cx="40" cy="60" rx="28" ry="55" fill="white" transform="rotate(-20 40 60)"/>
+    <ellipse cx="40" cy="60" rx="28" ry="55" fill="white" transform="rotate(20 40 60)"/>
+    <ellipse cx="40" cy="60" rx="28" ry="55" fill="white" transform="rotate(0 40 60)"/>
+  </svg>
+  <svg aria-hidden="true" style="position:absolute;top:30%;right:12%;opacity:0.1;width:60px;" viewBox="0 0 60 60" fill="none">
+    <circle cx="30" cy="30" r="28" stroke="white" stroke-width="2"/>
+    <circle cx="30" cy="30" r="18" stroke="white" stroke-width="1.5"/>
+  </svg>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Curated Living</div>
+    <h1 class="hero-h1"><em>Miranda</em></h1>
+    <p class="hero-tagline">Beauty. Intention. Grace.</p>
+    <p class="hero-p">A curated lifestyle brand for the modern woman — celebrating beauty in every detail, from skincare rituals to the spaces you inhabit.</p>
+    <div class="hero-actions">
+      <a href="#services" class="btn-primary">Explore Our World</a>
+      <a href="#about" class="btn-outline">Our Story</a>
+    </div>
+  </div>
+
+  <button class="hero-scroll" onclick="document.getElementById('strip').scrollIntoView({behavior:'smooth'})" aria-label="Scroll down">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+</section>
+
+<!-- ════════════════ STRIP ════════════════ -->
+<div id="strip" class="strip">
+  <div class="strip-inner">
+    <div class="strip-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Handcrafted with Care
+    </div>
+    <div class="strip-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      Women-Founded
+    </div>
+    <div class="strip-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Clean & Conscious
+    </div>
+    <div class="strip-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Delivered Worldwide
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ ABOUT ════════════════ -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-img-wrap reveal">
+      <div class="about-img-bg">
+        <span class="about-monogram">M</span>
+      </div>
+      <div class="about-badge">
+        <div class="badge-circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A0616A" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div>
+          <div class="badge-n">5,000+</div>
+          <div class="badge-l">Happy Clients</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal" style="transition-delay:0.15s">
+      <div class="section-label">Our Story</div>
+      <h2 class="about-h2">Built on a belief that <em>every woman deserves</em> to feel beautiful</h2>
+      <p class="about-p">Miranda was born from a simple truth: self-care is not a luxury — it's a language of self-love. We curate products, experiences and rituals that honour the woman you already are, while nurturing the one you're becoming.</p>
+      <p class="about-p">Every product in our collection is thoughtfully sourced, clean in formulation and beautiful in purpose. We believe what you put on your skin — and into your home — should be as intentional as the life you're building.</p>
+      <div class="about-sig">— Miranda, Founder</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ SERVICES ════════════════ -->
+<section id="services">
+  <div class="services-header reveal">
+    <div class="section-label" style="justify-content:center">What We Offer</div>
+    <h2 class="sec-h2">A world of <em>curated experiences</em></h2>
+    <p class="sec-p">From bespoke skincare to home wellness, every offering is designed to bring more beauty and intention into your everyday.</p>
+  </div>
+  <div class="services-grid">
+    <div class="svc-card reveal">
+      <div class="svc-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+        </svg>
+      </div>
+      <h3 class="svc-h3">Skincare Rituals</h3>
+      <p class="svc-p">Personalised routines built around your unique skin story. Clean, effective formulas that celebrate your natural glow.</p>
+      <a href="#cta" class="svc-link">Discover
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="svc-card reveal" style="transition-delay:0.1s">
+      <div class="svc-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <h3 class="svc-h3">Home Wellness</h3>
+      <p class="svc-p">Transform your space into a sanctuary. Curated scents, textures and rituals for a home that breathes with you.</p>
+      <a href="#cta" class="svc-link">Discover
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="svc-card reveal" style="transition-delay:0.2s">
+      <div class="svc-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+        </svg>
+      </div>
+      <h3 class="svc-h3">Wellness Coaching</h3>
+      <p class="svc-p">One-to-one sessions with our curated wellness advisors to design a self-care practice that truly fits your life.</p>
+      <a href="#cta" class="svc-link">Discover
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="svc-card reveal" style="transition-delay:0.3s">
+      <div class="svc-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>
+        </svg>
+      </div>
+      <h3 class="svc-h3">Gift Curation</h3>
+      <p class="svc-p">Bespoke gift boxes crafted for the women in your life — birthdays, celebrations, or simply to say "I see you."</p>
+      <a href="#cta" class="svc-link">Discover
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ GALLERY ════════════════ -->
+<section id="gallery">
+  <div class="gallery-header reveal">
+    <div class="section-label" style="justify-content:center">Our World</div>
+    <h2 class="sec-h2">Beauty in <em>every detail</em></h2>
+    <p class="sec-p">A glimpse into the Miranda aesthetic — soft, intentional, and always beautiful.</p>
+  </div>
+  <div class="gallery-grid reveal" style="max-width:1100px;margin:0 auto;">
+    <div class="g-item">
+      <span class="g-label">Skincare</span>
+      <div class="g-overlay"><span>View Collection</span></div>
+    </div>
+    <div class="g-item" style="background:linear-gradient(135deg,#E8D5B0,#F2E6DA)">
+      <span class="g-label">Home</span>
+      <div class="g-overlay"><span>Explore</span></div>
+    </div>
+    <div class="g-item">
+      <span class="g-label">Ritual</span>
+      <div class="g-overlay"><span>Discover</span></div>
+    </div>
+    <div class="g-item">
+      <span class="g-label">Gift</span>
+      <div class="g-overlay"><span>Shop Gifts</span></div>
+    </div>
+    <div class="g-item">
+      <span class="g-label">Wellness</span>
+      <div class="g-overlay"><span>Learn More</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ TESTIMONIALS ════════════════ -->
+<section id="testimonials">
+  <div class="testimonials-header reveal">
+    <div class="section-label" style="justify-content:center">Client Stories</div>
+    <h2 class="sec-h2">Words that <em>warm our hearts</em></h2>
+    <p class="sec-p">Real stories from the women who've made Miranda part of their daily rituals.</p>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Miranda changed the way I think about self-care. It's not just products — it's a whole philosophy of treating yourself with the same kindness you give others.</p>
+      <div class="testi-stars">
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <div class="testi-name">Sophia Andreou</div>
+      <div class="testi-role">Wellness Coach, Athens</div>
+    </div>
+    <div class="testi-card reveal" style="transition-delay:0.12s">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">I ordered a gift curation box for my sister's birthday and she cried — the packaging alone is a work of art. Miranda understands the art of gifting deeply.</p>
+      <div class="testi-stars">
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <div class="testi-name">Charlotte Meyers</div>
+      <div class="testi-role">Interior Designer, London</div>
+    </div>
+    <div class="testi-card reveal" style="transition-delay:0.24s">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">The skincare consultation transformed my entire routine. My skin has never looked better and — more importantly — I've never felt more confident in it.</p>
+      <div class="testi-stars">
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <div class="testi-name">Priya Nair</div>
+      <div class="testi-role">Entrepreneur, Singapore</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ CTA ════════════════ -->
+<section id="cta">
+  <div id="cta-content" style="position:relative;z-index:1;">
+    <p class="cta-eyebrow">Stay Connected</p>
+    <h2 class="cta-h2">Begin your <em>Miranda</em> journey today</h2>
+    <p class="cta-p">Join our community of women living with more beauty and intention. New rituals, stories and offers delivered to your inbox.</p>
+    <form class="cta-form" id="cta-form">
+      <input type="email" required placeholder="Your email address" class="cta-input" id="cta-email" aria-label="Email address" />
+      <button type="submit" class="cta-btn" id="cta-btn">Subscribe</button>
+    </form>
+  </div>
+  <div id="cta-success" style="display:none;position:relative;z-index:1;" class="cta-success">
+    <div class="cta-success-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h3>Welcome to Miranda</h3>
+    <p>You're on the list. Expect something beautiful in your inbox soon.</p>
+  </div>
+</section>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo"><em>Miranda</em></div>
+      <p class="footer-brand-p">A curated lifestyle brand for the modern woman — celebrating beauty in every detail, from skincare rituals to the spaces you inhabit.</p>
+      <div class="footer-social">
+        <!-- Instagram -->
+        <a href="#" class="social-btn" aria-label="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+        </a>
+        <!-- Pinterest -->
+        <a href="#" class="social-btn" aria-label="Pinterest">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.18-.77 1.22-5.17 1.22-5.17s-.31-.63-.31-1.56c0-1.46.85-2.55 1.9-2.55.9 0 1.33.67 1.33 1.48 0 .9-.58 2.25-.87 3.5-.25 1.05.52 1.9 1.55 1.9 1.86 0 3.1-2.4 3.1-5.24 0-2.16-1.45-3.77-4.07-3.77-2.96 0-4.8 2.21-4.8 4.67 0 .85.24 1.44.62 1.9.17.2.19.28.13.51-.04.17-.14.58-.18.74-.06.24-.24.32-.44.23-1.23-.5-1.8-1.86-1.8-3.38 0-2.51 2.12-5.52 6.33-5.52 3.39 0 5.62 2.46 5.62 5.1 0 3.5-1.94 6.12-4.8 6.12-.96 0-1.87-.52-2.18-1.1l-.6 2.31c-.2.75-.6 1.5-.96 2.08.72.22 1.48.34 2.27.34 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        </a>
+        <!-- TikTok -->
+        <a href="#" class="social-btn" aria-label="TikTok">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <h4 class="footer-h4">Explore</h4>
+      <ul class="footer-list">
+        <li><a href="#about">Our Story</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#testimonials">Client Stories</a></li>
+        <li><a href="#">Journal</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-h4">Services</h4>
+      <ul class="footer-list">
+        <li><a href="#">Skincare Rituals</a></li>
+        <li><a href="#">Home Wellness</a></li>
+        <li><a href="#">Wellness Coaching</a></li>
+        <li><a href="#">Gift Curation</a></li>
+        <li><a href="#">Private Events</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-h4">Contact</h4>
+      <ul class="footer-list">
+        <li style="display:flex;gap:8px;align-items:flex-start">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;margin-top:3px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <a href="mailto:hello@miranda.co">hello@miranda.co</a>
+        </li>
+        <li style="display:flex;gap:8px;align-items:flex-start">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;margin-top:3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Worldwide</span>
+        </li>
+        <li style="margin-top:16px">
+          <a href="#cta" style="display:inline-block;background:var(--rose);color:white;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:10px 22px;border-radius:50px;transition:all 200ms ease;"
+            onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+            Get in Touch
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© <span id="yr"></span> Miranda. All rights reserved.</p>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Year
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Navbar scroll
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20));
+
+  // Hamburger
+  const hamBtn = document.getElementById('ham-btn');
+  const drawer = document.getElementById('drawer');
+  hamBtn.addEventListener('click', () => {
+    const open = drawer.classList.toggle('open');
+    hamBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  });
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => drawer.classList.remove('open')));
+
+  // CTA form
+  document.getElementById('cta-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('cta-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="spinning" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
+    setTimeout(() => {
+      document.getElementById('cta-content').style.display = 'none';
+      document.getElementById('cta-success').style.display = 'block';
+    }, 1000);
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => io.observe(el));
+
+  // Smooth scroll for hero-scroll button
+  document.querySelector('.hero-scroll')?.addEventListener('click', () =>
+    document.getElementById('strip').scrollIntoView({ behavior: 'smooth' })
+  );
+</script>
+</body>
+</html>
