@@ -3,71 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CARNAGE — Active & Lifestyle Wear</title>
+<title>CARNAGE® | Active & Lifestyle Wear for Men & Women</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#0A0A0B;--carbon:#131316;--smoke:#1C1C21;--bone:#F2F0EB;--ash:#8E8E96;
-  --blood:#E2201C;--blood-deep:#8E120F;
-  --bg:var(--ink);--fg:var(--bone);--sub:var(--ash);--card:var(--carbon);--line:rgba(242,240,235,.1);
+  --ink:#0A0A0B;--carbon:#131316;--bone:#F2F0EB;--ash:#8E8E96;
+  --blood:#E2201C;
+  /* store (light) tokens — the shop half of the page reads like the real incarnage.com */
+  --store-bg:#FFFFFF;--store-soft:#F5F4F1;--store-ink:#111113;--store-sub:#6B6B70;--store-line:#E6E4DF;--sale:#D42B20;
   --font-d:'Anton',sans-serif;--font-b:'Archivo',sans-serif;--font-m:'Space Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--font-b);overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased}
-::selection{background:var(--blood);color:var(--bone)}
-h1,h2,h3{font-family:var(--font-d);font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:.01em}
+body{background:var(--ink);color:var(--bone);font-family:var(--font-b);overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased}
+::selection{background:var(--blood);color:#fff}
+h1,h2,h3{font-family:var(--font-d);font-weight:400;text-transform:uppercase;line-height:.94;letter-spacing:.01em}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
-.mono{font-family:var(--font-m);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sub)}
+.mono{font-family:var(--font-m);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase}
 
+/* ---------- loader ---------- */
 #loader{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;transition:opacity .8s cubic-bezier(.77,0,.18,1),visibility .8s}
 #loader.done{opacity:0;visibility:hidden}
 #loader .word{font-family:var(--font-d);font-size:clamp(2.6rem,8vw,6rem);text-transform:uppercase;overflow:hidden;height:1.05em;display:flex}
 #loader .word span{display:inline-block;transform:translateY(110%);animation:riseUp .9s cubic-bezier(.16,1,.3,1) forwards}
 @keyframes riseUp{to{transform:translateY(0)}}
-#loadbar{width:min(280px,60vw);height:2px;background:var(--line);position:relative;overflow:hidden}
+#loadbar{width:min(280px,60vw);height:2px;background:rgba(242,240,235,.12);position:relative;overflow:hidden}
 #loadbar i{position:absolute;inset:0;background:var(--blood);transform-origin:left;transform:scaleX(0);transition:transform .3s ease}
-#loadpct{font-family:var(--font-m);font-size:.7rem;letter-spacing:.2em;color:var(--sub)}
+#loadpct{font-family:var(--font-m);font-size:.7rem;letter-spacing:.2em;color:var(--ash)}
 
 #gl{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-#cursor{position:fixed;width:14px;height:14px;border:1px solid var(--bone);border-radius:50%;pointer-events:none;z-index:9000;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s;mix-blend-mode:difference}
+#cursor{position:fixed;width:14px;height:14px;border:1px solid #fff;border-radius:50%;pointer-events:none;z-index:9000;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s;mix-blend-mode:difference}
 #cursor.hot{width:56px;height:56px;background:rgba(226,32,28,.25);border-color:var(--blood)}
 @media(pointer:coarse){#cursor{display:none}}
 
-nav{position:fixed;top:0;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:1.1rem clamp(1.2rem,4vw,3rem);mix-blend-mode:difference}
-.logo{font-family:var(--font-d);font-size:1.35rem;letter-spacing:.06em;color:#fff}
+/* ---------- announcement bar (like the real store) ---------- */
+#annc{position:fixed;top:0;left:0;right:0;z-index:950;background:var(--blood);color:#fff;overflow:hidden;white-space:nowrap;padding:.42rem 0}
+#annc .track{display:inline-flex;gap:3rem;animation:mq 22s linear infinite}
+#annc span{font-family:var(--font-m);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;display:inline-flex;gap:3rem}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ---------- store nav ---------- */
+nav{position:fixed;top:1.55rem;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:.85rem clamp(1.2rem,4vw,3rem);transition:background .4s,box-shadow .4s;color:#fff;mix-blend-mode:difference}
+.logo{font-family:var(--font-d);font-size:1.45rem;letter-spacing:.06em}
 .logo em{color:var(--blood);font-style:normal}
-.nav-links{display:flex;gap:2rem;align-items:center}
-.nav-links a{font-family:var(--font-m);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:#fff;position:relative;padding:.3rem 0}
-.nav-links a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:#fff;transform:scaleX(0);transform-origin:right;transition:transform .4s cubic-bezier(.77,0,.18,1)}
+.nav-links{display:flex;gap:1.8rem;align-items:center}
+.nav-links a{font-family:var(--font-b);font-weight:700;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;position:relative;padding:.3rem 0}
+.nav-links a.sale{color:#ff6c64}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .35s cubic-bezier(.77,0,.18,1)}
 .nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
-.cart-btn{font-family:var(--font-m);font-size:.68rem;letter-spacing:.2em;color:#fff;border:1px solid rgba(255,255,255,.4);padding:.55rem 1.1rem;border-radius:99px;cursor:pointer;background:none;transition:background .3s,color .3s}
-.cart-btn:hover{background:#fff;color:#000}
-@media(max-width:760px){.nav-links{display:none}}
+.nav-right{display:flex;gap:1.1rem;align-items:center}
+.icon-btn{background:none;border:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:.45rem;font-family:var(--font-m);font-size:.66rem;letter-spacing:.14em}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6}
+@media(max-width:820px){.nav-links{display:none}}
 
 #scroll-wrap{position:fixed;top:0;left:0;width:100%;will-change:transform;z-index:1}
 #spacer{width:1px}
 
+/* ---------- story overlay ---------- */
 #story-ui{position:fixed;inset:0;z-index:5;pointer-events:none}
-.story-title{position:absolute;left:clamp(1.2rem,4vw,3rem);bottom:7vh;font-size:clamp(3.4rem,13vw,12rem);letter-spacing:-.005em;mix-blend-mode:difference}
+.story-title{position:absolute;left:clamp(1.2rem,4vw,3rem);bottom:9vh;font-size:clamp(3.2rem,12.5vw,11.5rem);letter-spacing:-.005em;mix-blend-mode:difference}
 .story-title .line{display:block;overflow:hidden}
 .story-title .line span{display:inline-block;transform:translateY(115%);transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
 body.ready .story-title .line span{transform:translateY(0)}
 .story-title .line:nth-child(2) span{transition-delay:.1s;color:transparent;-webkit-text-stroke:1.5px #fff}
-.story-hint{position:absolute;right:clamp(1.2rem,4vw,3rem);bottom:7vh;writing-mode:vertical-rl;font-family:var(--font-m);font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:.8rem}
+.story-sub{position:absolute;left:clamp(1.2rem,4vw,3rem);bottom:4.2vh;font-family:var(--font-m);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ash)}
+.story-hint{position:absolute;right:clamp(1.2rem,4vw,3rem);bottom:7vh;writing-mode:vertical-rl;font-family:var(--font-m);font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ash);display:flex;align-items:center;gap:.8rem}
 .story-hint::after{content:"";width:1px;height:56px;background:linear-gradient(var(--blood),transparent);animation:drip 2s ease-in-out infinite}
 @keyframes drip{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 
-.stage{position:absolute;left:clamp(1.2rem,4vw,3rem);top:50%;transform:translateY(-40%);opacity:0;transition:opacity .5s ease,transform .5s cubic-bezier(.16,1,.3,1);max-width:min(360px,80vw)}
+.stage{position:absolute;left:clamp(1.2rem,4vw,3rem);top:50%;transform:translateY(-40%);opacity:0;transition:opacity .5s ease,transform .5s cubic-bezier(.16,1,.3,1);max-width:min(380px,80vw)}
 .stage.on{opacity:1;transform:translateY(-50%)}
 .stage .idx{font-family:var(--font-m);font-size:.66rem;letter-spacing:.24em;color:var(--blood);display:block;margin-bottom:.7rem}
-.stage h3{font-size:clamp(2.2rem,5.5vw,4.2rem);margin-bottom:.8rem}
-.stage p{color:var(--sub);font-size:.9rem;max-width:30ch}
-.stage .pr{font-family:var(--font-m);font-size:.9rem;color:var(--bone);display:block;margin-top:1rem}
-.stage .pr s{color:var(--sub);margin-right:.5rem}
+.stage h3{font-size:clamp(2rem,5vw,3.8rem);margin-bottom:.8rem;color:var(--bone)}
+.stage p{color:var(--ash);font-size:.9rem;max-width:30ch}
+.stage .pr{font-family:var(--font-b);font-weight:800;font-size:1.05rem;color:var(--bone);display:block;margin-top:1rem}
+.stage .pr s{color:var(--ash);font-weight:400;margin-right:.5rem}
+.stage .pr .off{color:#ff6c64;font-size:.75rem;font-weight:700;margin-left:.5rem}
+.stage .atc{pointer-events:auto;display:inline-block;margin-top:1.1rem;background:var(--bone);color:var(--ink);font-family:var(--font-b);font-weight:800;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;padding:.8rem 1.7rem;border:none;cursor:pointer;transition:background .3s,color .3s}
+.stage .atc:hover{background:var(--blood);color:#fff}
 .stage-right{left:auto;right:clamp(1.2rem,4vw,3rem);text-align:right}
 .stage-right p{margin-left:auto}
 
@@ -76,113 +92,92 @@ body.ready .story-title .line span{transform:translateY(0)}
 #dots i.on{background:var(--blood);border-color:var(--blood);transform:scale(1.35)}
 @media(max-width:760px){#dots{display:none}}
 
-#chip{position:absolute;left:50%;bottom:7vh;transform:translateX(-50%);display:flex;align-items:center;gap:.7rem;font-family:var(--font-m);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sub);opacity:0;transition:opacity .5s}
+#chip{position:absolute;left:50%;bottom:7vh;transform:translateX(-50%);display:flex;align-items:center;gap:.7rem;font-family:var(--font-m);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);opacity:0;transition:opacity .5s}
 #chip.on{opacity:1}
-#chip b{width:14px;height:14px;border-radius:50%;border:1px solid var(--line);display:block;transition:background .6s}
+#chip b{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.3);display:block;transition:background .6s}
 
-.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.1rem 0;overflow:hidden;white-space:nowrap;background:var(--bg)}
-.marquee-track{display:inline-flex;gap:3.2rem;animation:mq 26s linear infinite;will-change:transform}
-.marquee-track span{font-family:var(--font-d);font-size:1.15rem;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);display:inline-flex;align-items:center;gap:3.2rem}
-.marquee-track span i{width:7px;height:7px;background:var(--blood);border-radius:50%;font-style:normal}
-@keyframes mq{to{transform:translateX(-50%)}}
-
-section{position:relative;padding:clamp(5rem,12vh,9rem) clamp(1.2rem,4vw,3rem);background:var(--bg)}
-.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:3.5rem;flex-wrap:wrap}
-.sec-head h2{font-size:clamp(2.6rem,7vw,5.5rem)}
-.sec-head h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1px var(--bone)}
-.counter{font-family:var(--font-m);font-size:.72rem;color:var(--sub);letter-spacing:.18em}
-
-.rv{opacity:0;transform:translateY(46px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+/* ================= STORE (light, like incarnage.com) ================= */
+.store{background:var(--store-bg);color:var(--store-ink)}
+.store section{padding:clamp(3.6rem,8vh,6rem) clamp(1.2rem,4vw,3rem);background:var(--store-bg)}
+.store .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:2.4rem;flex-wrap:wrap}
+.store .sec-head h2{font-size:clamp(1.9rem,4.6vw,3.4rem);color:var(--store-ink)}
+.store .sec-head a{font-family:var(--font-b);font-weight:700;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-bottom:2px solid var(--store-ink);padding-bottom:.2rem}
+.rv{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
 .rv.on{opacity:1;transform:none}
 
-.manifesto{max-width:1100px}
-.manifesto h2{font-family:var(--font-b);font-weight:600;text-transform:none;font-size:clamp(1.6rem,3.6vw,2.9rem);line-height:1.28;letter-spacing:-.01em}
-.manifesto h2 .dim{color:var(--sub)}
-.manifesto h2 .red{color:var(--blood)}
-.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:4rem}
-.stat{background:var(--bg);padding:2rem 1.6rem}
-.stat b{font-family:var(--font-d);font-size:clamp(2rem,4.5vw,3.4rem);display:block;font-weight:400}
-.stat b i{color:var(--blood);font-style:normal}
-.stat span{font-family:var(--font-m);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sub)}
+/* trust bar */
+.trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--store-line);border-top:1px solid var(--store-line);border-bottom:1px solid var(--store-line)}
+.trust div{background:var(--store-soft);padding:1.2rem 1.4rem;text-align:center}
+.trust b{display:block;font-family:var(--font-b);font-weight:800;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase}
+.trust span{font-size:.78rem;color:var(--store-sub)}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.4rem}
-.card{background:var(--card);border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;position:relative;transition:transform .5s cubic-bezier(.16,1,.3,1),border-color .4s}
-.card:hover{transform:translateY(-6px);border-color:rgba(226,32,28,.5)}
-.card-visual{aspect-ratio:4/4.6;position:relative;overflow:hidden;background:#101014}
-.card-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.25) contrast(1.08);transition:transform .8s cubic-bezier(.16,1,.3,1),filter .5s}
-.card:hover .card-visual img{transform:scale(1.06);filter:grayscale(0) contrast(1.05)}
-.card-visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(10,10,11,.55));pointer-events:none}
-.card-badge{position:absolute;top:.9rem;left:.9rem;font-family:var(--font-m);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;background:var(--blood);color:#fff;padding:.32rem .7rem;border-radius:2px;z-index:3}
-.card-info{padding:1.1rem 1.2rem 1.3rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
-.card-info h3{font-family:var(--font-b);font-weight:600;text-transform:none;font-size:1rem;line-height:1.3}
-.card-info small{display:block;color:var(--sub);font-size:.78rem;margin-top:.25rem;font-weight:400}
-.price{font-family:var(--font-m);font-size:.82rem;white-space:nowrap;font-variant-numeric:tabular-nums}
-.price s{color:var(--sub);margin-right:.4rem}
-.card-cta{position:absolute;inset:auto 0 0 0;background:var(--bone);color:var(--ink);font-family:var(--font-m);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;text-align:center;padding:.85rem;transform:translateY(100%);transition:transform .45s cubic-bezier(.16,1,.3,1);z-index:3}
-.card:hover .card-cta{transform:none}
+/* product grid — shopify-style cards */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.6rem 1.2rem}
+.pcard{cursor:pointer;position:relative}
+.pcard .ph{position:relative;aspect-ratio:3/3.8;overflow:hidden;background:var(--store-soft);border-radius:2px}
+.pcard .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.16,1,.3,1)}
+.pcard:hover .ph img{transform:scale(1.05)}
+.pcard .badge{position:absolute;top:.7rem;left:.7rem;font-family:var(--font-b);font-weight:800;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .6rem;z-index:2;background:var(--store-ink);color:#fff}
+.pcard .badge.sale{background:var(--sale)}
+.pcard .quick{position:absolute;left:.7rem;right:.7rem;bottom:.7rem;background:#fff;color:var(--store-ink);font-family:var(--font-b);font-weight:800;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;text-align:center;padding:.8rem;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;z-index:2;box-shadow:0 6px 24px rgba(0,0,0,.14)}
+.pcard:hover .quick{opacity:1;transform:none}
+.pcard .nm{margin-top:.8rem;font-weight:600;font-size:.92rem;line-height:1.35}
+.pcard .ct{font-size:.76rem;color:var(--store-sub)}
+.pcard .prc{margin-top:.25rem;font-weight:800;font-size:.9rem;font-variant-numeric:tabular-nums}
+.pcard .prc s{color:var(--store-sub);font-weight:400;margin-right:.45rem}
+.pcard .prc .now{color:var(--sale)}
+/* color swatches on card */
+.sw{display:flex;gap:.4rem;margin-top:.45rem}
+.sw i{width:12px;height:12px;border-radius:50%;border:1px solid var(--store-line)}
 
-.split{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
-@media(max-width:860px){.split{grid-template-columns:1fr}}
-.coll{position:relative;border-radius:4px;overflow:hidden;min-height:560px;display:flex;align-items:flex-end;padding:2.4rem;border:1px solid var(--line);cursor:pointer}
-.coll img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.3) contrast(1.1);transition:transform 1s cubic-bezier(.16,1,.3,1),filter .6s}
-.coll:hover img{transform:scale(1.05);filter:grayscale(0) contrast(1.05)}
-.coll::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.1) 30%,rgba(10,10,11,.92));pointer-events:none}
-.coll .ghost{position:absolute;top:50%;left:50%;transform:translate(-50%,-56%);font-family:var(--font-d);font-size:26rem;line-height:1;color:transparent;-webkit-text-stroke:1.5px rgba(242,240,235,.22);pointer-events:none;z-index:1;mix-blend-mode:screen}
-.coll-txt{position:relative;z-index:2}
-.coll-txt h3{font-size:clamp(2.4rem,5vw,4rem)}
-.coll-txt .mono{margin-bottom:.6rem;display:block}
-.coll-link{display:inline-flex;align-items:center;gap:.6rem;margin-top:1.2rem;font-family:var(--font-m);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bone)}
-.coll-link i{font-style:normal;transition:transform .4s}
-.coll:hover .coll-link i{transform:translateX(6px)}
+/* collection banners */
+.collrow{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:860px){.collrow{grid-template-columns:1fr}}
+.collbn{position:relative;border-radius:2px;overflow:hidden;min-height:480px;display:flex;align-items:flex-end;padding:2rem;cursor:pointer}
+.collbn img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1s cubic-bezier(.16,1,.3,1)}
+.collbn:hover img{transform:scale(1.05)}
+.collbn::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.66))}
+.collbn>div{position:relative;z-index:2;color:#fff}
+.collbn h3{font-size:clamp(2rem,4.4vw,3.2rem)}
+.collbn .shopnow{display:inline-block;margin-top:.9rem;background:#fff;color:#111;font-weight:800;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;padding:.75rem 1.5rem}
+.collbn:hover .shopnow{background:var(--blood);color:#fff}
 
-.pack-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1rem}
+/* sale banner */
+.salebn{background:var(--store-ink);color:#fff;text-align:center;padding:clamp(3.6rem,9vh,6.5rem) clamp(1.2rem,4vw,3rem)!important;position:relative;overflow:hidden}
+.salebn h2{font-size:clamp(2.6rem,8vw,6.5rem);color:#fff}
+.salebn h2 em{font-style:normal;color:var(--blood)}
+.salebn p{color:#b9b9c0;margin:.9rem auto 1.8rem;max-width:44ch}
+.salebn .shopnow{display:inline-block;background:var(--blood);color:#fff;font-weight:800;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;padding:1rem 2.4rem;transition:background .3s}
+.salebn .shopnow:hover{background:#fff;color:#111}
+.salebn .ghostword{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-d);font-size:clamp(8rem,26vw,22rem);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.07);white-space:nowrap;pointer-events:none}
+
+/* lifestyle strip */
+.pack-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
 @media(max-width:900px){.pack-strip{grid-template-columns:repeat(2,1fr)}}
-.pack-item{position:relative;border-radius:4px;overflow:hidden;aspect-ratio:3/4;border:1px solid var(--line)}
-.pack-item img{width:100%;height:100%;object-fit:cover;filter:grayscale(.4) contrast(1.12);transition:transform .8s cubic-bezier(.16,1,.3,1),filter .5s}
-.pack-item:hover img{transform:scale(1.07);filter:grayscale(0)}
-.pack-item span{position:absolute;left:.9rem;bottom:.8rem;font-family:var(--font-m);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--bone);z-index:2;text-shadow:0 1px 8px rgba(0,0,0,.8)}
-.pack-item:nth-child(even){transform:translateY(2.2rem)}
-@media(max-width:900px){.pack-item:nth-child(even){transform:none}}
+.pack-item{position:relative;border-radius:2px;overflow:hidden;aspect-ratio:3/4;background:var(--store-soft)}
+.pack-item img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.pack-item:hover img{transform:scale(1.06)}
+.pack-item span{position:absolute;left:.9rem;bottom:.8rem;font-family:var(--font-m);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:#fff;z-index:2;text-shadow:0 1px 8px rgba(0,0,0,.8)}
 
-.tech-wrap{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-@media(max-width:900px){.tech-wrap{grid-template-columns:1fr}}
-.tech-photo{position:relative;border-radius:4px;overflow:hidden;border:1px solid var(--line);aspect-ratio:1}
-.tech-photo img{width:100%;height:100%;object-fit:cover;filter:contrast(1.1)}
-.tech-photo::after{content:"FABRIC MACRO — 40×";position:absolute;left:1rem;bottom:1rem;font-family:var(--font-m);font-size:.6rem;letter-spacing:.2em;color:var(--bone);text-shadow:0 1px 8px rgba(0,0,0,.9)}
-#fabric-zoom{position:absolute;inset:0;width:100%;height:100%}
-.tech-list{display:flex;flex-direction:column}
-.tech-item{padding:1.6rem 0;border-bottom:1px solid var(--line);display:flex;gap:1.6rem;align-items:baseline}
-.tech-item:first-child{border-top:1px solid var(--line)}
-.tech-item b{font-family:var(--font-m);font-size:.68rem;color:var(--blood);letter-spacing:.15em;min-width:3ch}
-.tech-item h3{font-family:var(--font-b);text-transform:none;font-weight:600;font-size:1.15rem;margin-bottom:.3rem}
-.tech-item p{color:var(--sub);font-size:.9rem;max-width:44ch}
+/* newsletter */
+.news{background:var(--store-soft);text-align:center}
+.news h2{font-size:clamp(1.8rem,4.4vw,3rem);color:var(--store-ink)}
+.news p{color:var(--store-sub);max-width:46ch;margin:.8rem auto 1.8rem}
+.news form{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap}
+.news input{padding:1rem 1.2rem;border:1px solid var(--store-line);background:#fff;font-family:var(--font-b);font-size:.9rem;min-width:min(320px,72vw);outline:none}
+.news input:focus{border-color:var(--store-ink)}
+.news button{background:var(--store-ink);color:#fff;border:none;font-family:var(--font-b);font-weight:800;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;padding:1rem 2rem;cursor:pointer;transition:background .3s}
+.news button:hover{background:var(--blood)}
 
-.statement{text-align:center;padding-top:clamp(7rem,16vh,12rem);padding-bottom:clamp(7rem,16vh,12rem);position:relative;overflow:hidden}
-.statement h2{font-size:clamp(3rem,11vw,10rem);position:relative;z-index:2}
-.statement h2 .fill{color:var(--blood)}
-.statement h2 .stroke{color:transparent;-webkit-text-stroke:1.5px var(--bone)}
-.statement p{color:var(--sub);max-width:46ch;margin:2rem auto 0;position:relative;z-index:2}
-.statement img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.18;filter:grayscale(1) contrast(1.3)}
-
-.cta-band{border-top:1px solid var(--line);text-align:center}
-.cta-band h2{font-size:clamp(2.6rem,7vw,5.8rem);margin-bottom:1.4rem}
-.cta-band p{color:var(--sub);max-width:44ch;margin:0 auto 2.4rem}
-.btn{display:inline-flex;align-items:center;gap:.8rem;background:var(--blood);color:#fff;font-family:var(--font-m);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;padding:1.15rem 2.6rem;border-radius:99px;border:none;cursor:pointer;position:relative;overflow:hidden;transition:transform .3s}
-.btn::before{content:"";position:absolute;inset:0;background:var(--bone);transform:translateY(101%);transition:transform .45s cubic-bezier(.16,1,.3,1);border-radius:99px}
-.btn:hover::before{transform:none}
-.btn span{position:relative;z-index:1;transition:color .3s}
-.btn:hover span{color:var(--ink)}
-.btn:active{transform:scale(.96)}
-
-footer{border-top:1px solid var(--line);padding:3.5rem clamp(1.2rem,4vw,3rem) 2rem;background:var(--bg);position:relative;z-index:1}
+footer{background:var(--store-ink);color:#fff;padding:3.5rem clamp(1.2rem,4vw,3rem) 2rem}
 .foot-grid{display:flex;justify-content:space-between;gap:3rem;flex-wrap:wrap;margin-bottom:3rem}
-.foot-grid .logo{font-size:2rem}
+.foot-grid .logo{font-size:2rem;color:#fff}
 .foot-col{display:flex;flex-direction:column;gap:.7rem}
-.foot-col b{font-family:var(--font-m);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sub);margin-bottom:.4rem}
-.foot-col a{font-size:.9rem;color:var(--fg);opacity:.8;transition:opacity .3s,color .3s}
-.foot-col a:hover{opacity:1;color:var(--blood)}
-.foot-base{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:1.6rem}
-.foot-base span{font-family:var(--font-m);font-size:.62rem;letter-spacing:.15em;color:var(--sub);text-transform:uppercase}
+.foot-col b{font-family:var(--font-m);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#8e8e96;margin-bottom:.4rem}
+.foot-col a{font-size:.9rem;opacity:.85;transition:opacity .3s,color .3s}
+.foot-col a:hover{opacity:1;color:#ff6c64}
+.foot-base{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.12);padding-top:1.6rem}
+.foot-base span{font-family:var(--font-m);font-size:.62rem;letter-spacing:.15em;color:#8e8e96;text-transform:uppercase}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
@@ -192,7 +187,7 @@ footer{border-top:1px solid var(--line);padding:3.5rem clamp(1.2rem,4vw,3rem) 2r
 <body>
 
 <div id="loader">
-  <div class="word"><span>CARNAGE<em style="color:var(--blood);font-style:normal">.</em></span></div>
+  <div class="word"><span>CARNAGE<em style="color:var(--blood);font-style:normal">®</em></span></div>
   <div id="loadbar"><i></i></div>
   <div id="loadpct">00</div>
 </div>
@@ -200,47 +195,63 @@ footer{border-top:1px solid var(--line);padding:3.5rem clamp(1.2rem,4vw,3rem) 2r
 <canvas id="gl"></canvas>
 <div id="cursor"></div>
 
-<nav>
-  <a class="logo" href="#top">CARNAGE<em>.</em></a>
-  <div class="nav-links">
-    <a href="#shop" data-hot>Shop</a>
-    <a href="#men" data-hot>Men</a>
-    <a href="#women" data-hot>Women</a>
-    <a href="#tech" data-hot>Fabric Tech</a>
+<div id="annc" aria-hidden="true">
+  <div class="track">
+    <span>Island-wide delivery in 2–3 days ★ Easy 14-day exchanges ★ Shop the sale — up to 60% off ★ Sri Lanka's #1 active &amp; lifestyle brand ★</span>
+    <span>Island-wide delivery in 2–3 days ★ Easy 14-day exchanges ★ Shop the sale — up to 60% off ★ Sri Lanka's #1 active &amp; lifestyle brand ★</span>
   </div>
-  <button class="cart-btn" data-hot>Cart — 0</button>
+</div>
+
+<nav id="mainnav">
+  <div class="nav-links">
+    <a href="#new" data-hot>New + Restocks</a>
+    <a href="#mens" data-hot>Mens</a>
+    <a href="#womens" data-hot>Womens</a>
+    <a href="#sale" class="sale" data-hot>Sale</a>
+  </div>
+  <a class="logo" href="#top" style="position:absolute;left:50%;transform:translateX(-50%)">CARNAGE<em>®</em></a>
+  <div class="nav-right">
+    <button class="icon-btn" data-hot aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+    <button class="icon-btn" data-hot aria-label="Account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></button>
+    <button class="icon-btn" data-hot aria-label="Cart"><svg viewBox="0 0 24 24"><path d="M6 7h12l-1.2 12H7.2L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><span>(0)</span></button>
+  </div>
 </nav>
 
 <div id="story-ui">
   <h1 class="story-title" id="storyTitle">
-    <span class="line"><span>BUILT FOR</span></span>
-    <span class="line"><span>CARNAGE</span></span>
+    <span class="line"><span>ESSENTIAL</span></span>
+    <span class="line"><span>OVERSIZED TEE</span></span>
   </h1>
+  <div class="story-sub" id="storySub">SS26 drop — 4 colorways · DryCore cotton · Rs 4,490.00</div>
   <div class="story-hint" id="storyHint">Scroll</div>
 
   <div class="stage stage-right" data-stage="1">
     <span class="idx">Colorway 01 / 04</span>
-    <h3>Onyx<br>Tee</h3>
-    <p>DryCore training tee with the chest mark. The uniform of the 5AM pack.</p>
-    <span class="pr">LKR 4,950</span>
+    <h3>Essential Oversized Tee<br>— Onyx</h3>
+    <p>Heavy 240gsm DryCore cotton. Drop shoulder, boxy cut. The uniform of the 5AM pack.</p>
+    <span class="pr">Rs 4,490.00</span>
+    <button class="atc" data-hot>Add to cart</button>
   </div>
   <div class="stage" data-stage="2">
     <span class="idx">Colorway 02 / 04</span>
-    <h3>Blood<br>Tee</h3>
-    <p>For the ones who leave everything on the floor. 4-way FlexKnit.</p>
-    <span class="pr">LKR 5,450</span>
+    <h3>Essential Oversized Tee<br>— Blood</h3>
+    <p>For the ones who leave everything on the floor. Pre-shrunk, bio-washed.</p>
+    <span class="pr">Rs 4,490.00</span>
+    <button class="atc" data-hot>Add to cart</button>
   </div>
   <div class="stage stage-right" data-stage="3">
     <span class="idx">Colorway 03 / 04</span>
-    <h3>Bone<br>Tee</h3>
-    <p>Off-white heat-reflective knit for street miles under the sun.</p>
-    <span class="pr"><s>LKR 6,900</s>LKR 4,450</span>
+    <h3>Essential Oversized Tee<br>— Bone</h3>
+    <p>Off-white heat-reflective knit for street miles under the Colombo sun.</p>
+    <span class="pr"><s>Rs 5,990.00</s>Rs 3,590.00<span class="off">SAVE 40%</span></span>
+    <button class="atc" data-hot>Add to cart</button>
   </div>
   <div class="stage" data-stage="4">
     <span class="idx">Colorway 04 / 04</span>
-    <h3>Jungle<br>Tee</h3>
-    <p>Deep moss knit. Limited SS26 — 300 units only.</p>
-    <span class="pr">LKR 6,950</span>
+    <h3>Essential Oversized Tee<br>— Jungle</h3>
+    <p>Deep moss knit. Limited SS26 run — 300 units only.</p>
+    <span class="pr">Rs 4,990.00</span>
+    <button class="atc" data-hot>Add to cart</button>
   </div>
 
   <div id="dots"><i class="on"></i><i></i><i></i><i></i></div>
@@ -250,122 +261,94 @@ footer{border-top:1px solid var(--line);padding:3.5rem clamp(1.2rem,4vw,3rem) 2r
 <div id="scroll-wrap">
 <main id="top">
 
-  <div id="story-space" style="height:480vh" aria-hidden="true"></div>
+  <div id="story-space" style="height:480vh;background:transparent" aria-hidden="true"></div>
 
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>Train Hard <i></i> Live Loud <i></i> Oversized Tees <i></i> Seamless Leggings <i></i> Premium Joggers <i></i> Lifting Gear <i></i></span>
-      <span>Train Hard <i></i> Live Loud <i></i> Oversized Tees <i></i> Seamless Leggings <i></i> Premium Joggers <i></i> Lifting Gear <i></i></span>
-    </div>
-  </div>
+  <!-- ============ STORE ============ -->
+  <div class="store">
 
-  <section class="manifesto" id="about">
-    <span class="mono rv">( 01 — The brand )</span>
-    <h2 class="rv" style="margin-top:1.6rem">We don't make gym clothes. <span class="dim">We build a second skin for people who</span> <span class="red">show up every day</span> <span class="dim">— on the floor, on the street, in the grind.</span></h2>
-    <div class="stat-row rv">
-      <div class="stat"><b>#<i>1</i></b><span>Active brand · Sri Lanka</span></div>
-      <div class="stat"><b>250<i>K+</i></b><span>Athletes wearing Carnage</span></div>
-      <div class="stat"><b>4<i>-way</i></b><span>Stretch fabric engineering</span></div>
-      <div class="stat"><b>72<i>hr</i></b><span>Island-wide delivery</span></div>
+    <div class="trust">
+      <div><b>Island-wide delivery</b><span>2–3 working days</span></div>
+      <div><b>Easy exchanges</b><span>14-day no-question swaps</span></div>
+      <div><b>Cash on delivery</b><span>Pay when it arrives</span></div>
+      <div><b>250K+ athletes</b><span>Sri Lanka's #1 active brand</span></div>
     </div>
-  </section>
 
-  <section id="shop">
-    <div class="sec-head rv">
-      <h2>The <em>Drop</em></h2>
-      <span class="counter">( 02 — SS26 / 06 pieces )</span>
-    </div>
-    <div class="grid" id="prodgrid"></div>
-  </section>
+    <section id="new">
+      <div class="sec-head rv">
+        <h2>New Collection + Restocks</h2>
+        <a href="#" data-hot>View all</a>
+      </div>
+      <div class="pgrid" id="newgrid"></div>
+    </section>
 
-  <section id="men">
-    <div class="sec-head rv">
-      <h2>Shop by <em>Body</em></h2>
-      <span class="counter">( 03 — Collections )</span>
-    </div>
-    <div class="split rv">
-      <a class="coll" data-hot>
-        <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=75" alt="Man training in Carnage activewear" loading="lazy" onerror="this.style.display='none'">
-        <span class="ghost">M</span>
-        <div class="coll-txt">
-          <span class="mono">28 pieces</span>
-          <h3>Men's</h3>
-          <span class="coll-link">Explore collection <i>→</i></span>
+    <section id="mens" style="padding-top:0">
+      <div class="collrow rv">
+        <a class="collbn" data-hot>
+          <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=75" alt="Men's activewear" loading="lazy" onerror="this.style.display='none';this.parentElement.style.background='#17171B'">
+          <div><span class="mono">Training · Muscle · Oversize</span><h3>Men's Wear</h3><span class="shopnow">Shop now</span></div>
+        </a>
+        <a class="collbn" data-hot id="womens">
+          <img src="https://images.unsplash.com/photo-1518310383802-640c2de311b2?auto=format&fit=crop&w=900&q=75" alt="Women's activewear" loading="lazy" onerror="this.style.display='none';this.parentElement.style.background='#17171B'">
+          <div><span class="mono">Leggings · Bras · Oversize</span><h3>Women's Wear</h3><span class="shopnow">Shop now</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="salebn" id="sale">
+      <span class="ghostword">SALE SALE</span>
+      <h2 class="rv">Shop the sale — <em>up to 60% off</em></h2>
+      <p class="rv">End-of-season clearance across tees, joggers, leggings and lifting gear. While stocks last.</p>
+      <a class="shopnow rv" data-hot>Shop the sale</a>
+    </section>
+
+    <section id="bestsellers">
+      <div class="sec-head rv">
+        <h2>Best Sellers</h2>
+        <a href="#" data-hot>View all</a>
+      </div>
+      <div class="pgrid" id="bestgrid"></div>
+    </section>
+
+    <section id="pack" style="padding-top:0">
+      <div class="sec-head rv">
+        <h2>#TeamCarnage</h2>
+        <a href="#" data-hot>@carnagelifestyle</a>
+      </div>
+      <div class="pack-strip rv">
+        <div class="pack-item"><img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=600&q=75" alt="Athlete in hoodie" loading="lazy" onerror="this.parentElement.style.background='#E6E4DF'"><span>Colombo — 05:40 AM</span></div>
+        <div class="pack-item"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=75" alt="Kettlebell training" loading="lazy" onerror="this.parentElement.style.background='#E6E4DF'"><span>Iron work</span></div>
+        <div class="pack-item"><img src="https://images.unsplash.com/photo-1599058917765-a780eda07a3e?auto=format&fit=crop&w=600&q=75" alt="Battle ropes" loading="lazy" onerror="this.parentElement.style.background='#E6E4DF'"><span>No mercy sets</span></div>
+        <div class="pack-item"><img src="https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&w=600&q=75" alt="Runner at dusk" loading="lazy" onerror="this.parentElement.style.background='#E6E4DF'"><span>Street miles</span></div>
+      </div>
+    </section>
+
+    <section class="news">
+      <h2 class="rv">Join the pack</h2>
+      <p class="rv">New drops sell out in hours. Get 24-hour early access and exclusive member pricing.</p>
+      <form class="rv" onsubmit="event.preventDefault();this.querySelector('button').textContent='Subscribed ✓'">
+        <input type="email" placeholder="Email address" aria-label="Email address" required>
+        <button type="submit" data-hot>Sign up</button>
+      </form>
+    </section>
+
+    <footer>
+      <div class="foot-grid">
+        <div>
+          <a class="logo" href="#top">CARNAGE<em>®</em></a>
+          <p style="color:#b9b9c0;font-size:.85rem;max-width:30ch;margin-top:1rem">Active &amp; lifestyle wear for men and women. Made to be beaten up.</p>
         </div>
-      </a>
-      <a class="coll" data-hot id="women">
-        <img src="https://images.unsplash.com/photo-1518310383802-640c2de311b2?auto=format&fit=crop&w=900&q=75" alt="Woman training in Carnage activewear" loading="lazy" onerror="this.style.display='none'">
-        <span class="ghost">W</span>
-        <div class="coll-txt">
-          <span class="mono">34 pieces</span>
-          <h3>Women's</h3>
-          <span class="coll-link">Explore collection <i>→</i></span>
-        </div>
-      </a>
-    </div>
-  </section>
-
-  <section id="pack">
-    <div class="sec-head rv">
-      <h2>The <em>Pack</em></h2>
-      <span class="counter">( 04 — Community )</span>
-    </div>
-    <div class="pack-strip rv">
-      <div class="pack-item"><img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=600&q=75" alt="Athlete in hoodie" loading="lazy" onerror="this.parentElement.style.background='#17171B'"><span>Colombo — 05:40 AM</span></div>
-      <div class="pack-item"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=75" alt="Kettlebell training" loading="lazy" onerror="this.parentElement.style.background='#17171B'"><span>Iron work</span></div>
-      <div class="pack-item"><img src="https://images.unsplash.com/photo-1599058917765-a780eda07a3e?auto=format&fit=crop&w=600&q=75" alt="Battle ropes session" loading="lazy" onerror="this.parentElement.style.background='#17171B'"><span>No mercy sets</span></div>
-      <div class="pack-item"><img src="https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&w=600&q=75" alt="Runner at dusk" loading="lazy" onerror="this.parentElement.style.background='#17171B'"><span>Street miles</span></div>
-    </div>
-  </section>
-
-  <section id="tech">
-    <div class="sec-head rv">
-      <h2>Fabric <em>Tech</em></h2>
-      <span class="counter">( 05 — Engineering )</span>
-    </div>
-    <div class="tech-wrap">
-      <div class="tech-photo rv">
-        <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=900&q=75" alt="Training gear detail" loading="lazy" onerror="this.style.display='none'">
-        <canvas id="fabric-zoom"></canvas>
+        <div class="foot-col"><b>Shop</b><a href="#mens" data-hot>Men's wear</a><a href="#womens" data-hot>Women's wear</a><a href="#new" data-hot>New + Restocks</a><a href="#sale" data-hot>Shop the sale</a></div>
+        <div class="foot-col"><b>Help</b><a href="#" data-hot>Delivery &amp; returns</a><a href="#" data-hot>Size guide</a><a href="#" data-hot>Track order</a><a href="#" data-hot>Contact us</a></div>
+        <div class="foot-col"><b>Social</b><a href="#" data-hot>Instagram</a><a href="#" data-hot>TikTok</a><a href="#" data-hot>Facebook</a><a href="#" data-hot>YouTube</a></div>
       </div>
-      <div class="tech-list rv">
-        <div class="tech-item"><b>01</b><div><h3>DryCore™ wicking</h3><p>Sweat is pulled off the skin and pushed to the surface, where it evaporates before it weighs you down.</p></div></div>
-        <div class="tech-item"><b>02</b><div><h3>4-way FlexKnit</h3><p>The weave stretches with every plane of movement — squat depth, overhead reach, full sprint — and snaps back.</p></div></div>
-        <div class="tech-item"><b>03</b><div><h3>Seamless zones</h3><p>Body-mapped knitting removes seams where friction lives. Nothing rubs, nothing rides up.</p></div></div>
-        <div class="tech-item"><b>04</b><div><h3>Anti-odour finish</h3><p>A mineral-based treatment keeps bacteria from settling in the fibre. Train twice, wash once.</p></div></div>
+      <div class="foot-base">
+        <span>© 2026 Carnage Lifestyle</span>
+        <span>Colombo — Sri Lanka</span>
+        <span>Terms · Privacy · Refund policy</span>
       </div>
-    </div>
-  </section>
+    </footer>
 
-  <section class="statement">
-    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=70" alt="" loading="lazy" onerror="this.remove()">
-    <h2 class="rv"><span class="stroke">NO SHORTCUTS.</span><br><span class="fill">NO MERCY.</span></h2>
-    <p class="rv">Every rep counts. Every fibre is tested. That's the deal.</p>
-  </section>
-
-  <section class="cta-band">
-    <span class="mono rv">( 06 — Join the pack )</span>
-    <h2 class="rv" style="margin-top:1.4rem">Get the next drop first</h2>
-    <p class="rv">New releases sell out in hours. Members get 24-hour early access and free shipping island-wide.</p>
-    <button class="btn rv" data-hot><span>Become a member</span></button>
-  </section>
-
-  <footer>
-    <div class="foot-grid">
-      <div>
-        <a class="logo" href="#top">CARNAGE<em>.</em></a>
-        <p style="color:var(--sub);font-size:.85rem;max-width:30ch;margin-top:1rem">Active &amp; lifestyle wear for men and women. Made to be beaten up.</p>
-      </div>
-      <div class="foot-col"><b>Shop</b><a href="#men" data-hot>Men's wear</a><a href="#women" data-hot>Women's wear</a><a href="#shop" data-hot>New drop</a><a href="#shop" data-hot>Lifting accessories</a></div>
-      <div class="foot-col"><b>Brand</b><a href="#about" data-hot>Our story</a><a href="#tech" data-hot>Fabric tech</a><a href="#" data-hot>Stores</a><a href="#" data-hot>Careers</a></div>
-      <div class="foot-col"><b>Social</b><a href="#" data-hot>Instagram</a><a href="#" data-hot>TikTok</a><a href="#" data-hot>Facebook</a><a href="#" data-hot>YouTube</a></div>
-    </div>
-    <div class="foot-base">
-      <span>© 2026 Carnage Lifestyle</span>
-      <span>Colombo — Sri Lanka</span>
-      <span>Terms · Privacy</span>
-    </div>
-  </footer>
+  </div><!-- /store -->
 
 </main>
 </div>
@@ -406,13 +389,13 @@ const cursor=document.getElementById('cursor');
 let cx=innerWidth/2,cy=innerHeight/2,px=cx,py=cy;
 addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;});
 (function moveCur(){px+=(cx-px)*.2;py+=(cy-py)*.2;cursor.style.left=px+'px';cursor.style.top=py+'px';requestAnimationFrame(moveCur);})();
-document.addEventListener('mouseover',e=>{cursor.classList.toggle('hot',!!e.target.closest('[data-hot],a,button,.card'));});
+document.addEventListener('mouseover',e=>{cursor.classList.toggle('hot',!!e.target.closest('[data-hot],a,button,.pcard'));});
 
 /* ============ REVEALS ============ */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}}),{rootMargin:'0px 0px -8% 0px',threshold:.05});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 
-/* ============ THE MODEL — real person, real Carnage tee, scroll-morph ============ */
+/* ============ 3D — real person, real Carnage tee ============ */
 const glc=document.getElementById('gl');
 const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -444,7 +427,6 @@ const pgeo=new THREE.BufferGeometry();pgeo.setAttribute('position',new THREE.Buf
 const parts=new THREE.Points(pgeo,new THREE.PointsMaterial({color:0x8e8e96,size:.02,transparent:true,opacity:.55}));
 scene.add(parts);
 
-/* --- colorways: shirt color painted onto the real texture, plus scene glow --- */
 const colorways=[
   {kit:'#1a1a20',glow:0xe2201c,name:'Onyx — 010',light:false,speed:.6},
   {kit:'#8E120F',glow:0xff4a3c,name:'Blood — 020',light:false,speed:.9},
@@ -459,10 +441,7 @@ function b64ToBuf(b64){
   return buf;
 }
 
-/* Paint a real CARNAGE tee onto the person's texture:
-   - find torso triangles in bind pose → shirt mask in UV space
-   - find front-chest vertices → logo placement box
-   - per colorway: recolor only the shirt pixels + stamp the print */
+/* Paint the real Carnage wordmark onto the person's shirt texture (UV-mapped) */
 function buildShirtPainter(mesh){
   const mat=mesh.material;
   const src=mat.map&&mat.map.image;
@@ -477,7 +456,6 @@ function buildShirtPainter(mesh){
   const nx=k=>Math.abs(pos.getX(k)-midx)/(wid/2);
   const inTorso=k=>{const y=ny(k);return y>.50&&y<.82&&nx(k)<.26;};
   const inChest=k=>{const y=ny(k);return y>.60&&y<.74&&nx(k)<.16&&pos.getZ(k)>0;};
-  /* shirt mask */
   const mask=document.createElement('canvas');mask.width=W;mask.height=H;
   const mx2=mask.getContext('2d');mx2.fillStyle='#fff';
   const chest={u0:1,v0:1,u1:0,v1:0};let chestN=0;
@@ -499,7 +477,6 @@ function buildShirtPainter(mesh){
       chestN++;
     }
   }
-  /* soften mask edges slightly */
   mx2.filter='blur(1.5px)';mx2.drawImage(mask,0,0);mx2.filter='none';
 
   const texCan=document.createElement('canvas');texCan.width=W;texCan.height=H;
@@ -516,17 +493,14 @@ function buildShirtPainter(mesh){
   return function repaint(hex,light){
     tx.globalCompositeOperation='source-over';tx.globalAlpha=1;
     tx.drawImage(src,0,0,W,H);
-    /* colored shirt layer through the mask */
     tcx.globalCompositeOperation='source-over';
     tcx.clearRect(0,0,W,H);
     tcx.drawImage(mask,0,0);
     tcx.globalCompositeOperation='source-in';
     tcx.fillStyle=hex;tcx.fillRect(0,0,W,H);
-    /* hue/sat replace keeps the fabric shading */
     tx.globalCompositeOperation='color';tx.drawImage(tint,0,0);
     tx.globalCompositeOperation=light?'soft-light':'multiply';
     tx.globalAlpha=light?.55:.6;tx.drawImage(tint,0,0);tx.globalAlpha=1;
-    /* chest print */
     if(chestN>6){
       const cu=(chest.u0+chest.u1)/2*W,cv=(chest.v0+chest.v1)/2*H;
       const cw=Math.max((chest.u1-chest.u0)*W,60);
@@ -540,7 +514,7 @@ function buildShirtPainter(mesh){
       tx.fillRect(-cw*.22,cw*.10,cw*.44,Math.max(3,cw*.035));
       tx.font=`400 ${Math.round(cw*.10)}px "Space Mono", monospace`;
       tx.fillStyle=light?'#141416':'#F2F0EB';
-      tx.fillText('NO MERCY',0,cw*.26);
+      tx.fillText('EST. COLOMBO',0,cw*.26);
       tx.restore();
     }
     newTex.needsUpdate=true;
@@ -567,7 +541,6 @@ try{
     person.position.x=-c.x;person.position.z=-c.z;
     person.position.y+=-1.35-box2.min.y;
     scene.add(person);
-    /* dress them in the Carnage tee */
     document.fonts.ready.then(()=>{
       try{
         repaint=buildShirtPainter(skinned);
@@ -584,7 +557,7 @@ try{
 const stages=[...document.querySelectorAll('.stage')];
 const dots=[...document.querySelectorAll('#dots i')];
 const chip=document.getElementById('chip'),chipdot=document.getElementById('chipdot'),chipname=document.getElementById('chipname');
-const storyTitle=document.getElementById('storyTitle'),storyHint=document.getElementById('storyHint'),storyUI=document.getElementById('story-ui');
+const storyTitle=document.getElementById('storyTitle'),storySub=document.getElementById('storySub'),storyHint=document.getElementById('storyHint'),storyUI=document.getElementById('story-ui');
 const glowColor=new THREE.Color(colorways[0].glow);
 let curStage=-1;
 
@@ -629,7 +602,6 @@ function tick(){
   rim.color.copy(glowColor);under.color.copy(glowColor);
   rings.forEach(r=>r.material.color.copy(glowColor));
 
-  /* rotate the person as you scroll — 2 full turns */
   if(person){
     person.rotation.y=p*Math.PI*4+mx*.25;
   }
@@ -641,6 +613,7 @@ function tick(){
   cam.lookAt(0,.2-p*.4,0);
 
   storyTitle.style.opacity=String(Math.max(0,1-p*6));
+  storySub.style.opacity=String(Math.max(0,1-p*6));
   storyHint.style.opacity=String(Math.max(0,1-p*6));
   const fade=Math.max(0,1-after*1.4);
   glc.style.opacity=String(fade);
@@ -654,60 +627,46 @@ function tick(){
 }
 if(!reduced)tick();else renderer.render(scene,cam);
 
-/* ============ PRODUCTS ============ */
-const products=[
-  {n:'Oversized Training Tee',c:'Men · DryCore cotton-blend',p:'LKR 4,950',o:null,b:'New drop',
+/* ============ REAL CARNAGE CATALOGUE ============ */
+const newDrop=[
+  {n:'Essential Oversized Tee',c:'Men · 240gsm DryCore cotton',p:'Rs 4,490.00',o:null,b:'New',sw:['#1a1a20','#8E120F','#d8d4c9','#2e4a2c'],
    img:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=75'},
-  {n:'Seamless High-Rise Leggings',c:'Women · 4-way FlexKnit',p:'LKR 7,450',o:null,b:'Best seller',
-   img:'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=700&q=75'},
-  {n:'Premium Tapered Joggers',c:'Unisex · brushed fleece',p:'LKR 8,950',o:'LKR 10,500',b:'Sale',
+  {n:'Abyss Oversized Tee',c:'Men · acid-washed heavy knit',p:'Rs 4,990.00',o:null,b:'New',sw:['#101014','#3a3a44'],
+   img:'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=700&q=75'},
+  {n:'Stormtrack Toggle Jogger',c:'Men · water-repellent shell',p:'Rs 8,490.00',o:null,b:'Restock',sw:['#111113','#2c3038'],
    img:'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=700&q=75'},
-  {n:'Racerback Sports Bra',c:'Women · nylon-spandex',p:'LKR 5,450',o:null,b:null,
-   img:'https://images.unsplash.com/photo-1518459031867-a89b944bffe4?auto=format&fit=crop&w=700&q=75'},
-  {n:'Muscle Fit Tank',c:'Men · quick-dry knit',p:'LKR 3,950',o:null,b:null,
-   img:'https://images.unsplash.com/photo-1583500178450-e59e4309b57a?auto=format&fit=crop&w=700&q=75'},
-  {n:'Pro Lifting Straps',c:'Accessories · reinforced weave',p:'LKR 2,450',o:null,b:'Restocked',
-   img:'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?auto=format&fit=crop&w=700&q=75'},
+  {n:'Active Pocket Legging',c:'Women · seamless 4-way stretch',p:'Rs 5,990.00',o:null,b:'New',sw:['#111113','#4a2531','#2e4a2c'],
+   img:'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=700&q=75'},
 ];
-const grid=document.getElementById('prodgrid');
-products.forEach((pr,i)=>{
-  const el=document.createElement('article');el.className='card rv';el.style.transitionDelay=(i%3*80)+'ms';
-  el.innerHTML=`<div class="card-visual">${pr.b?`<span class="card-badge">${pr.b}</span>`:''}
-    <img src="${pr.img}" alt="${pr.n}" loading="lazy" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(180deg,#0D0D10,#1C1C21)'">
-    <div class="card-cta">Add to cart</div></div>
-  <div class="card-info"><div><h3>${pr.n}</h3><small>${pr.c}</small></div><span class="price">${pr.o?`<s>${pr.o}</s>`:''}${pr.p}</span></div>`;
-  grid.appendChild(el);io.observe(el);
-});
-
-/* ============ FABRIC MACRO ============ */
-const fz=document.getElementById('fabric-zoom');
-const fzx=fz.getContext('2d');let fzT=0;
-function sizeFZ(){const r=fz.getBoundingClientRect();fz.width=Math.max(2,r.width*2);fz.height=Math.max(2,r.height*2);}
-sizeFZ();addEventListener('resize',sizeFZ);
-function drawFZ(){
-  fzT+=reduced?0:.008;
-  const w=fz.width,h=fz.height;
-  fzx.clearRect(0,0,w,h);
-  fzx.fillStyle='rgba(10,10,11,.55)';fzx.fillRect(0,0,w,h);
-  const cell=Math.max(26,w/26);
-  for(let yy=0;yy<h+cell;yy+=cell){
-    for(let xx=0;xx<w+cell;xx+=cell){
-      const ph=Math.sin(xx*.008+yy*.006+fzT*2);
-      const lift=ph*cell*.14;
-      fzx.strokeStyle=`rgba(242,240,235,${.10+ph*.05})`;
-      fzx.lineWidth=cell*.32;fzx.lineCap='round';
-      fzx.beginPath();fzx.moveTo(xx-cell*.4,yy+lift);fzx.quadraticCurveTo(xx,yy-cell*.3+lift,xx+cell*.4,yy+lift);fzx.stroke();
-      fzx.strokeStyle=`rgba(142,142,150,${.08-ph*.03})`;
-      fzx.beginPath();fzx.moveTo(xx,yy-cell*.4-lift);fzx.quadraticCurveTo(xx+cell*.3,yy,xx,yy+cell*.4-lift);fzx.stroke();
-    }
-  }
-  fzx.strokeStyle='rgba(226,32,28,.65)';fzx.lineWidth=cell*.14;
-  fzx.beginPath();
-  for(let xx=0;xx<=w;xx+=8)fzx.lineTo(xx,h*.5+Math.sin(xx*.01+fzT*3)*cell*1.2);
-  fzx.stroke();
-  requestAnimationFrame(drawFZ);
+const best=[
+  {n:'Champion Arc Muscle Tank',c:'Men · tapered quick-dry',p:'Rs 3,990.00',o:null,b:null,sw:['#111113','#d8d4c9'],
+   img:'https://images.unsplash.com/photo-1583500178450-e59e4309b57a?auto=format&fit=crop&w=700&q=75'},
+  {n:'Carnage Flex Short V3',c:'Men · 4-way stretch woven',p:'Rs 3,590.00',o:'Rs 4,990.00',b:'Sale',sw:['#111113','#2c3038','#2e4a2c'],
+   img:'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=700&q=75'},
+  {n:'Softform Cropped Hoodie',c:'Women · brushed fleece',p:'Rs 6,990.00',o:null,b:null,sw:['#d8d4c9','#4a2531','#111113'],
+   img:'https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=700&q=75'},
+  {n:'90’s Bell Bottom Legging',c:'Women · retro-rise flare',p:'Rs 4,190.00',o:'Rs 6,990.00',b:'Save 40%',sw:['#111113','#3d2b3a'],
+   img:'https://images.unsplash.com/photo-1518459031867-a89b944bffe4?auto=format&fit=crop&w=700&q=75'},
+];
+function cardHTML(pr){
+  return `<div class="ph">${pr.b?`<span class="badge ${/sale|save/i.test(pr.b)?'sale':''}">${pr.b}</span>`:''}
+    <img src="${pr.img}" alt="${pr.n}" loading="lazy" onerror="this.style.display='none'">
+    <span class="quick">Quick add +</span></div>
+  <div class="nm">${pr.n}</div>
+  <div class="ct">${pr.c}</div>
+  <div class="prc">${pr.o?`<s>${pr.o}</s><span class="now">${pr.p}</span>`:pr.p}</div>
+  <div class="sw">${pr.sw.map(s=>`<i style="background:${s}"></i>`).join('')}</div>`;
 }
-drawFZ();
+function fillGrid(id,items){
+  const g=document.getElementById(id);
+  items.forEach((pr,i)=>{
+    const el=document.createElement('article');el.className='pcard rv';el.style.transitionDelay=(i%4*70)+'ms';
+    el.innerHTML=cardHTML(pr);
+    g.appendChild(el);io.observe(el);
+  });
+}
+fillGrid('newgrid',newDrop);
+fillGrid('bestgrid',best);
 
 addEventListener('load',()=>document.body.classList.add('ready'));
 setTimeout(()=>document.body.classList.add('ready'),2600);
