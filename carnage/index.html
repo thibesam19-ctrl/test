@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Carnage — Born from the Wild</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
+
+<style>
+/* ──────── TOKENS ──────── */
+:root {
+  --soil:    #0F1209;
+  --forest:  #1C2B16;
+  --moss:    #4A5E38;
+  --amber:   #B89A74;
+  --linen:   #EAE4D8;
+  --cream:   #F5F1EA;
+  --blood:   #A33218;
+  --fog:     rgba(234,228,216,0.06);
+  --border:  rgba(184,154,116,0.18);
+
+  --bg:      var(--soil);
+  --surface: var(--forest);
+  --text:    var(--linen);
+  --muted:   rgba(234,228,216,0.45);
+  --accent:  var(--blood);
+
+  --fh: 'Cormorant Garamond', Georgia, serif;
+  --fb: 'DM Sans', system-ui, sans-serif;
+  --fm: 'DM Mono', 'Courier New', monospace;
+}
+@media (prefers-color-scheme: light) { :root { --bg: var(--cream); --surface: #E8E1D4; --text: var(--soil); --muted: rgba(15,18,9,0.48); --border: rgba(15,18,9,0.12); --fog: rgba(15,18,9,0.04); } }
+:root[data-theme="light"] { --bg: var(--cream); --surface: #E8E1D4; --text: var(--soil); --muted: rgba(15,18,9,0.48); --border: rgba(15,18,9,0.12); --fog: rgba(15,18,9,0.04); }
+:root[data-theme="dark"]  { --bg: var(--soil); --surface: var(--forest); --text: var(--linen); --muted: rgba(234,228,216,0.45); --border: rgba(184,154,116,0.18); --fog: rgba(234,228,216,0.06); }
+
+/* ──────── RESET ──────── */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html { scroll-behavior:smooth; font-size:16px }
+body { background:var(--bg); color:var(--text); font-family:var(--fb); font-weight:300; line-height:1.65; overflow-x:hidden; transition:background .4s,color .4s }
+img { max-width:100%; display:block }
+a { color:inherit; text-decoration:none }
+button { cursor:pointer; font-family:inherit; border:none; background:none }
+::-webkit-scrollbar { width:3px }
+::-webkit-scrollbar-thumb { background:var(--moss) }
+::selection { background:var(--blood); color:#fff }
+
+/* ──────── GRAIN OVERLAY ──────── */
+body::before {
+  content:''; pointer-events:none;
+  position:fixed; inset:0; z-index:1000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.55; mix-blend-mode:overlay;
+}
+
+/* ──────── NAV ──────── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 56px; height:72px;
+  transition:background .5s, backdrop-filter .5s;
+}
+nav.scrolled { background:rgba(15,18,9,.85); backdrop-filter:blur(18px); border-bottom:1px solid var(--border) }
+.nav-wordmark { font-family:var(--fh); font-size:22px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--text) }
+.nav-links { display:flex; gap:36px; list-style:none }
+.nav-links a { font-family:var(--fm); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); transition:color .2s }
+.nav-links a:hover { color:var(--text) }
+.nav-links a:focus-visible { outline:1px solid var(--amber); outline-offset:4px }
+.nav-right { display:flex; align-items:center; gap:24px }
+.theme-toggle {
+  width:40px; height:40px; display:flex; align-items:center; justify-content:center;
+  color:var(--muted); transition:color .2s;
+}
+.theme-toggle:hover { color:var(--text) }
+.theme-toggle:focus-visible { outline:1px solid var(--amber); outline-offset:3px }
+.nav-cta {
+  font-family:var(--fm); font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+  padding:10px 22px; border:1px solid var(--border); color:var(--text);
+  transition:background .25s, border-color .25s, color .25s;
+}
+.nav-cta:hover { background:var(--amber); border-color:var(--amber); color:var(--soil) }
+.nav-cta:focus-visible { outline:1px solid var(--amber); outline-offset:3px }
+
+/* ──────── HERO ──────── */
+#hero { position:relative; height:100dvh; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end }
+#terrain-canvas { position:absolute; inset:0; width:100%; height:100%; display:block }
+.hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(15,18,9,.92) 0%, rgba(15,18,9,.3) 55%, transparent 100%) }
+.hero-content {
+  position:relative; z-index:2;
+  padding:0 80px 72px;
+  display:grid; grid-template-columns:1fr auto;
+  align-items:flex-end; gap:48px;
+}
+.hero-headline {
+  font-family:var(--fh); font-size:clamp(96px,13vw,200px);
+  font-weight:600; line-height:.88; text-transform:uppercase;
+  letter-spacing:-.02em; color:var(--linen);
+  text-wrap:balance;
+}
+.hero-headline em { font-style:italic; font-weight:300; color:var(--amber); display:block }
+.hero-right { text-align:right; max-width:260px }
+.hero-label { font-family:var(--fm); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--amber); margin-bottom:14px }
+.hero-sub { font-size:14px; line-height:1.75; color:var(--muted) }
+.hero-scroll {
+  position:absolute; left:80px; bottom:30px; z-index:2;
+  display:flex; align-items:center; gap:12px;
+  font-family:var(--fm); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+  animation:scrollpulse 2.5s ease-in-out infinite;
+}
+.hero-scroll-line { width:40px; height:1px; background:var(--amber); opacity:.5 }
+@keyframes scrollpulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+/* ──────── MARQUEE ──────── */
+.marquee-band {
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  padding:16px 0; overflow:hidden; background:var(--surface);
+}
+.marquee-track { display:flex; width:max-content; animation:march 40s linear infinite }
+@media(prefers-reduced-motion:reduce){.marquee-track{animation:none}}
+@keyframes march{to{transform:translateX(-50%)}}
+.marquee-item {
+  font-family:var(--fh); font-style:italic; font-size:18px; font-weight:300;
+  color:var(--muted); padding:0 40px; white-space:nowrap;
+  display:inline-flex; align-items:center; gap:36px;
+}
+.marquee-dot { width:4px; height:4px; border-radius:50%; background:var(--amber); opacity:.6; flex-shrink:0 }
+
+/* ──────── SECTION SHARED ──────── */
+.label {
+  font-family:var(--fm); font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--amber); margin-bottom:20px; display:block;
+}
+.eyebrow-rule { width:40px; height:1px; background:var(--amber); display:inline-block; vertical-align:middle; margin-right:12px }
+.display {
+  font-family:var(--fh); font-weight:600; text-transform:uppercase;
+  line-height:.92; letter-spacing:-.01em; text-wrap:balance;
+}
+.display-xl { font-size:clamp(52px,7vw,108px) }
+.display-lg { font-size:clamp(40px,5vw,80px) }
+.display-md { font-size:clamp(32px,4vw,60px) }
+.body-copy { font-size:15px; line-height:1.8; color:var(--muted); max-width:520px }
+
+/* REVEAL */
+.r { opacity:0; transform:translateY(24px); transition:opacity .85s cubic-bezier(.23,1,.32,1), transform .85s cubic-bezier(.23,1,.32,1) }
+.r.on { opacity:1; transform:translateY(0) }
+.r.from-left { transform:translateX(-24px) }
+.r.from-left.on { transform:translateX(0) }
+.d1{transition-delay:80ms}.d2{transition-delay:160ms}.d3{transition-delay:240ms}
+.d4{transition-delay:320ms}.d5{transition-delay:400ms}.d6{transition-delay:480ms}
+@media(prefers-reduced-motion:reduce){.r{opacity:1;transform:none;transition:none}}
+
+/* ──────── MANIFESTO ──────── */
+#manifesto {
+  padding:140px 80px;
+  display:grid; grid-template-columns:1fr 1fr; gap:120px; align-items:center;
+}
+.manifesto-left { position:relative }
+.manifesto-number {
+  font-family:var(--fh); font-size:240px; font-weight:600; line-height:.8;
+  color:var(--border); position:absolute; top:-40px; left:-24px; z-index:0;
+  pointer-events:none; user-select:none; letter-spacing:-.05em;
+}
+.manifesto-text { position:relative; z-index:1 }
+.manifesto-right { border-left:1px solid var(--border); padding-left:56px }
+.manifesto-right p { font-size:16px; line-height:1.9; color:var(--muted); margin-bottom:20px }
+.manifesto-right p:last-child { margin-bottom:0 }
+.manifesto-stat { margin-top:48px; padding-top:36px; border-top:1px solid var(--border) }
+.stat-row { display:flex; gap:56px; margin-top:24px }
+.stat-n { font-family:var(--fh); font-size:52px; font-weight:600; color:var(--text); line-height:1 }
+.stat-l { font-family:var(--fm); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-top:6px }
+
+/* ──────── COLLECTION ──────── */
+#collection { padding:80px 80px 140px; background:var(--surface) }
+.collection-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:72px }
+.collection-link {
+  font-family:var(--fm); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+  border-bottom:1px solid var(--border); padding-bottom:2px; transition:color .2s, border-color .2s;
+}
+.collection-link:hover { color:var(--amber); border-color:var(--amber) }
+.coll-grid {
+  display:grid; grid-template-columns:1.4fr 1fr 1fr; grid-template-rows:auto auto;
+  gap:3px;
+}
+.coll-item { position:relative; overflow:hidden; cursor:pointer }
+.coll-item:first-child { grid-row:1/3 }
+.coll-visual {
+  position:absolute; inset:0;
+  transition:transform .7s cubic-bezier(.23,1,.32,1);
+}
+.coll-item:hover .coll-visual { transform:scale(1.04) }
+.coll-dark { position:absolute; inset:0; background:linear-gradient(to top, rgba(15,18,9,.88) 0%, rgba(15,18,9,.1) 60%, transparent 100%) }
+.coll-meta {
+  position:absolute; bottom:0; left:0; right:0; padding:28px 28px 32px;
+  transform:translateY(8px); transition:transform .4s cubic-bezier(.23,1,.32,1);
+}
+.coll-item:hover .coll-meta { transform:translateY(0) }
+.coll-tag { font-family:var(--fm); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--amber); margin-bottom:8px }
+.coll-name { font-family:var(--fh); font-size:24px; font-weight:600; text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px }
+.coll-price { font-family:var(--fm); font-size:12px; color:var(--muted) }
+.coll-arrow {
+  position:absolute; top:24px; right:24px;
+  width:36px; height:36px; border:1px solid rgba(184,154,116,.3);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--amber); opacity:0; transition:opacity .3s, background .25s;
+}
+.coll-item:hover .coll-arrow { opacity:1 }
+.coll-arrow:hover { background:var(--amber); color:var(--soil) }
+/* Product visual cards */
+.pv { width:100%; height:100%; position:absolute; inset:0 }
+.pv-1 { background:linear-gradient(160deg,#0a1208 0%,#1a2c12 45%,#2a3d1e 100%) }
+.pv-2 { background:linear-gradient(140deg,#141008 0%,#241a0a 50%,#3a2a14 100%) }
+.pv-3 { background:linear-gradient(150deg,#0c1010 0%,#182420 50%,#243630 100%) }
+.pv-4 { background:linear-gradient(130deg,#100a08 0%,#1e1208 50%,#301c0c 100%) }
+.pv-5 { background:linear-gradient(155deg,#080c10 0%,#10182a 50%,#182840 100%) }
+/* Item heights */
+.coll-item:first-child { min-height:560px }
+.coll-item:not(:first-child) { min-height:272px }
+
+/* ──────── DARK FEATURE ──────── */
+#feature {
+  background:var(--forest);
+  padding:0;
+  display:grid; grid-template-columns:1fr 1fr;
+  min-height:80vh;
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+.feature-canvas-wrap { position:relative; overflow:hidden }
+#feature-canvas { display:block; width:100%; height:100% }
+.feature-body { padding:100px 80px; display:flex; flex-direction:column; justify-content:center }
+.feature-body .display-lg { margin-bottom:36px }
+.feature-points { margin-top:48px; display:flex; flex-direction:column; gap:0 }
+.fp {
+  display:flex; align-items:flex-start; gap:20px;
+  padding:24px 0; border-bottom:1px solid var(--border);
+}
+.fp:first-child { border-top:1px solid var(--border) }
+.fp-num { font-family:var(--fm); font-size:10px; letter-spacing:.14em; color:var(--amber); margin-top:4px; flex-shrink:0 }
+.fp-title { font-family:var(--fh); font-size:18px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px }
+.fp-desc { font-size:13px; color:var(--muted); line-height:1.7 }
+
+/* ──────── QUOTE ──────── */
+#quote {
+  padding:140px 80px;
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+  position:relative; overflow:hidden;
+}
+.quote-bg { position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 50%, rgba(74,94,56,.12) 0%, transparent 70%); pointer-events:none }
+.quote-mark { font-family:var(--fh); font-size:160px; line-height:.5; color:var(--border); font-weight:600; margin-bottom:24px }
+.quote-text { font-family:var(--fh); font-style:italic; font-size:clamp(28px,4vw,52px); font-weight:300; line-height:1.2; max-width:900px; margin-bottom:36px; color:var(--text) }
+.quote-attr { font-family:var(--fm); font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--amber) }
+
+/* ──────── MATERIALS ──────── */
+#materials { padding:120px 80px }
+.materials-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:72px }
+.mat-cell {
+  padding:48px 40px; background:var(--surface);
+  position:relative; overflow:hidden;
+  transition:background .3s;
+}
+.mat-cell::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:2px;
+  background:var(--amber); transform:scaleY(0); transform-origin:bottom;
+  transition:transform .4s cubic-bezier(.23,1,.32,1);
+}
+.mat-cell:hover::before { transform:scaleY(1) }
+.mat-cell:hover { background:var(--forest) }
+.mat-icon { width:44px; height:44px; margin-bottom:28px }
+.mat-icon svg { width:100%; height:100%; color:var(--amber) }
+.mat-name { font-family:var(--fh); font-size:22px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; margin-bottom:12px }
+.mat-desc { font-size:13px; color:var(--muted); line-height:1.75 }
+
+/* ──────── FIELD NOTES ──────── */
+#field-notes { padding:120px 80px; background:var(--surface) }
+.notes-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; margin-top:72px }
+.note-item { cursor:pointer }
+.note-visual { height:240px; position:relative; overflow:hidden; margin-bottom:24px }
+.note-visual-bg { position:absolute; inset:0; transition:transform .6s cubic-bezier(.23,1,.32,1) }
+.note-item:hover .note-visual-bg { transform:scale(1.05) }
+.note-date { font-family:var(--fm); font-size:10px; letter-spacing:.16em; color:var(--muted); margin-bottom:10px }
+.note-title { font-family:var(--fh); font-size:22px; font-weight:600; text-transform:uppercase; line-height:1.05; letter-spacing:.03em; margin-bottom:12px; transition:color .2s }
+.note-item:hover .note-title { color:var(--amber) }
+.note-excerpt { font-size:13px; color:var(--muted); line-height:1.75 }
+.note-read { font-family:var(--fm); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--amber); margin-top:16px; display:inline-flex; align-items:center; gap:8px }
+.note-read::after { content:'→'; font-size:12px }
+
+/* ──────── CTA ──────── */
+#cta-section {
+  padding:160px 80px;
+  background:var(--soil);
+  display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;
+  border-top:1px solid var(--border);
+}
+.cta-copy .display-lg { margin-bottom:24px }
+.cta-form { display:flex; flex-direction:column; gap:16px }
+.cta-field-wrap { position:relative }
+.cta-label-float { font-family:var(--fm); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; display:block }
+.cta-input {
+  width:100%; background:transparent;
+  border:1px solid var(--border); padding:16px 20px;
+  color:var(--text); font-family:var(--fb); font-size:14px;
+  outline:none; transition:border-color .2s;
+}
+.cta-input:focus { border-color:var(--amber) }
+.cta-input::placeholder { color:rgba(234,228,216,.25) }
+.cta-btn {
+  background:var(--amber); color:var(--soil);
+  font-family:var(--fm); font-size:11px; font-weight:400; letter-spacing:.22em; text-transform:uppercase;
+  padding:18px 32px; border:1px solid var(--amber); align-self:flex-start;
+  transition:background .25s, color .25s;
+}
+.cta-btn:hover { background:transparent; color:var(--amber) }
+.cta-btn:focus-visible { outline:1px solid var(--amber); outline-offset:3px }
+.cta-fine { font-size:12px; color:var(--muted); opacity:.6 }
+
+/* ──────── FOOTER ──────── */
+footer {
+  padding:72px 80px 40px;
+  background:var(--soil); border-top:1px solid var(--border);
+}
+.footer-top { display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:48px; margin-bottom:60px }
+.footer-brand .display { font-size:40px; margin-bottom:16px }
+.footer-brand p { font-size:13px; color:var(--muted); line-height:1.75; max-width:240px }
+.footer-col h5 { font-family:var(--fm); font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--amber); margin-bottom:20px }
+.footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px }
+.footer-col a { font-size:13px; color:var(--muted); transition:color .2s }
+.footer-col a:hover { color:var(--text) }
+.footer-col a:focus-visible { outline:1px solid var(--amber) }
+.footer-bottom { border-top:1px solid var(--border); padding-top:28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px }
+.footer-copy { font-family:var(--fm); font-size:10px; letter-spacing:.14em; color:var(--muted) }
+.footer-socials { display:flex; gap:8px }
+.soc {
+  width:40px; height:40px; border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--muted); transition:all .2s;
+}
+.soc:hover { border-color:var(--amber); color:var(--amber) }
+.soc:focus-visible { outline:1px solid var(--amber) }
+
+/* ──────── RESPONSIVE ──────── */
+@media(max-width:1100px){
+  nav { padding:0 32px }
+  .hero-content { padding:0 48px 60px; grid-template-columns:1fr; gap:24px }
+  .hero-right { max-width:none; text-align:left }
+  #manifesto { grid-template-columns:1fr; gap:60px; padding:100px 48px }
+  .manifesto-number { font-size:160px }
+  #collection { padding:60px 48px 100px }
+  .coll-grid { grid-template-columns:1fr 1fr; grid-template-rows:auto }
+  .coll-item:first-child { grid-row:auto; grid-column:1/3 }
+  #feature { grid-template-columns:1fr }
+  .feature-canvas-wrap { min-height:320px }
+  .feature-body { padding:64px 48px }
+  #quote { padding:100px 48px }
+  #materials { padding:80px 48px }
+  .materials-grid { grid-template-columns:1fr 1fr }
+  #field-notes { padding:80px 48px }
+  .notes-grid { grid-template-columns:1fr 1fr; gap:32px }
+  #cta-section { padding:100px 48px; grid-template-columns:1fr }
+  footer { padding:56px 48px 32px }
+  .footer-top { grid-template-columns:1fr 1fr; gap:32px }
+}
+@media(max-width:680px){
+  nav { padding:0 22px }
+  .nav-links { display:none }
+  .hero-content { padding:0 24px 52px }
+  .hero-headline { font-size:clamp(72px,18vw,100px) }
+  #manifesto { padding:80px 24px }
+  #collection,.note-visual-bg,#field-notes,#materials,#cta-section,footer { padding-left:24px; padding-right:24px }
+  .coll-grid { grid-template-columns:1fr }
+  .coll-item:first-child { grid-column:auto }
+  .materials-grid,.notes-grid { grid-template-columns:1fr }
+  .footer-top { grid-template-columns:1fr }
+  .stat-row { gap:32px }
+  .stat-n { font-size:40px }
+}
+</style>
+</head>
+<body>
+
+<!-- SKIP LINK -->
+<a href="#main" style="position:absolute;left:-9999px;top:4px;background:var(--amber);color:var(--soil);padding:10px 20px;font-family:var(--fm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;z-index:9999" onfocus="this.style.left='8px'" onblur="this.style.left='-9999px'">Skip to content</a>
+
+<!-- NAV -->
+<nav id="nav" role="navigation" aria-label="Main">
+  <a href="#" class="nav-wordmark" aria-label="Carnage home">Carnage</a>
+  <ul class="nav-links" role="list">
+    <li><a href="#collection">Collection</a></li>
+    <li><a href="#feature">The Build</a></li>
+    <li><a href="#materials">Materials</a></li>
+    <li><a href="#field-notes">Field Notes</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" id="theme-btn" aria-label="Toggle theme" title="Toggle light/dark">
+      <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+    <a href="#cta-section" class="nav-cta">Shop Now</a>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- HERO -->
+<section id="hero" aria-labelledby="hero-h">
+  <canvas id="terrain-canvas" aria-hidden="true"></canvas>
+  <div class="hero-overlay" aria-hidden="true"></div>
+  <div class="hero-content">
+    <h1 class="hero-headline" id="hero-h">
+      Born from<br><em>the wild.</em>
+    </h1>
+    <div class="hero-right">
+      <p class="hero-label">Est. 2019 — Wilderness Collection</p>
+      <p class="hero-sub">Gear forged in the places where nature doesn't apologize. Built for those who go where trails end.</p>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <div class="hero-scroll-line"></div>
+    <span>Scroll to explore</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-band" aria-label="Brand values" role="marquee">
+  <div class="marquee-track" id="marquee-track"></div>
+</div>
+
+<!-- MANIFESTO -->
+<section id="manifesto" aria-labelledby="manifesto-h">
+  <div class="manifesto-left">
+    <div class="manifesto-number" aria-hidden="true">01</div>
+    <div class="manifesto-text">
+      <span class="label r"><span class="eyebrow-rule"></span>The Philosophy</span>
+      <h2 class="display display-xl r d1" id="manifesto-h">We don't<br>tame it.</h2>
+    </div>
+  </div>
+  <div class="manifesto-right r d2">
+    <p>Carnage was born on a ridge above the treeline where the wind doesn't care who you are. We make gear for that ridge — not for the parking lot.</p>
+    <p>Every stitch, every material, every silhouette is stress-tested in conditions that would snap anything designed in a studio. We design in the field, fail in the field, and rebuild until it's right.</p>
+    <p>Nothing is decorative here. If it doesn't serve a function, it isn't on the garment.</p>
+    <div class="manifesto-stat">
+      <span class="label">Tested in the field</span>
+      <div class="stat-row">
+        <div>
+          <div class="stat-n">4,200<span style="font-size:.45em;font-weight:300">m</span></div>
+          <div class="stat-l">Highest test altitude</div>
+        </div>
+        <div>
+          <div class="stat-n">−40<span style="font-size:.45em;font-weight:300">°C</span></div>
+          <div class="stat-l">Minimum rating</div>
+        </div>
+        <div>
+          <div class="stat-n">340<span style="font-size:.45em;font-weight:300">+</span></div>
+          <div class="stat-l">Field test days</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION -->
+<section id="collection" aria-labelledby="coll-h">
+  <div class="collection-header r">
+    <div>
+      <span class="label"><span class="eyebrow-rule"></span>AW 2025</span>
+      <h2 class="display display-lg" id="coll-h">The Carnage<br><em style="font-style:italic">Range</em></h2>
+    </div>
+    <a href="#" class="collection-link r d2">View all pieces →</a>
+  </div>
+  <div class="coll-grid">
+    <div class="coll-item r" tabindex="0" aria-label="Ridge Shell Jacket">
+      <div class="coll-visual"><div class="pv pv-1"></div><canvas class="prod-canvas" data-hue="120" data-variant="1"></canvas></div>
+      <div class="coll-dark"></div>
+      <div class="coll-meta">
+        <div class="coll-tag">Outerwear</div>
+        <div class="coll-name">Ridge Shell<br>Jacket</div>
+        <div class="coll-price">£ 420</div>
+      </div>
+      <button class="coll-arrow" aria-label="View Ridge Shell Jacket">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="coll-item r d1" tabindex="0" aria-label="Summit Fleece">
+      <div class="coll-visual"><div class="pv pv-2"></div><canvas class="prod-canvas" data-hue="30" data-variant="2"></canvas></div>
+      <div class="coll-dark"></div>
+      <div class="coll-meta">
+        <div class="coll-tag">Midlayer</div>
+        <div class="coll-name">Summit<br>Fleece</div>
+        <div class="coll-price">£ 195</div>
+      </div>
+      <button class="coll-arrow" aria-label="View Summit Fleece">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="coll-item r d2" tabindex="0" aria-label="Gorge Trousers">
+      <div class="coll-visual"><div class="pv pv-3"></div><canvas class="prod-canvas" data-hue="180" data-variant="3"></canvas></div>
+      <div class="coll-dark"></div>
+      <div class="coll-meta">
+        <div class="coll-tag">Bottoms</div>
+        <div class="coll-name">Gorge<br>Trousers</div>
+        <div class="coll-price">£ 245</div>
+      </div>
+      <button class="coll-arrow" aria-label="View Gorge Trousers">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="coll-item r d3" tabindex="0" aria-label="Scree Pack 38L">
+      <div class="coll-visual"><div class="pv pv-4"></div><canvas class="prod-canvas" data-hue="20" data-variant="4"></canvas></div>
+      <div class="coll-dark"></div>
+      <div class="coll-meta">
+        <div class="coll-tag">Carry</div>
+        <div class="coll-name">Scree<br>Pack 38L</div>
+        <div class="coll-price">£ 310</div>
+      </div>
+      <button class="coll-arrow" aria-label="View Scree Pack 38L">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="coll-item r d4" tabindex="0" aria-label="Cairn Boot">
+      <div class="coll-visual"><div class="pv pv-5"></div><canvas class="prod-canvas" data-hue="220" data-variant="5"></canvas></div>
+      <div class="coll-dark"></div>
+      <div class="coll-meta">
+        <div class="coll-tag">Footwear</div>
+        <div class="coll-name">Cairn<br>Boot</div>
+        <div class="coll-price">£ 380</div>
+      </div>
+      <button class="coll-arrow" aria-label="View Cairn Boot">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE -->
+<section id="feature" aria-labelledby="feature-h">
+  <div class="feature-canvas-wrap" aria-hidden="true">
+    <canvas id="feature-canvas"></canvas>
+  </div>
+  <div class="feature-body">
+    <span class="label r"><span class="eyebrow-rule"></span>The Build</span>
+    <h2 class="display display-lg r d1" id="feature-h">No<br>shortcuts.<br><em style="font-style:italic">Ever.</em></h2>
+    <div class="feature-points">
+      <div class="fp r d2">
+        <span class="fp-num">01</span>
+        <div>
+          <div class="fp-title">Welded seams</div>
+          <div class="fp-desc">Ultrasonic bonding eliminates stitching as a failure point. 10,000mm HH rating, tested over 5,000 abrasion cycles.</div>
+        </div>
+      </div>
+      <div class="fp r d3">
+        <span class="fp-num">02</span>
+        <div>
+          <div class="fp-title">Reclaimed face fabric</div>
+          <div class="fp-desc">Every shell is woven from post-consumer PET. Reclaimed, not recycled into something weaker.</div>
+        </div>
+      </div>
+      <div class="fp r d4">
+        <span class="fp-num">03</span>
+        <div>
+          <div class="fp-title">YKK Aquaguard hardware</div>
+          <div class="fp-desc">Every zip, cord-lock, and buckle rated for submersion. Standard across the range — no exceptions.</div>
+        </div>
+      </div>
+      <div class="fp r d5">
+        <span class="fp-num">04</span>
+        <div>
+          <div class="fp-title">Field-repairable design</div>
+          <div class="fp-desc">Modular baffles, replaceable gaskets. You can rebuild this in a tent with a multitool.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section id="quote" aria-label="Brand quote">
+  <div class="quote-bg" aria-hidden="true"></div>
+  <div class="quote-mark" aria-hidden="true">"</div>
+  <blockquote class="quote-text r">"The mountain doesn't grade on effort. It only marks what holds and what breaks."</blockquote>
+  <cite class="quote-attr r d1">Lena Voss — Carnage Field Tester, Patagonia 2024</cite>
+</section>
+
+<!-- MATERIALS -->
+<section id="materials" aria-labelledby="mat-h">
+  <span class="label r"><span class="eyebrow-rule"></span>What We Use</span>
+  <h2 class="display display-lg r d1" id="mat-h">Materials<br><em style="font-style:italic">sourced honestly.</em></h2>
+  <p class="body-copy r d2">We publish every material's origin, mill, and impact data. No greenwashing. If we don't know exactly where something comes from, it isn't on our gear.</p>
+  <div class="materials-grid">
+    <div class="mat-cell r d1">
+      <div class="mat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M12 22V12m0 0C12 7 7 4 7 4s1 4 5 8zm0 0c0-5 5-8 5-8s-1 4-5 8z"/></svg>
+      </div>
+      <div class="mat-name">Recycled Nylon</div>
+      <div class="mat-desc">100% post-consumer. Woven in Biella, Italy. Carries the same tensile rating as virgin 70D — verified by SGS.</div>
+    </div>
+    <div class="mat-cell r d2">
+      <div class="mat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M3 6l9-3 9 3v6c0 5-4 8-9 9-5-1-9-4-9-9V6z"/></svg>
+      </div>
+      <div class="mat-name">PFC-Free DWR</div>
+      <div class="mat-desc">Durable water repellency without fluorochemicals. Bio-based. Rated 90/100 on the OEKO-TEX® Bluesign index.</div>
+    </div>
+    <div class="mat-cell r d3">
+      <div class="mat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>
+      </div>
+      <div class="mat-name">Merino Wool</div>
+      <div class="mat-desc">18.5 micron. ZQ-certified flocks in New Zealand. Non-mulesed. Live fibre tracking from paddock to garment.</div>
+    </div>
+    <div class="mat-cell r d4">
+      <div class="mat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="mat-name">Down Alternative</div>
+      <div class="mat-desc">Primaloft® Gold Active+. Performs when wet, packs to 650-fill-equivalent. Entirely animal-free.</div>
+    </div>
+    <div class="mat-cell r d5">
+      <div class="mat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <div class="mat-name">Vibram® Outsole</div>
+      <div class="mat-desc">Megagrip compound with 53% recycled natural rubber. Tested on limestone, wet basalt, and scree at angle.</div>
+    </div>
+    <div class="mat-cell r d6">
+      <div class="mat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 0v20M2 12h20"/></svg>
+      </div>
+      <div class="mat-name">Dyneema® Core</div>
+      <div class="mat-desc">15× stronger than steel at equal weight. Used in critical load paths in the Scree Pack and harness webbing.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FIELD NOTES -->
+<section id="field-notes" aria-labelledby="notes-h">
+  <span class="label r"><span class="eyebrow-rule"></span>Field Notes</span>
+  <h2 class="display display-lg r d1" id="notes-h">From the<br><em style="font-style:italic">terrain.</em></h2>
+  <div class="notes-grid">
+    <div class="note-item r d2">
+      <div class="note-visual">
+        <div class="note-visual-bg" style="background:linear-gradient(150deg,#0c1408 0%,#162412 50%,#203018 100%)"></div>
+      </div>
+      <div class="note-date">12 Nov 2024 · Scottish Highlands</div>
+      <h3 class="note-title">Forty-eight hours on the Cairngorms in November</h3>
+      <p class="note-excerpt">Wind at 80km/h, sleet, zero visibility above 900m. The Ridge Shell did not move. This is a test report, not a review.</p>
+      <span class="note-read">Read the report</span>
+    </div>
+    <div class="note-item r d3">
+      <div class="note-visual">
+        <div class="note-visual-bg" style="background:linear-gradient(140deg,#100e08 0%,#1e1808 50%,#2e2610 100%)"></div>
+      </div>
+      <div class="note-date">04 Oct 2024 · Patagonia</div>
+      <h3 class="note-title">What breaks first when everything is wet for two weeks</h3>
+      <p class="note-excerpt">A failure log from Lena Voss's Torres del Paine traverse. Honest, unsponsored, and useful.</p>
+      <span class="note-read">Read the report</span>
+    </div>
+    <div class="note-item r d4">
+      <div class="note-visual">
+        <div class="note-visual-bg" style="background:linear-gradient(160deg,#081010 0%,#10201e 50%,#182e2c 100%)"></div>
+      </div>
+      <div class="note-date">22 Aug 2024 · Norwegian Fjords</div>
+      <h3 class="note-title">The Cairn Boot at altitude: a podiatrist and a climber compare notes</h3>
+      <p class="note-excerpt">Foot strike data, blister mapping, and a lacing technique nobody talks about. Pure mechanics.</p>
+      <span class="note-read">Read the report</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta-section" aria-labelledby="cta-h">
+  <div class="cta-copy">
+    <span class="label r"><span class="eyebrow-rule"></span>Join the Carnage List</span>
+    <h2 class="display display-lg r d1" id="cta-h">First access.<br><em style="font-style:italic">No noise.</em></h2>
+    <p class="body-copy r d2">New drops, field reports, and early access to limited runs. We email when we have something worth saying.</p>
+  </div>
+  <div class="r d2">
+    <form class="cta-form" onsubmit="handleCta(event)" aria-label="Email signup">
+      <div class="cta-field-wrap">
+        <label for="cta-name" class="cta-label-float">Your name</label>
+        <input type="text" id="cta-name" class="cta-input" placeholder="First name" autocomplete="given-name"/>
+      </div>
+      <div class="cta-field-wrap">
+        <label for="cta-email" class="cta-label-float">Email address</label>
+        <input type="email" id="cta-email" class="cta-input" placeholder="you@example.com" required autocomplete="email"/>
+      </div>
+      <button type="submit" class="cta-btn" id="cta-submit">Join the List</button>
+      <p class="cta-fine" id="cta-confirm" style="display:none">You're in. Watch for a message from us.</p>
+      <p class="cta-fine">One email per month. Unsubscribe anytime.</p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <h2 class="display" style="font-size:36px">Carnage</h2>
+      <p>Wilderness gear built for conditions that don't forgive. Designed in the field. Made to last a decade.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Shop</h5>
+      <ul>
+        <li><a href="#">Outerwear</a></li>
+        <li><a href="#">Midlayer</a></li>
+        <li><a href="#">Bottoms</a></li>
+        <li><a href="#">Footwear</a></li>
+        <li><a href="#">Carry</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Materials</a></li>
+        <li><a href="#">Field Notes</a></li>
+        <li><a href="#">Repair Program</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Support</h5>
+      <ul>
+        <li><a href="#">Sizing Guide</a></li>
+        <li><a href="#">Care & Repair</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 Carnage Ltd. All rights reserved. Made somewhere cold.</p>
+    <nav class="footer-socials" aria-label="Social links">
+      <a href="#" class="soc" aria-label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#" class="soc" aria-label="X / Twitter"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      <a href="#" class="soc" aria-label="YouTube"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.45A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.45a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+/* ──────── THEME TOGGLE ──────── */
+const root=document.documentElement;
+const btn=document.getElementById('theme-btn');
+const icon=document.getElementById('theme-icon');
+let dark=true;
+const moonSVG=`<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>`;
+const sunSVG=`<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
+btn.addEventListener('click',()=>{
+  dark=!dark;
+  root.setAttribute('data-theme',dark?'dark':'light');
+  icon.innerHTML=dark?sunSVG:moonSVG;
+});
+
+/* ──────── NAV SCROLL ──────── */
+window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',scrollY>60);},{passive:true});
+
+/* ──────── MARQUEE ──────── */
+const ITEMS=['Ridge Shell','Summit Fleece','Gorge Trousers','Scree Pack 38L','Cairn Boot','Thermal Base','Watershed Glove','Boulderfield Beanie','Couloir Gaiter','Via Ferrata Harness'];
+const track=document.getElementById('marquee-track');
+const all=[...ITEMS,...ITEMS];
+track.innerHTML=all.map(n=>`<span class="marquee-item">${n}<span class="marquee-dot" aria-hidden="true"></span></span>`).join('');
+
+/* ──────── REVEALS ──────── */
+const ro=new IntersectionObserver(ee=>{ee.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');ro.unobserve(e.target);}});},{threshold:.1});
+document.querySelectorAll('.r').forEach(el=>ro.observe(el));
+
+/* ──────── CTA ──────── */
+window.handleCta=function(e){
+  e.preventDefault();
+  const btn=document.getElementById('cta-submit');
+  btn.textContent='Joining…';btn.disabled=true;
+  setTimeout(()=>{btn.style.display='none';document.getElementById('cta-confirm').style.display='block';},900);
+};
+
+/* ──────── NOISE HELPERS ──────── */
+function smoothstep(a,b,t){t=Math.max(0,Math.min(1,(t-a)/(b-a)));return t*t*(3-2*t);}
+function lerp(a,b,t){return a+t*(b-a);}
+// Minimal value noise
+const PERM=(()=>{const p=Array.from({length:256},(_,i)=>i);for(let i=255;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]];}return [...p,...p];})();
+function fade(t){return t*t*t*(t*(t*6-15)+10);}
+function grad1d(h,x){return(h&1)?x:-x;}
+function noise1d(x){const X=Math.floor(x)&255,xf=x-Math.floor(x),u=fade(xf);return lerp(grad1d(PERM[X],xf),grad1d(PERM[X+1],xf-1),u);}
+function noise2d(x,y){
+  const X=Math.floor(x)&255,Y=Math.floor(y)&255;
+  const xf=x-Math.floor(x),yf=y-Math.floor(y);
+  const u=fade(xf),v=fade(yf);
+  const aa=PERM[PERM[X]+Y],ab=PERM[PERM[X]+Y+1],ba=PERM[PERM[X+1]+Y],bb=PERM[PERM[X+1]+Y+1];
+  const g=(h,gx,gy)=>{const h2=h&3;return[gx,gy,-gx,-gy][h2]*(h&4?gy:gx)+([-gy,gx,gy,-gx][h2])*(h&4?gx:gy);};
+  const dot=(h,gx,gy)=>{const a=PERM[h]&3;const dx=[1,-1,1,-1][a],dy=[1,1,-1,-1][a];return dx*gx+dy*gy;};
+  return lerp(lerp(dot(aa,xf,yf),dot(ba,xf-1,yf),u),lerp(dot(ab,xf,yf-1),dot(bb,xf-1,yf-1),u),v);
+}
+function fbm(x,y,oct=5){
+  let v=0,a=.5,f=1,mx=0;
+  for(let i=0;i<oct;i++){v+=a*noise2d(x*f,y*f);mx+=a;f*=2;a*=.5;}
+  return v/mx;
+}
+
+/* ──────── HERO TERRAIN CANVAS ──────── */
+(()=>{
+  const canvas=document.getElementById('terrain-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,t=0;
+
+  function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight;}
+  resize();window.addEventListener('resize',()=>{resize();},{ passive:true});
+
+  // star field
+  const STARS=Array.from({length:220},()=>({
+    x:Math.random(),y:Math.random()*.5,r:Math.random()*.9+.1,a:Math.random()
+  }));
+
+  function draw(){
+    t+=.0004;
+    ctx.clearRect(0,0,W,H);
+
+    // SKY gradient — deep indigo twilight
+    const sky=ctx.createLinearGradient(0,0,0,H*.75);
+    sky.addColorStop(0,'#050810');
+    sky.addColorStop(.35,'#0a1220');
+    sky.addColorStop(.65,'#12201a');
+    sky.addColorStop(1,'#1a2e18');
+    ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+
+    // Stars
+    STARS.forEach(s=>{
+      const twinkle=.5+.5*Math.sin(t*800+s.a*100);
+      ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(220,215,200,${twinkle*0.7})`;ctx.fill();
+    });
+
+    // Atmospheric glow near horizon
+    const glow=ctx.createRadialGradient(W*.45,H*.54,0,W*.45,H*.54,W*.45);
+    glow.addColorStop(0,'rgba(40,60,30,.18)');
+    glow.addColorStop(.5,'rgba(20,35,15,.08)');
+    glow.addColorStop(1,'transparent');
+    ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+
+    // Moon
+    const mx=W*.78,my=H*.14;
+    const moonGlow=ctx.createRadialGradient(mx,my,0,mx,my,60);
+    moonGlow.addColorStop(0,'rgba(215,210,190,.15)');
+    moonGlow.addColorStop(.4,'rgba(215,210,190,.05)');
+    moonGlow.addColorStop(1,'transparent');
+    ctx.fillStyle=moonGlow;ctx.fillRect(0,0,W,H);
+    ctx.beginPath();ctx.arc(mx,my,14,0,Math.PI*2);
+    ctx.fillStyle='rgba(220,215,195,.85)';ctx.fill();
+
+    // TERRAIN LAYERS — 4 ridgelines at different depths
+    const layers=[
+      {yOff:.72,amp:.12,scl:.8,spd:.00008,col:[15,28,12],opa:.95},
+      {yOff:.65,amp:.09,scl:1.2,spd:.00013,col:[20,38,16],opa:.88},
+      {yOff:.58,amp:.07,scl:1.8,spd:.00018,col:[30,52,24],opa:.82},
+      {yOff:.52,amp:.05,scl:2.8,spd:.00022,col:[42,68,34],opa:.7},
+    ];
+
+    layers.forEach(l=>{
+      const pts=[];
+      const STEPS=W+1;
+      for(let px=0;px<=STEPS;px++){
+        const nx=px/W*3+t*l.spd*W*0.1;
+        const ny=t*l.spd*0.5;
+        const h=fbm(nx*l.scl,ny*l.scl+l.yOff,6);
+        pts.push({x:px,y:H*(l.yOff-h*l.amp)});
+      }
+      ctx.beginPath();
+      ctx.moveTo(0,H);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.lineTo(W,H);ctx.closePath();
+      ctx.fillStyle=`rgba(${l.col[0]},${l.col[1]},${l.col[2]},${l.opa})`;
+      ctx.fill();
+
+      // Ridge highlight
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x,pts[0].y);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.strokeStyle=`rgba(${l.col[0]+20},${l.col[1]+26},${l.col[2]+16},.35)`;
+      ctx.lineWidth=1;ctx.stroke();
+    });
+
+    // Foreground fog band
+    const fog=ctx.createLinearGradient(0,H*.68,0,H*.78);
+    fog.addColorStop(0,'transparent');
+    fog.addColorStop(.5,'rgba(20,35,18,.4)');
+    fog.addColorStop(1,'transparent');
+    ctx.fillStyle=fog;ctx.fillRect(0,0,W,H);
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ──────── FEATURE CANVAS — close-up rock texture ──────── */
+(()=>{
+  const canvas=document.getElementById('feature-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,t=0;
+  function resize(){W=canvas.width=canvas.offsetWidth||600;H=canvas.height=canvas.offsetHeight||600;}
+  resize();window.addEventListener('resize',resize,{passive:true});
+
+  function draw(){
+    t+=.0006;
+    ctx.clearRect(0,0,W,H);
+    // Base rock color
+    ctx.fillStyle='#0e140a';ctx.fillRect(0,0,W,H);
+    // Layered rock strata
+    for(let y=0;y<=H;y+=1){
+      const nx=t*.3,ny=y/H*4+t*.05;
+      const n=fbm(nx+.5,ny,6);
+      const n2=fbm(nx+2,ny+.5,4);
+      const lum=Math.floor(10+n*22+n2*10);
+      const r=lum+4,g=lum+2,b=lum-2;
+      ctx.strokeStyle=`rgb(${r},${g},${b})`;
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    }
+    // Crack lines
+    ctx.strokeStyle='rgba(8,12,6,.6)';ctx.lineWidth=1.5;
+    for(let i=0;i<6;i++){
+      ctx.beginPath();
+      let cx=W*((.15+i*.14)+Math.sin(t*.3+i)*.04),cy=0;
+      ctx.moveTo(cx,cy);
+      for(let y=0;y<H;y+=6){
+        cx+=noise1d(y*.05+i*2+t*.1)*4;
+        ctx.lineTo(cx,y);
+      }
+      ctx.stroke();
+    }
+    // Moss patches
+    for(let i=0;i<5;i++){
+      const mx=W*(.1+i*.18+Math.sin(t*.2+i)*.02);
+      const my=H*(.3+Math.sin(i*1.3)*.25);
+      const mg=ctx.createRadialGradient(mx,my,0,mx,my,W*.12);
+      mg.addColorStop(0,'rgba(44,70,28,.35)');
+      mg.addColorStop(.6,'rgba(30,50,18,.12)');
+      mg.addColorStop(1,'transparent');
+      ctx.fillStyle=mg;ctx.fillRect(0,0,W,H);
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ──────── PRODUCT CARD MINI-CANVASES ──────── */
+document.querySelectorAll('.prod-canvas').forEach(cv=>{
+  const hue=+cv.dataset.hue||120;
+  const variant=+cv.dataset.variant||1;
+  const ctx=cv.getContext('2d');
+  cv.style.position='absolute';cv.style.inset='0';cv.style.width='100%';cv.style.height='100%';cv.style.opacity='.55';
+  function rs(){cv.width=cv.offsetWidth||300;cv.height=cv.offsetHeight||280;}
+  rs();
+  window.addEventListener('resize',rs,{passive:true});
+  let t=0;
+  (function draw(){
+    t+=.0008;
+    const W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    // Painterly texture
+    for(let y=0;y<H;y+=2){
+      const n=fbm(y*.02+variant,t*.1,4);
+      const n2=fbm(y*.04+variant+1,t*.08+.5,3);
+      const lum=18+n*28;
+      const sat=30+n2*20;
+      ctx.strokeStyle=`hsla(${hue+n2*20},${sat}%,${lum}%,.6)`;
+      ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    }
+    requestAnimationFrame(draw);
+  })();
+});
+</script>
+</body>
+</html>
