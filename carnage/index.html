@@ -1,976 +1,605 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Carnage — Born from the Wild</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARNAGE — Active & Lifestyle Wear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* ──────── TOKENS ──────── */
-:root {
-  --soil:    #0F1209;
-  --forest:  #1C2B16;
-  --moss:    #4A5E38;
-  --amber:   #B89A74;
-  --linen:   #EAE4D8;
-  --cream:   #F5F1EA;
-  --blood:   #A33218;
-  --fog:     rgba(234,228,216,0.06);
-  --border:  rgba(184,154,116,0.18);
+:root{
+  --ink:#0A0A0B;--carbon:#131316;--smoke:#1C1C21;--bone:#F2F0EB;--ash:#8E8E96;
+  --blood:#E2201C;--blood-deep:#8E120F;
+  --bg:var(--ink);--fg:var(--bone);--sub:var(--ash);--card:var(--carbon);--line:rgba(242,240,235,.1);
+  --font-d:'Anton',sans-serif;--font-b:'Archivo',sans-serif;--font-m:'Space Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-b);overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased}
+::selection{background:var(--blood);color:var(--bone)}
+h1,h2,h3{font-family:var(--font-d);font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:.01em}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.mono{font-family:var(--font-m);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sub)}
 
-  --bg:      var(--soil);
-  --surface: var(--forest);
-  --text:    var(--linen);
-  --muted:   rgba(234,228,216,0.45);
-  --accent:  var(--blood);
+/* ---------- loader ---------- */
+#loader{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;transition:opacity .8s cubic-bezier(.77,0,.18,1),visibility .8s}
+#loader.done{opacity:0;visibility:hidden}
+#loader .word{font-family:var(--font-d);font-size:clamp(2.6rem,8vw,6rem);text-transform:uppercase;overflow:hidden;height:1.05em;display:flex}
+#loader .word span{display:inline-block;transform:translateY(110%);animation:riseUp .9s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes riseUp{to{transform:translateY(0)}}
+#loadbar{width:min(280px,60vw);height:2px;background:var(--line);position:relative;overflow:hidden}
+#loadbar i{position:absolute;inset:0;background:var(--blood);transform-origin:left;transform:scaleX(0);transition:transform .3s ease}
+#loadpct{font-family:var(--font-m);font-size:.7rem;letter-spacing:.2em;color:var(--sub)}
 
-  --fh: 'Cormorant Garamond', Georgia, serif;
-  --fb: 'DM Sans', system-ui, sans-serif;
-  --fm: 'DM Mono', 'Courier New', monospace;
-}
-@media (prefers-color-scheme: light) { :root { --bg: var(--cream); --surface: #E8E1D4; --text: var(--soil); --muted: rgba(15,18,9,0.48); --border: rgba(15,18,9,0.12); --fog: rgba(15,18,9,0.04); } }
-:root[data-theme="light"] { --bg: var(--cream); --surface: #E8E1D4; --text: var(--soil); --muted: rgba(15,18,9,0.48); --border: rgba(15,18,9,0.12); --fog: rgba(15,18,9,0.04); }
-:root[data-theme="dark"]  { --bg: var(--soil); --surface: var(--forest); --text: var(--linen); --muted: rgba(234,228,216,0.45); --border: rgba(184,154,116,0.18); --fog: rgba(234,228,216,0.06); }
+/* ---------- fixed webgl canvas ---------- */
+#gl{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-/* ──────── RESET ──────── */
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
-html { scroll-behavior:smooth; font-size:16px }
-body { background:var(--bg); color:var(--text); font-family:var(--fb); font-weight:300; line-height:1.65; overflow-x:hidden; transition:background .4s,color .4s }
-img { max-width:100%; display:block }
-a { color:inherit; text-decoration:none }
-button { cursor:pointer; font-family:inherit; border:none; background:none }
-::-webkit-scrollbar { width:3px }
-::-webkit-scrollbar-thumb { background:var(--moss) }
-::selection { background:var(--blood); color:#fff }
+/* ---------- cursor ---------- */
+#cursor{position:fixed;width:14px;height:14px;border:1px solid var(--bone);border-radius:50%;pointer-events:none;z-index:9000;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s;mix-blend-mode:difference}
+#cursor.hot{width:56px;height:56px;background:rgba(226,32,28,.25);border-color:var(--blood)}
+@media(pointer:coarse){#cursor{display:none}}
 
-/* ──────── GRAIN OVERLAY ──────── */
-body::before {
-  content:''; pointer-events:none;
-  position:fixed; inset:0; z-index:1000;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  opacity:.55; mix-blend-mode:overlay;
-}
+/* ---------- nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:1.1rem clamp(1.2rem,4vw,3rem);mix-blend-mode:difference}
+.logo{font-family:var(--font-d);font-size:1.35rem;letter-spacing:.06em;color:#fff}
+.logo em{color:var(--blood);font-style:normal}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{font-family:var(--font-m);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:#fff;position:relative;padding:.3rem 0}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:#fff;transform:scaleX(0);transform-origin:right;transition:transform .4s cubic-bezier(.77,0,.18,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+.cart-btn{font-family:var(--font-m);font-size:.68rem;letter-spacing:.2em;color:#fff;border:1px solid rgba(255,255,255,.4);padding:.55rem 1.1rem;border-radius:99px;cursor:pointer;background:none;transition:background .3s,color .3s}
+.cart-btn:hover{background:#fff;color:#000}
+@media(max-width:760px){.nav-links{display:none}}
 
-/* ──────── NAV ──────── */
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:200;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 56px; height:72px;
-  transition:background .5s, backdrop-filter .5s;
-}
-nav.scrolled { background:rgba(15,18,9,.85); backdrop-filter:blur(18px); border-bottom:1px solid var(--border) }
-.nav-wordmark { font-family:var(--fh); font-size:22px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--text) }
-.nav-links { display:flex; gap:36px; list-style:none }
-.nav-links a { font-family:var(--fm); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); transition:color .2s }
-.nav-links a:hover { color:var(--text) }
-.nav-links a:focus-visible { outline:1px solid var(--amber); outline-offset:4px }
-.nav-right { display:flex; align-items:center; gap:24px }
-.theme-toggle {
-  width:40px; height:40px; display:flex; align-items:center; justify-content:center;
-  color:var(--muted); transition:color .2s;
-}
-.theme-toggle:hover { color:var(--text) }
-.theme-toggle:focus-visible { outline:1px solid var(--amber); outline-offset:3px }
-.nav-cta {
-  font-family:var(--fm); font-size:10px; letter-spacing:.18em; text-transform:uppercase;
-  padding:10px 22px; border:1px solid var(--border); color:var(--text);
-  transition:background .25s, border-color .25s, color .25s;
-}
-.nav-cta:hover { background:var(--amber); border-color:var(--amber); color:var(--soil) }
-.nav-cta:focus-visible { outline:1px solid var(--amber); outline-offset:3px }
+/* ---------- smooth-scroll wrapper ---------- */
+#scroll-wrap{position:fixed;top:0;left:0;width:100%;will-change:transform;z-index:1}
+#spacer{width:1px}
 
-/* ──────── HERO ──────── */
-#hero { position:relative; height:100dvh; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end }
-#terrain-canvas { position:absolute; inset:0; width:100%; height:100%; display:block }
-.hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(15,18,9,.92) 0%, rgba(15,18,9,.3) 55%, transparent 100%) }
-.hero-content {
-  position:relative; z-index:2;
-  padding:0 80px 72px;
-  display:grid; grid-template-columns:1fr auto;
-  align-items:flex-end; gap:48px;
-}
-.hero-headline {
-  font-family:var(--fh); font-size:clamp(96px,13vw,200px);
-  font-weight:600; line-height:.88; text-transform:uppercase;
-  letter-spacing:-.02em; color:var(--linen);
-  text-wrap:balance;
-}
-.hero-headline em { font-style:italic; font-weight:300; color:var(--amber); display:block }
-.hero-right { text-align:right; max-width:260px }
-.hero-label { font-family:var(--fm); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--amber); margin-bottom:14px }
-.hero-sub { font-size:14px; line-height:1.75; color:var(--muted) }
-.hero-scroll {
-  position:absolute; left:80px; bottom:30px; z-index:2;
-  display:flex; align-items:center; gap:12px;
-  font-family:var(--fm); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
-  animation:scrollpulse 2.5s ease-in-out infinite;
-}
-.hero-scroll-line { width:40px; height:1px; background:var(--amber); opacity:.5 }
-@keyframes scrollpulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+/* ---------- hero ---------- */
+.hero{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 clamp(1.2rem,4vw,3rem) 8vh;position:relative}
+.hero-title{font-size:clamp(4rem,17vw,15.5rem);letter-spacing:-.005em;position:relative;z-index:2}
+.hero-title .line{display:block;overflow:hidden}
+.hero-title .line span{display:inline-block;transform:translateY(115%);transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
+body.ready .hero-title .line span{transform:translateY(0)}
+.hero-title .line:nth-child(2) span{transition-delay:.1s;color:transparent;-webkit-text-stroke:1.5px var(--bone)}
+.hero-meta{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-top:2.2rem;flex-wrap:wrap;z-index:2;position:relative}
+.hero-meta p{max-width:34ch;color:var(--sub);font-size:.95rem}
+.hero-tags{display:flex;gap:.5rem;flex-wrap:wrap}
+.tag{font-family:var(--font-m);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:.45rem 1rem;color:var(--sub)}
+.scroll-hint{position:absolute;right:clamp(1.2rem,4vw,3rem);bottom:8vh;writing-mode:vertical-rl;font-family:var(--font-m);font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:.8rem}
+.scroll-hint::after{content:"";width:1px;height:56px;background:linear-gradient(var(--blood),transparent);animation:drip 2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media(max-width:760px){.scroll-hint{display:none}}
 
-/* ──────── MARQUEE ──────── */
-.marquee-band {
-  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-  padding:16px 0; overflow:hidden; background:var(--surface);
-}
-.marquee-track { display:flex; width:max-content; animation:march 40s linear infinite }
-@media(prefers-reduced-motion:reduce){.marquee-track{animation:none}}
-@keyframes march{to{transform:translateX(-50%)}}
-.marquee-item {
-  font-family:var(--fh); font-style:italic; font-size:18px; font-weight:300;
-  color:var(--muted); padding:0 40px; white-space:nowrap;
-  display:inline-flex; align-items:center; gap:36px;
-}
-.marquee-dot { width:4px; height:4px; border-radius:50%; background:var(--amber); opacity:.6; flex-shrink:0 }
+/* ---------- marquee ---------- */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.1rem 0;overflow:hidden;white-space:nowrap;background:var(--bg)}
+.marquee-track{display:inline-flex;gap:3.2rem;animation:mq 26s linear infinite;will-change:transform}
+.marquee-track span{font-family:var(--font-d);font-size:1.15rem;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);display:inline-flex;align-items:center;gap:3.2rem}
+.marquee-track span i{width:7px;height:7px;background:var(--blood);border-radius:50%;font-style:normal}
+@keyframes mq{to{transform:translateX(-50%)}}
 
-/* ──────── SECTION SHARED ──────── */
-.label {
-  font-family:var(--fm); font-size:10px; letter-spacing:.22em; text-transform:uppercase;
-  color:var(--amber); margin-bottom:20px; display:block;
-}
-.eyebrow-rule { width:40px; height:1px; background:var(--amber); display:inline-block; vertical-align:middle; margin-right:12px }
-.display {
-  font-family:var(--fh); font-weight:600; text-transform:uppercase;
-  line-height:.92; letter-spacing:-.01em; text-wrap:balance;
-}
-.display-xl { font-size:clamp(52px,7vw,108px) }
-.display-lg { font-size:clamp(40px,5vw,80px) }
-.display-md { font-size:clamp(32px,4vw,60px) }
-.body-copy { font-size:15px; line-height:1.8; color:var(--muted); max-width:520px }
+/* ---------- sections ---------- */
+section{position:relative;padding:clamp(5rem,12vh,9rem) clamp(1.2rem,4vw,3rem);background:var(--bg)}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:3.5rem;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(2.6rem,7vw,5.5rem)}
+.sec-head h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1px var(--bone)}
+.counter{font-family:var(--font-m);font-size:.72rem;color:var(--sub);letter-spacing:.18em}
 
-/* REVEAL */
-.r { opacity:0; transform:translateY(24px); transition:opacity .85s cubic-bezier(.23,1,.32,1), transform .85s cubic-bezier(.23,1,.32,1) }
-.r.on { opacity:1; transform:translateY(0) }
-.r.from-left { transform:translateX(-24px) }
-.r.from-left.on { transform:translateX(0) }
-.d1{transition-delay:80ms}.d2{transition-delay:160ms}.d3{transition-delay:240ms}
-.d4{transition-delay:320ms}.d5{transition-delay:400ms}.d6{transition-delay:480ms}
-@media(prefers-reduced-motion:reduce){.r{opacity:1;transform:none;transition:none}}
+/* reveal */
+.rv{opacity:0;transform:translateY(46px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.rv.on{opacity:1;transform:none}
 
-/* ──────── MANIFESTO ──────── */
-#manifesto {
-  padding:140px 80px;
-  display:grid; grid-template-columns:1fr 1fr; gap:120px; align-items:center;
-}
-.manifesto-left { position:relative }
-.manifesto-number {
-  font-family:var(--fh); font-size:240px; font-weight:600; line-height:.8;
-  color:var(--border); position:absolute; top:-40px; left:-24px; z-index:0;
-  pointer-events:none; user-select:none; letter-spacing:-.05em;
-}
-.manifesto-text { position:relative; z-index:1 }
-.manifesto-right { border-left:1px solid var(--border); padding-left:56px }
-.manifesto-right p { font-size:16px; line-height:1.9; color:var(--muted); margin-bottom:20px }
-.manifesto-right p:last-child { margin-bottom:0 }
-.manifesto-stat { margin-top:48px; padding-top:36px; border-top:1px solid var(--border) }
-.stat-row { display:flex; gap:56px; margin-top:24px }
-.stat-n { font-family:var(--fh); font-size:52px; font-weight:600; color:var(--text); line-height:1 }
-.stat-l { font-family:var(--fm); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-top:6px }
+/* ---------- manifesto ---------- */
+.manifesto{max-width:1100px}
+.manifesto h2{font-family:var(--font-b);font-weight:600;text-transform:none;font-size:clamp(1.6rem,3.6vw,2.9rem);line-height:1.28;letter-spacing:-.01em}
+.manifesto h2 .dim{color:var(--sub)}
+.manifesto h2 .red{color:var(--blood)}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:4rem}
+.stat{background:var(--bg);padding:2rem 1.6rem}
+.stat b{font-family:var(--font-d);font-size:clamp(2rem,4.5vw,3.4rem);display:block;font-weight:400}
+.stat b i{color:var(--blood);font-style:normal}
+.stat span{font-family:var(--font-m);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sub)}
 
-/* ──────── COLLECTION ──────── */
-#collection { padding:80px 80px 140px; background:var(--surface) }
-.collection-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:72px }
-.collection-link {
-  font-family:var(--fm); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
-  border-bottom:1px solid var(--border); padding-bottom:2px; transition:color .2s, border-color .2s;
-}
-.collection-link:hover { color:var(--amber); border-color:var(--amber) }
-.coll-grid {
-  display:grid; grid-template-columns:1.4fr 1fr 1fr; grid-template-rows:auto auto;
-  gap:3px;
-}
-.coll-item { position:relative; overflow:hidden; cursor:pointer }
-.coll-item:first-child { grid-row:1/3 }
-.coll-visual {
-  position:absolute; inset:0;
-  transition:transform .7s cubic-bezier(.23,1,.32,1);
-}
-.coll-item:hover .coll-visual { transform:scale(1.04) }
-.coll-dark { position:absolute; inset:0; background:linear-gradient(to top, rgba(15,18,9,.88) 0%, rgba(15,18,9,.1) 60%, transparent 100%) }
-.coll-meta {
-  position:absolute; bottom:0; left:0; right:0; padding:28px 28px 32px;
-  transform:translateY(8px); transition:transform .4s cubic-bezier(.23,1,.32,1);
-}
-.coll-item:hover .coll-meta { transform:translateY(0) }
-.coll-tag { font-family:var(--fm); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--amber); margin-bottom:8px }
-.coll-name { font-family:var(--fh); font-size:24px; font-weight:600; text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px }
-.coll-price { font-family:var(--fm); font-size:12px; color:var(--muted) }
-.coll-arrow {
-  position:absolute; top:24px; right:24px;
-  width:36px; height:36px; border:1px solid rgba(184,154,116,.3);
-  display:flex; align-items:center; justify-content:center;
-  color:var(--amber); opacity:0; transition:opacity .3s, background .25s;
-}
-.coll-item:hover .coll-arrow { opacity:1 }
-.coll-arrow:hover { background:var(--amber); color:var(--soil) }
-/* Product visual cards */
-.pv { width:100%; height:100%; position:absolute; inset:0 }
-.pv-1 { background:linear-gradient(160deg,#0a1208 0%,#1a2c12 45%,#2a3d1e 100%) }
-.pv-2 { background:linear-gradient(140deg,#141008 0%,#241a0a 50%,#3a2a14 100%) }
-.pv-3 { background:linear-gradient(150deg,#0c1010 0%,#182420 50%,#243630 100%) }
-.pv-4 { background:linear-gradient(130deg,#100a08 0%,#1e1208 50%,#301c0c 100%) }
-.pv-5 { background:linear-gradient(155deg,#080c10 0%,#10182a 50%,#182840 100%) }
-/* Item heights */
-.coll-item:first-child { min-height:560px }
-.coll-item:not(:first-child) { min-height:272px }
+/* ---------- products ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.4rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;position:relative;transition:transform .5s cubic-bezier(.16,1,.3,1),border-color .4s}
+.card:hover{transform:translateY(-6px);border-color:rgba(226,32,28,.5)}
+.card-visual{aspect-ratio:4/4.6;position:relative;overflow:hidden}
+.card-visual canvas{width:100%;height:100%;display:block;transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.card:hover .card-visual canvas{transform:scale(1.06)}
+.card-badge{position:absolute;top:.9rem;left:.9rem;font-family:var(--font-m);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;background:var(--blood);color:#fff;padding:.32rem .7rem;border-radius:2px}
+.card-info{padding:1.1rem 1.2rem 1.3rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.card-info h3{font-family:var(--font-b);font-weight:600;text-transform:none;font-size:1rem;line-height:1.3}
+.card-info small{display:block;color:var(--sub);font-size:.78rem;margin-top:.25rem;font-weight:400}
+.price{font-family:var(--font-m);font-size:.82rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.price s{color:var(--sub);margin-right:.4rem}
+.card-cta{position:absolute;inset:auto 0 0 0;background:var(--bone);color:var(--ink);font-family:var(--font-m);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;text-align:center;padding:.85rem;transform:translateY(100%);transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.card:hover .card-cta{transform:none}
 
-/* ──────── DARK FEATURE ──────── */
-#feature {
-  background:var(--forest);
-  padding:0;
-  display:grid; grid-template-columns:1fr 1fr;
-  min-height:80vh;
-  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-}
-.feature-canvas-wrap { position:relative; overflow:hidden }
-#feature-canvas { display:block; width:100%; height:100% }
-.feature-body { padding:100px 80px; display:flex; flex-direction:column; justify-content:center }
-.feature-body .display-lg { margin-bottom:36px }
-.feature-points { margin-top:48px; display:flex; flex-direction:column; gap:0 }
-.fp {
-  display:flex; align-items:flex-start; gap:20px;
-  padding:24px 0; border-bottom:1px solid var(--border);
-}
-.fp:first-child { border-top:1px solid var(--border) }
-.fp-num { font-family:var(--fm); font-size:10px; letter-spacing:.14em; color:var(--amber); margin-top:4px; flex-shrink:0 }
-.fp-title { font-family:var(--fh); font-size:18px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px }
-.fp-desc { font-size:13px; color:var(--muted); line-height:1.7 }
+/* ---------- split collections ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
+@media(max-width:860px){.split{grid-template-columns:1fr}}
+.coll{position:relative;border-radius:4px;overflow:hidden;min-height:520px;display:flex;align-items:flex-end;padding:2.4rem;border:1px solid var(--line);cursor:pointer}
+.coll canvas{position:absolute;inset:0;width:100%;height:100%;transition:transform 1s cubic-bezier(.16,1,.3,1)}
+.coll:hover canvas{transform:scale(1.05)}
+.coll::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(10,10,11,.88));pointer-events:none}
+.coll-txt{position:relative;z-index:2}
+.coll-txt h3{font-size:clamp(2.4rem,5vw,4rem)}
+.coll-txt .mono{margin-bottom:.6rem;display:block}
+.coll-link{display:inline-flex;align-items:center;gap:.6rem;margin-top:1.2rem;font-family:var(--font-m);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bone)}
+.coll-link i{font-style:normal;transition:transform .4s}
+.coll:hover .coll-link i{transform:translateX(6px)}
 
-/* ──────── QUOTE ──────── */
-#quote {
-  padding:140px 80px;
-  display:flex; flex-direction:column; align-items:center; text-align:center;
-  position:relative; overflow:hidden;
-}
-.quote-bg { position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 50%, rgba(74,94,56,.12) 0%, transparent 70%); pointer-events:none }
-.quote-mark { font-family:var(--fh); font-size:160px; line-height:.5; color:var(--border); font-weight:600; margin-bottom:24px }
-.quote-text { font-family:var(--fh); font-style:italic; font-size:clamp(28px,4vw,52px); font-weight:300; line-height:1.2; max-width:900px; margin-bottom:36px; color:var(--text) }
-.quote-attr { font-family:var(--fm); font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--amber) }
+/* ---------- tech ---------- */
+.tech-wrap{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+@media(max-width:900px){.tech-wrap{grid-template-columns:1fr}}
+#fabric-zoom{width:100%;aspect-ratio:1;border-radius:4px;border:1px solid var(--line);display:block}
+.tech-list{display:flex;flex-direction:column}
+.tech-item{padding:1.6rem 0;border-bottom:1px solid var(--line);display:flex;gap:1.6rem;align-items:baseline}
+.tech-item:first-child{border-top:1px solid var(--line)}
+.tech-item b{font-family:var(--font-m);font-size:.68rem;color:var(--blood);letter-spacing:.15em;min-width:3ch}
+.tech-item h3{font-family:var(--font-b);text-transform:none;font-weight:600;font-size:1.15rem;margin-bottom:.3rem}
+.tech-item p{color:var(--sub);font-size:.9rem;max-width:44ch}
 
-/* ──────── MATERIALS ──────── */
-#materials { padding:120px 80px }
-.materials-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:72px }
-.mat-cell {
-  padding:48px 40px; background:var(--surface);
-  position:relative; overflow:hidden;
-  transition:background .3s;
-}
-.mat-cell::before {
-  content:''; position:absolute; left:0; top:0; bottom:0; width:2px;
-  background:var(--amber); transform:scaleY(0); transform-origin:bottom;
-  transition:transform .4s cubic-bezier(.23,1,.32,1);
-}
-.mat-cell:hover::before { transform:scaleY(1) }
-.mat-cell:hover { background:var(--forest) }
-.mat-icon { width:44px; height:44px; margin-bottom:28px }
-.mat-icon svg { width:100%; height:100%; color:var(--amber) }
-.mat-name { font-family:var(--fh); font-size:22px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; margin-bottom:12px }
-.mat-desc { font-size:13px; color:var(--muted); line-height:1.75 }
+/* ---------- big statement ---------- */
+.statement{text-align:center;padding-top:clamp(7rem,16vh,12rem);padding-bottom:clamp(7rem,16vh,12rem)}
+.statement h2{font-size:clamp(3rem,11vw,10rem)}
+.statement h2 .fill{color:var(--blood)}
+.statement h2 .stroke{color:transparent;-webkit-text-stroke:1.5px var(--bone)}
+.statement p{color:var(--sub);max-width:46ch;margin:2rem auto 0}
 
-/* ──────── FIELD NOTES ──────── */
-#field-notes { padding:120px 80px; background:var(--surface) }
-.notes-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; margin-top:72px }
-.note-item { cursor:pointer }
-.note-visual { height:240px; position:relative; overflow:hidden; margin-bottom:24px }
-.note-visual-bg { position:absolute; inset:0; transition:transform .6s cubic-bezier(.23,1,.32,1) }
-.note-item:hover .note-visual-bg { transform:scale(1.05) }
-.note-date { font-family:var(--fm); font-size:10px; letter-spacing:.16em; color:var(--muted); margin-bottom:10px }
-.note-title { font-family:var(--fh); font-size:22px; font-weight:600; text-transform:uppercase; line-height:1.05; letter-spacing:.03em; margin-bottom:12px; transition:color .2s }
-.note-item:hover .note-title { color:var(--amber) }
-.note-excerpt { font-size:13px; color:var(--muted); line-height:1.75 }
-.note-read { font-family:var(--fm); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--amber); margin-top:16px; display:inline-flex; align-items:center; gap:8px }
-.note-read::after { content:'→'; font-size:12px }
+/* ---------- cta ---------- */
+.cta-band{border-top:1px solid var(--line);text-align:center}
+.cta-band h2{font-size:clamp(2.6rem,7vw,5.8rem);margin-bottom:1.4rem}
+.cta-band p{color:var(--sub);max-width:44ch;margin:0 auto 2.4rem}
+.btn{display:inline-flex;align-items:center;gap:.8rem;background:var(--blood);color:#fff;font-family:var(--font-m);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;padding:1.15rem 2.6rem;border-radius:99px;border:none;cursor:pointer;position:relative;overflow:hidden;transition:transform .3s}
+.btn::before{content:"";position:absolute;inset:0;background:var(--bone);transform:translateY(101%);transition:transform .45s cubic-bezier(.16,1,.3,1);border-radius:99px}
+.btn:hover::before{transform:none}
+.btn span{position:relative;z-index:1;transition:color .3s}
+.btn:hover span{color:var(--ink)}
+.btn:active{transform:scale(.96)}
 
-/* ──────── CTA ──────── */
-#cta-section {
-  padding:160px 80px;
-  background:var(--soil);
-  display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;
-  border-top:1px solid var(--border);
-}
-.cta-copy .display-lg { margin-bottom:24px }
-.cta-form { display:flex; flex-direction:column; gap:16px }
-.cta-field-wrap { position:relative }
-.cta-label-float { font-family:var(--fm); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; display:block }
-.cta-input {
-  width:100%; background:transparent;
-  border:1px solid var(--border); padding:16px 20px;
-  color:var(--text); font-family:var(--fb); font-size:14px;
-  outline:none; transition:border-color .2s;
-}
-.cta-input:focus { border-color:var(--amber) }
-.cta-input::placeholder { color:rgba(234,228,216,.25) }
-.cta-btn {
-  background:var(--amber); color:var(--soil);
-  font-family:var(--fm); font-size:11px; font-weight:400; letter-spacing:.22em; text-transform:uppercase;
-  padding:18px 32px; border:1px solid var(--amber); align-self:flex-start;
-  transition:background .25s, color .25s;
-}
-.cta-btn:hover { background:transparent; color:var(--amber) }
-.cta-btn:focus-visible { outline:1px solid var(--amber); outline-offset:3px }
-.cta-fine { font-size:12px; color:var(--muted); opacity:.6 }
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:3.5rem clamp(1.2rem,4vw,3rem) 2rem;background:var(--bg);position:relative;z-index:1}
+.foot-grid{display:flex;justify-content:space-between;gap:3rem;flex-wrap:wrap;margin-bottom:3rem}
+.foot-grid .logo{font-size:2rem}
+.foot-col{display:flex;flex-direction:column;gap:.7rem}
+.foot-col b{font-family:var(--font-m);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sub);margin-bottom:.4rem}
+.foot-col a{font-size:.9rem;color:var(--fg);opacity:.8;transition:opacity .3s,color .3s}
+.foot-col a:hover{opacity:1;color:var(--blood)}
+.foot-base{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:1.6rem}
+.foot-base span{font-family:var(--font-m);font-size:.62rem;letter-spacing:.15em;color:var(--sub);text-transform:uppercase}
 
-/* ──────── FOOTER ──────── */
-footer {
-  padding:72px 80px 40px;
-  background:var(--soil); border-top:1px solid var(--border);
-}
-.footer-top { display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:48px; margin-bottom:60px }
-.footer-brand .display { font-size:40px; margin-bottom:16px }
-.footer-brand p { font-size:13px; color:var(--muted); line-height:1.75; max-width:240px }
-.footer-col h5 { font-family:var(--fm); font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--amber); margin-bottom:20px }
-.footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px }
-.footer-col a { font-size:13px; color:var(--muted); transition:color .2s }
-.footer-col a:hover { color:var(--text) }
-.footer-col a:focus-visible { outline:1px solid var(--amber) }
-.footer-bottom { border-top:1px solid var(--border); padding-top:28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px }
-.footer-copy { font-family:var(--fm); font-size:10px; letter-spacing:.14em; color:var(--muted) }
-.footer-socials { display:flex; gap:8px }
-.soc {
-  width:40px; height:40px; border:1px solid var(--border);
-  display:flex; align-items:center; justify-content:center;
-  color:var(--muted); transition:all .2s;
-}
-.soc:hover { border-color:var(--amber); color:var(--amber) }
-.soc:focus-visible { outline:1px solid var(--amber) }
-
-/* ──────── RESPONSIVE ──────── */
-@media(max-width:1100px){
-  nav { padding:0 32px }
-  .hero-content { padding:0 48px 60px; grid-template-columns:1fr; gap:24px }
-  .hero-right { max-width:none; text-align:left }
-  #manifesto { grid-template-columns:1fr; gap:60px; padding:100px 48px }
-  .manifesto-number { font-size:160px }
-  #collection { padding:60px 48px 100px }
-  .coll-grid { grid-template-columns:1fr 1fr; grid-template-rows:auto }
-  .coll-item:first-child { grid-row:auto; grid-column:1/3 }
-  #feature { grid-template-columns:1fr }
-  .feature-canvas-wrap { min-height:320px }
-  .feature-body { padding:64px 48px }
-  #quote { padding:100px 48px }
-  #materials { padding:80px 48px }
-  .materials-grid { grid-template-columns:1fr 1fr }
-  #field-notes { padding:80px 48px }
-  .notes-grid { grid-template-columns:1fr 1fr; gap:32px }
-  #cta-section { padding:100px 48px; grid-template-columns:1fr }
-  footer { padding:56px 48px 32px }
-  .footer-top { grid-template-columns:1fr 1fr; gap:32px }
-}
-@media(max-width:680px){
-  nav { padding:0 22px }
-  .nav-links { display:none }
-  .hero-content { padding:0 24px 52px }
-  .hero-headline { font-size:clamp(72px,18vw,100px) }
-  #manifesto { padding:80px 24px }
-  #collection,.note-visual-bg,#field-notes,#materials,#cta-section,footer { padding-left:24px; padding-right:24px }
-  .coll-grid { grid-template-columns:1fr }
-  .coll-item:first-child { grid-column:auto }
-  .materials-grid,.notes-grid { grid-template-columns:1fr }
-  .footer-top { grid-template-columns:1fr }
-  .stat-row { gap:32px }
-  .stat-n { font-size:40px }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
 }
 </style>
 </head>
 <body>
 
-<!-- SKIP LINK -->
-<a href="#main" style="position:absolute;left:-9999px;top:4px;background:var(--amber);color:var(--soil);padding:10px 20px;font-family:var(--fm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;z-index:9999" onfocus="this.style.left='8px'" onblur="this.style.left='-9999px'">Skip to content</a>
-
-<!-- NAV -->
-<nav id="nav" role="navigation" aria-label="Main">
-  <a href="#" class="nav-wordmark" aria-label="Carnage home">Carnage</a>
-  <ul class="nav-links" role="list">
-    <li><a href="#collection">Collection</a></li>
-    <li><a href="#feature">The Build</a></li>
-    <li><a href="#materials">Materials</a></li>
-    <li><a href="#field-notes">Field Notes</a></li>
-  </ul>
-  <div class="nav-right">
-    <button class="theme-toggle" id="theme-btn" aria-label="Toggle theme" title="Toggle light/dark">
-      <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-      </svg>
-    </button>
-    <a href="#cta-section" class="nav-cta">Shop Now</a>
-  </div>
-</nav>
-
-<main id="main">
-
-<!-- HERO -->
-<section id="hero" aria-labelledby="hero-h">
-  <canvas id="terrain-canvas" aria-hidden="true"></canvas>
-  <div class="hero-overlay" aria-hidden="true"></div>
-  <div class="hero-content">
-    <h1 class="hero-headline" id="hero-h">
-      Born from<br><em>the wild.</em>
-    </h1>
-    <div class="hero-right">
-      <p class="hero-label">Est. 2019 — Wilderness Collection</p>
-      <p class="hero-sub">Gear forged in the places where nature doesn't apologize. Built for those who go where trails end.</p>
-    </div>
-  </div>
-  <div class="hero-scroll" aria-hidden="true">
-    <div class="hero-scroll-line"></div>
-    <span>Scroll to explore</span>
-  </div>
-</section>
-
-<!-- MARQUEE -->
-<div class="marquee-band" aria-label="Brand values" role="marquee">
-  <div class="marquee-track" id="marquee-track"></div>
+<div id="loader">
+  <div class="word"><span>CARNAGE<em style="color:var(--blood);font-style:normal">.</em></span></div>
+  <div id="loadbar"><i></i></div>
+  <div id="loadpct">00</div>
 </div>
 
-<!-- MANIFESTO -->
-<section id="manifesto" aria-labelledby="manifesto-h">
-  <div class="manifesto-left">
-    <div class="manifesto-number" aria-hidden="true">01</div>
-    <div class="manifesto-text">
-      <span class="label r"><span class="eyebrow-rule"></span>The Philosophy</span>
-      <h2 class="display display-xl r d1" id="manifesto-h">We don't<br>tame it.</h2>
-    </div>
-  </div>
-  <div class="manifesto-right r d2">
-    <p>Carnage was born on a ridge above the treeline where the wind doesn't care who you are. We make gear for that ridge — not for the parking lot.</p>
-    <p>Every stitch, every material, every silhouette is stress-tested in conditions that would snap anything designed in a studio. We design in the field, fail in the field, and rebuild until it's right.</p>
-    <p>Nothing is decorative here. If it doesn't serve a function, it isn't on the garment.</p>
-    <div class="manifesto-stat">
-      <span class="label">Tested in the field</span>
-      <div class="stat-row">
-        <div>
-          <div class="stat-n">4,200<span style="font-size:.45em;font-weight:300">m</span></div>
-          <div class="stat-l">Highest test altitude</div>
-        </div>
-        <div>
-          <div class="stat-n">−40<span style="font-size:.45em;font-weight:300">°C</span></div>
-          <div class="stat-l">Minimum rating</div>
-        </div>
-        <div>
-          <div class="stat-n">340<span style="font-size:.45em;font-weight:300">+</span></div>
-          <div class="stat-l">Field test days</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<canvas id="gl"></canvas>
+<div id="cursor"></div>
 
-<!-- COLLECTION -->
-<section id="collection" aria-labelledby="coll-h">
-  <div class="collection-header r">
-    <div>
-      <span class="label"><span class="eyebrow-rule"></span>AW 2025</span>
-      <h2 class="display display-lg" id="coll-h">The Carnage<br><em style="font-style:italic">Range</em></h2>
-    </div>
-    <a href="#" class="collection-link r d2">View all pieces →</a>
+<nav>
+  <a class="logo" href="#top">CARNAGE<em>.</em></a>
+  <div class="nav-links">
+    <a href="#shop" data-hot>Shop</a>
+    <a href="#men" data-hot>Men</a>
+    <a href="#women" data-hot>Women</a>
+    <a href="#tech" data-hot>Fabric Tech</a>
   </div>
-  <div class="coll-grid">
-    <div class="coll-item r" tabindex="0" aria-label="Ridge Shell Jacket">
-      <div class="coll-visual"><div class="pv pv-1"></div><canvas class="prod-canvas" data-hue="120" data-variant="1"></canvas></div>
-      <div class="coll-dark"></div>
-      <div class="coll-meta">
-        <div class="coll-tag">Outerwear</div>
-        <div class="coll-name">Ridge Shell<br>Jacket</div>
-        <div class="coll-price">£ 420</div>
-      </div>
-      <button class="coll-arrow" aria-label="View Ridge Shell Jacket">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
-    <div class="coll-item r d1" tabindex="0" aria-label="Summit Fleece">
-      <div class="coll-visual"><div class="pv pv-2"></div><canvas class="prod-canvas" data-hue="30" data-variant="2"></canvas></div>
-      <div class="coll-dark"></div>
-      <div class="coll-meta">
-        <div class="coll-tag">Midlayer</div>
-        <div class="coll-name">Summit<br>Fleece</div>
-        <div class="coll-price">£ 195</div>
-      </div>
-      <button class="coll-arrow" aria-label="View Summit Fleece">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
-    <div class="coll-item r d2" tabindex="0" aria-label="Gorge Trousers">
-      <div class="coll-visual"><div class="pv pv-3"></div><canvas class="prod-canvas" data-hue="180" data-variant="3"></canvas></div>
-      <div class="coll-dark"></div>
-      <div class="coll-meta">
-        <div class="coll-tag">Bottoms</div>
-        <div class="coll-name">Gorge<br>Trousers</div>
-        <div class="coll-price">£ 245</div>
-      </div>
-      <button class="coll-arrow" aria-label="View Gorge Trousers">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
-    <div class="coll-item r d3" tabindex="0" aria-label="Scree Pack 38L">
-      <div class="coll-visual"><div class="pv pv-4"></div><canvas class="prod-canvas" data-hue="20" data-variant="4"></canvas></div>
-      <div class="coll-dark"></div>
-      <div class="coll-meta">
-        <div class="coll-tag">Carry</div>
-        <div class="coll-name">Scree<br>Pack 38L</div>
-        <div class="coll-price">£ 310</div>
-      </div>
-      <button class="coll-arrow" aria-label="View Scree Pack 38L">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
-    <div class="coll-item r d4" tabindex="0" aria-label="Cairn Boot">
-      <div class="coll-visual"><div class="pv pv-5"></div><canvas class="prod-canvas" data-hue="220" data-variant="5"></canvas></div>
-      <div class="coll-dark"></div>
-      <div class="coll-meta">
-        <div class="coll-tag">Footwear</div>
-        <div class="coll-name">Cairn<br>Boot</div>
-        <div class="coll-price">£ 380</div>
-      </div>
-      <button class="coll-arrow" aria-label="View Cairn Boot">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
-  </div>
-</section>
+  <button class="cart-btn" data-hot>Cart — 0</button>
+</nav>
 
-<!-- FEATURE -->
-<section id="feature" aria-labelledby="feature-h">
-  <div class="feature-canvas-wrap" aria-hidden="true">
-    <canvas id="feature-canvas"></canvas>
+<div id="scroll-wrap">
+<main id="top">
+
+  <header class="hero">
+    <h1 class="hero-title">
+      <span class="line"><span>BUILT FOR</span></span>
+      <span class="line"><span>CARNAGE</span></span>
+    </h1>
+    <div class="hero-meta">
+      <p>Sri Lanka's #1 active &amp; lifestyle wear. Four-way stretch, sweat-wicking, engineered for the work you put in — and the life after it.</p>
+      <div class="hero-tags">
+        <span class="tag">Est. Colombo</span>
+        <span class="tag">Activewear</span>
+        <span class="tag">Lifestyle</span>
+        <span class="tag">SS26 Drop</span>
+      </div>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </header>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="mqtrack">
+      <span>Train Hard <i></i> Live Loud <i></i> Oversized Tees <i></i> Seamless Leggings <i></i> Premium Joggers <i></i> Lifting Gear <i></i></span>
+      <span>Train Hard <i></i> Live Loud <i></i> Oversized Tees <i></i> Seamless Leggings <i></i> Premium Joggers <i></i> Lifting Gear <i></i></span>
+    </div>
   </div>
-  <div class="feature-body">
-    <span class="label r"><span class="eyebrow-rule"></span>The Build</span>
-    <h2 class="display display-lg r d1" id="feature-h">No<br>shortcuts.<br><em style="font-style:italic">Ever.</em></h2>
-    <div class="feature-points">
-      <div class="fp r d2">
-        <span class="fp-num">01</span>
-        <div>
-          <div class="fp-title">Welded seams</div>
-          <div class="fp-desc">Ultrasonic bonding eliminates stitching as a failure point. 10,000mm HH rating, tested over 5,000 abrasion cycles.</div>
+
+  <section class="manifesto" id="about">
+    <span class="mono rv">( 01 — The brand )</span>
+    <h2 class="rv" style="margin-top:1.6rem">We don't make gym clothes. <span class="dim">We build a second skin for people who</span> <span class="red">show up every day</span> <span class="dim">— on the floor, on the street, in the grind.</span></h2>
+    <div class="stat-row rv">
+      <div class="stat"><b>#<i>1</i></b><span>Active brand · Sri Lanka</span></div>
+      <div class="stat"><b>250<i>K+</i></b><span>Athletes wearing Carnage</span></div>
+      <div class="stat"><b>4<i>-way</i></b><span>Stretch fabric engineering</span></div>
+      <div class="stat"><b>72<i>hr</i></b><span>Island-wide delivery</span></div>
+    </div>
+  </section>
+
+  <section id="shop">
+    <div class="sec-head rv">
+      <h2>The <em>Drop</em></h2>
+      <span class="counter">( 02 — SS26 / 06 pieces )</span>
+    </div>
+    <div class="grid" id="prodgrid"></div>
+  </section>
+
+  <section id="men">
+    <div class="sec-head rv">
+      <h2>Shop by <em>Body</em></h2>
+      <span class="counter">( 03 — Collections )</span>
+    </div>
+    <div class="split rv">
+      <a class="coll" data-hot data-cv="men" id="c-men">
+        <canvas></canvas>
+        <div class="coll-txt">
+          <span class="mono">28 pieces</span>
+          <h3>Men's</h3>
+          <span class="coll-link">Explore collection <i>→</i></span>
         </div>
-      </div>
-      <div class="fp r d3">
-        <span class="fp-num">02</span>
-        <div>
-          <div class="fp-title">Reclaimed face fabric</div>
-          <div class="fp-desc">Every shell is woven from post-consumer PET. Reclaimed, not recycled into something weaker.</div>
+      </a>
+      <a class="coll" data-hot data-cv="women" id="women">
+        <canvas></canvas>
+        <div class="coll-txt">
+          <span class="mono">34 pieces</span>
+          <h3>Women's</h3>
+          <span class="coll-link">Explore collection <i>→</i></span>
         </div>
-      </div>
-      <div class="fp r d4">
-        <span class="fp-num">03</span>
-        <div>
-          <div class="fp-title">YKK Aquaguard hardware</div>
-          <div class="fp-desc">Every zip, cord-lock, and buckle rated for submersion. Standard across the range — no exceptions.</div>
-        </div>
-      </div>
-      <div class="fp r d5">
-        <span class="fp-num">04</span>
-        <div>
-          <div class="fp-title">Field-repairable design</div>
-          <div class="fp-desc">Modular baffles, replaceable gaskets. You can rebuild this in a tent with a multitool.</div>
-        </div>
-      </div>
+      </a>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- QUOTE -->
-<section id="quote" aria-label="Brand quote">
-  <div class="quote-bg" aria-hidden="true"></div>
-  <div class="quote-mark" aria-hidden="true">"</div>
-  <blockquote class="quote-text r">"The mountain doesn't grade on effort. It only marks what holds and what breaks."</blockquote>
-  <cite class="quote-attr r d1">Lena Voss — Carnage Field Tester, Patagonia 2024</cite>
-</section>
+  <section id="tech">
+    <div class="sec-head rv">
+      <h2>Fabric <em>Tech</em></h2>
+      <span class="counter">( 04 — Engineering )</span>
+    </div>
+    <div class="tech-wrap">
+      <canvas id="fabric-zoom" class="rv"></canvas>
+      <div class="tech-list rv">
+        <div class="tech-item"><b>01</b><div><h3>DryCore™ wicking</h3><p>Sweat is pulled off the skin and pushed to the surface, where it evaporates before it weighs you down.</p></div></div>
+        <div class="tech-item"><b>02</b><div><h3>4-way FlexKnit</h3><p>The weave stretches with every plane of movement — squat depth, overhead reach, full sprint — and snaps back.</p></div></div>
+        <div class="tech-item"><b>03</b><div><h3>Seamless zones</h3><p>Body-mapped knitting removes seams where friction lives. Nothing rubs, nothing rides up.</p></div></div>
+        <div class="tech-item"><b>04</b><div><h3>Anti-odour finish</h3><p>A mineral-based treatment keeps bacteria from settling in the fibre. Train twice, wash once.</p></div></div>
+      </div>
+    </div>
+  </section>
 
-<!-- MATERIALS -->
-<section id="materials" aria-labelledby="mat-h">
-  <span class="label r"><span class="eyebrow-rule"></span>What We Use</span>
-  <h2 class="display display-lg r d1" id="mat-h">Materials<br><em style="font-style:italic">sourced honestly.</em></h2>
-  <p class="body-copy r d2">We publish every material's origin, mill, and impact data. No greenwashing. If we don't know exactly where something comes from, it isn't on our gear.</p>
-  <div class="materials-grid">
-    <div class="mat-cell r d1">
-      <div class="mat-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M12 22V12m0 0C12 7 7 4 7 4s1 4 5 8zm0 0c0-5 5-8 5-8s-1 4-5 8z"/></svg>
-      </div>
-      <div class="mat-name">Recycled Nylon</div>
-      <div class="mat-desc">100% post-consumer. Woven in Biella, Italy. Carries the same tensile rating as virgin 70D — verified by SGS.</div>
-    </div>
-    <div class="mat-cell r d2">
-      <div class="mat-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M3 6l9-3 9 3v6c0 5-4 8-9 9-5-1-9-4-9-9V6z"/></svg>
-      </div>
-      <div class="mat-name">PFC-Free DWR</div>
-      <div class="mat-desc">Durable water repellency without fluorochemicals. Bio-based. Rated 90/100 on the OEKO-TEX® Bluesign index.</div>
-    </div>
-    <div class="mat-cell r d3">
-      <div class="mat-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>
-      </div>
-      <div class="mat-name">Merino Wool</div>
-      <div class="mat-desc">18.5 micron. ZQ-certified flocks in New Zealand. Non-mulesed. Live fibre tracking from paddock to garment.</div>
-    </div>
-    <div class="mat-cell r d4">
-      <div class="mat-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-      </div>
-      <div class="mat-name">Down Alternative</div>
-      <div class="mat-desc">Primaloft® Gold Active+. Performs when wet, packs to 650-fill-equivalent. Entirely animal-free.</div>
-    </div>
-    <div class="mat-cell r d5">
-      <div class="mat-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-      </div>
-      <div class="mat-name">Vibram® Outsole</div>
-      <div class="mat-desc">Megagrip compound with 53% recycled natural rubber. Tested on limestone, wet basalt, and scree at angle.</div>
-    </div>
-    <div class="mat-cell r d6">
-      <div class="mat-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 0v20M2 12h20"/></svg>
-      </div>
-      <div class="mat-name">Dyneema® Core</div>
-      <div class="mat-desc">15× stronger than steel at equal weight. Used in critical load paths in the Scree Pack and harness webbing.</div>
-    </div>
-  </div>
-</section>
+  <section class="statement">
+    <h2 class="rv"><span class="stroke">NO SHORTCUTS.</span><br><span class="fill">NO MERCY.</span></h2>
+    <p class="rv">Every rep counts. Every fibre is tested. That's the deal.</p>
+  </section>
 
-<!-- FIELD NOTES -->
-<section id="field-notes" aria-labelledby="notes-h">
-  <span class="label r"><span class="eyebrow-rule"></span>Field Notes</span>
-  <h2 class="display display-lg r d1" id="notes-h">From the<br><em style="font-style:italic">terrain.</em></h2>
-  <div class="notes-grid">
-    <div class="note-item r d2">
-      <div class="note-visual">
-        <div class="note-visual-bg" style="background:linear-gradient(150deg,#0c1408 0%,#162412 50%,#203018 100%)"></div>
-      </div>
-      <div class="note-date">12 Nov 2024 · Scottish Highlands</div>
-      <h3 class="note-title">Forty-eight hours on the Cairngorms in November</h3>
-      <p class="note-excerpt">Wind at 80km/h, sleet, zero visibility above 900m. The Ridge Shell did not move. This is a test report, not a review.</p>
-      <span class="note-read">Read the report</span>
-    </div>
-    <div class="note-item r d3">
-      <div class="note-visual">
-        <div class="note-visual-bg" style="background:linear-gradient(140deg,#100e08 0%,#1e1808 50%,#2e2610 100%)"></div>
-      </div>
-      <div class="note-date">04 Oct 2024 · Patagonia</div>
-      <h3 class="note-title">What breaks first when everything is wet for two weeks</h3>
-      <p class="note-excerpt">A failure log from Lena Voss's Torres del Paine traverse. Honest, unsponsored, and useful.</p>
-      <span class="note-read">Read the report</span>
-    </div>
-    <div class="note-item r d4">
-      <div class="note-visual">
-        <div class="note-visual-bg" style="background:linear-gradient(160deg,#081010 0%,#10201e 50%,#182e2c 100%)"></div>
-      </div>
-      <div class="note-date">22 Aug 2024 · Norwegian Fjords</div>
-      <h3 class="note-title">The Cairn Boot at altitude: a podiatrist and a climber compare notes</h3>
-      <p class="note-excerpt">Foot strike data, blister mapping, and a lacing technique nobody talks about. Pure mechanics.</p>
-      <span class="note-read">Read the report</span>
-    </div>
-  </div>
-</section>
+  <section class="cta-band">
+    <span class="mono rv">( 05 — Join the pack )</span>
+    <h2 class="rv" style="margin-top:1.4rem">Get the next drop first</h2>
+    <p class="rv">New releases sell out in hours. Members get 24-hour early access and free shipping island-wide.</p>
+    <button class="btn rv" data-hot><span>Become a member</span></button>
+  </section>
 
-<!-- CTA -->
-<section id="cta-section" aria-labelledby="cta-h">
-  <div class="cta-copy">
-    <span class="label r"><span class="eyebrow-rule"></span>Join the Carnage List</span>
-    <h2 class="display display-lg r d1" id="cta-h">First access.<br><em style="font-style:italic">No noise.</em></h2>
-    <p class="body-copy r d2">New drops, field reports, and early access to limited runs. We email when we have something worth saying.</p>
-  </div>
-  <div class="r d2">
-    <form class="cta-form" onsubmit="handleCta(event)" aria-label="Email signup">
-      <div class="cta-field-wrap">
-        <label for="cta-name" class="cta-label-float">Your name</label>
-        <input type="text" id="cta-name" class="cta-input" placeholder="First name" autocomplete="given-name"/>
+  <footer>
+    <div class="foot-grid">
+      <div>
+        <a class="logo" href="#top">CARNAGE<em>.</em></a>
+        <p style="color:var(--sub);font-size:.85rem;max-width:30ch;margin-top:1rem">Active &amp; lifestyle wear for men and women. Made to be beaten up.</p>
       </div>
-      <div class="cta-field-wrap">
-        <label for="cta-email" class="cta-label-float">Email address</label>
-        <input type="email" id="cta-email" class="cta-input" placeholder="you@example.com" required autocomplete="email"/>
-      </div>
-      <button type="submit" class="cta-btn" id="cta-submit">Join the List</button>
-      <p class="cta-fine" id="cta-confirm" style="display:none">You're in. Watch for a message from us.</p>
-      <p class="cta-fine">One email per month. Unsubscribe anytime.</p>
-    </form>
-  </div>
-</section>
+      <div class="foot-col"><b>Shop</b><a href="#men" data-hot>Men's wear</a><a href="#women" data-hot>Women's wear</a><a href="#shop" data-hot>New drop</a><a href="#shop" data-hot>Lifting accessories</a></div>
+      <div class="foot-col"><b>Brand</b><a href="#about" data-hot>Our story</a><a href="#tech" data-hot>Fabric tech</a><a href="#" data-hot>Stores</a><a href="#" data-hot>Careers</a></div>
+      <div class="foot-col"><b>Social</b><a href="#" data-hot>Instagram</a><a href="#" data-hot>TikTok</a><a href="#" data-hot>Facebook</a><a href="#" data-hot>YouTube</a></div>
+    </div>
+    <div class="foot-base">
+      <span>© 2026 Carnage Lifestyle</span>
+      <span>Colombo — Sri Lanka</span>
+      <span>Terms · Privacy</span>
+    </div>
+  </footer>
 
 </main>
+</div>
+<div id="spacer"></div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <h2 class="display" style="font-size:36px">Carnage</h2>
-      <p>Wilderness gear built for conditions that don't forgive. Designed in the field. Made to last a decade.</p>
-    </div>
-    <div class="footer-col">
-      <h5>Shop</h5>
-      <ul>
-        <li><a href="#">Outerwear</a></li>
-        <li><a href="#">Midlayer</a></li>
-        <li><a href="#">Bottoms</a></li>
-        <li><a href="#">Footwear</a></li>
-        <li><a href="#">Carry</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h5>Company</h5>
-      <ul>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Materials</a></li>
-        <li><a href="#">Field Notes</a></li>
-        <li><a href="#">Repair Program</a></li>
-        <li><a href="#">Careers</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h5>Support</h5>
-      <ul>
-        <li><a href="#">Sizing Guide</a></li>
-        <li><a href="#">Care & Repair</a></li>
-        <li><a href="#">Returns</a></li>
-        <li><a href="#">Contact</a></li>
-        <li><a href="#">Privacy</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p class="footer-copy">© 2025 Carnage Ltd. All rights reserved. Made somewhere cold.</p>
-    <nav class="footer-socials" aria-label="Social links">
-      <a href="#" class="soc" aria-label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
-      <a href="#" class="soc" aria-label="X / Twitter"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
-      <a href="#" class="soc" aria-label="YouTube"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.45A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.45a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
-    </nav>
-  </div>
-</footer>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
 
-<script>
-/* ──────── THEME TOGGLE ──────── */
-const root=document.documentElement;
-const btn=document.getElementById('theme-btn');
-const icon=document.getElementById('theme-icon');
-let dark=true;
-const moonSVG=`<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>`;
-const sunSVG=`<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
-btn.addEventListener('click',()=>{
-  dark=!dark;
-  root.setAttribute('data-theme',dark?'dark':'light');
-  icon.innerHTML=dark?sunSVG:moonSVG;
-});
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ──────── NAV SCROLL ──────── */
-window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',scrollY>60);},{passive:true});
+/* ============ LOADER ============ */
+const bar=document.querySelector('#loadbar i'),pct=document.getElementById('loadpct');
+let lp=0;const lt=setInterval(()=>{lp=Math.min(100,lp+Math.random()*22);bar.style.transform=`scaleX(${lp/100})`;pct.textContent=String(Math.floor(lp)).padStart(2,'0');
+if(lp>=100){clearInterval(lt);setTimeout(()=>{document.getElementById('loader').classList.add('done');document.body.classList.add('ready');},350);}},130);
 
-/* ──────── MARQUEE ──────── */
-const ITEMS=['Ridge Shell','Summit Fleece','Gorge Trousers','Scree Pack 38L','Cairn Boot','Thermal Base','Watershed Glove','Boulderfield Beanie','Couloir Gaiter','Via Ferrata Harness'];
-const track=document.getElementById('marquee-track');
-const all=[...ITEMS,...ITEMS];
-track.innerHTML=all.map(n=>`<span class="marquee-item">${n}<span class="marquee-dot" aria-hidden="true"></span></span>`).join('');
+/* ============ SMOOTH SCROLL (dogstudio-style inertia) ============ */
+const wrap=document.getElementById('scroll-wrap'),spacer=document.getElementById('spacer');
+let cur=0,tgt=0;
+function setH(){spacer.style.height=wrap.getBoundingClientRect().height+'px';}
+setH();addEventListener('resize',setH);new ResizeObserver(setH).observe(wrap);
+addEventListener('scroll',()=>{tgt=scrollY;},{passive:true});
+function smooth(){
+  cur+= (tgt-cur)*(reduced?1:.085);
+  if(Math.abs(tgt-cur)<.05)cur=tgt;
+  wrap.style.transform=`translate3d(0,${-cur}px,0)`;
+  requestAnimationFrame(smooth);
+}
+smooth();
 
-/* ──────── REVEALS ──────── */
-const ro=new IntersectionObserver(ee=>{ee.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');ro.unobserve(e.target);}});},{threshold:.1});
-document.querySelectorAll('.r').forEach(el=>ro.observe(el));
+/* ============ CURSOR ============ */
+const cursor=document.getElementById('cursor');
+let cx=innerWidth/2,cy=innerHeight/2,px=cx,py=cy;
+addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;});
+(function moveCur(){px+=(cx-px)*.2;py+=(cy-py)*.2;cursor.style.left=px+'px';cursor.style.top=py+'px';requestAnimationFrame(moveCur);})();
+document.addEventListener('mouseover',e=>{cursor.classList.toggle('hot',!!e.target.closest('[data-hot],a,button,.card'));});
 
-/* ──────── CTA ──────── */
-window.handleCta=function(e){
-  e.preventDefault();
-  const btn=document.getElementById('cta-submit');
-  btn.textContent='Joining…';btn.disabled=true;
-  setTimeout(()=>{btn.style.display='none';document.getElementById('cta-confirm').style.display='block';},900);
+/* ============ REVEALS ============ */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}}),{rootMargin:'0px 0px -8% 0px',threshold:.05});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* ============ HERO WEBGL — flowing fabric (the product IS the material) ============ */
+const glc=document.getElementById('gl');
+const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,50);
+cam.position.set(0,0,6.5);
+
+// fabric texture: knit weave + CARNAGE print, drawn on canvas
+function fabricTexture(base='#131316',thread='#232329',print=true){
+  const c=document.createElement('canvas');c.width=c.height=1024;const x=c.getContext('2d');
+  x.fillStyle=base;x.fillRect(0,0,1024,1024);
+  // knit ribs
+  for(let i=0;i<1024;i+=6){
+    x.strokeStyle=i%12?thread:'rgba(255,255,255,.03)';x.lineWidth=2;
+    x.beginPath();
+    for(let j=0;j<=1024;j+=8){x.lineTo(j,i+Math.sin(j*.08)*2);}
+    x.stroke();
+  }
+  // subtle noise
+  const im=x.getImageData(0,0,1024,1024),d=im.data;
+  for(let i=0;i<d.length;i+=4){const n=(Math.random()-.5)*14;d[i]+=n;d[i+1]+=n;d[i+2]+=n;}
+  x.putImageData(im,0,0);
+  if(print){
+    x.save();x.translate(512,512);
+    x.font='400 150px Anton, sans-serif';x.textAlign='center';x.textBaseline='middle';
+    x.fillStyle='rgba(242,240,235,.92)';x.fillText('CARNAGE',0,-40);
+    x.fillStyle='#E2201C';x.font='400 44px "Space Mono", monospace';
+    x.fillText('EST. COLOMBO — NO MERCY',0,80);
+    x.restore();
+  }
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;
+  return t;
+}
+
+// cloth mesh with shader displacement (fluid dogstudio-like motion)
+const SEG=140;
+const clothGeo=new THREE.PlaneGeometry(9,5.6,SEG,Math.round(SEG*.62));
+const clothUniforms={
+  uTime:{value:0},uMouse:{value:new THREE.Vector2(0,0)},uScroll:{value:0},
+  uMap:{value:fabricTexture()},uIntro:{value:0}
 };
-
-/* ──────── NOISE HELPERS ──────── */
-function smoothstep(a,b,t){t=Math.max(0,Math.min(1,(t-a)/(b-a)));return t*t*(3-2*t);}
-function lerp(a,b,t){return a+t*(b-a);}
-// Minimal value noise
-const PERM=(()=>{const p=Array.from({length:256},(_,i)=>i);for(let i=255;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]];}return [...p,...p];})();
-function fade(t){return t*t*t*(t*(t*6-15)+10);}
-function grad1d(h,x){return(h&1)?x:-x;}
-function noise1d(x){const X=Math.floor(x)&255,xf=x-Math.floor(x),u=fade(xf);return lerp(grad1d(PERM[X],xf),grad1d(PERM[X+1],xf-1),u);}
-function noise2d(x,y){
-  const X=Math.floor(x)&255,Y=Math.floor(y)&255;
-  const xf=x-Math.floor(x),yf=y-Math.floor(y);
-  const u=fade(xf),v=fade(yf);
-  const aa=PERM[PERM[X]+Y],ab=PERM[PERM[X]+Y+1],ba=PERM[PERM[X+1]+Y],bb=PERM[PERM[X+1]+Y+1];
-  const g=(h,gx,gy)=>{const h2=h&3;return[gx,gy,-gx,-gy][h2]*(h&4?gy:gx)+([-gy,gx,gy,-gx][h2])*(h&4?gx:gy);};
-  const dot=(h,gx,gy)=>{const a=PERM[h]&3;const dx=[1,-1,1,-1][a],dy=[1,1,-1,-1][a];return dx*gx+dy*gy;};
-  return lerp(lerp(dot(aa,xf,yf),dot(ba,xf-1,yf),u),lerp(dot(ab,xf,yf-1),dot(bb,xf-1,yf-1),u),v);
-}
-function fbm(x,y,oct=5){
-  let v=0,a=.5,f=1,mx=0;
-  for(let i=0;i<oct;i++){v+=a*noise2d(x*f,y*f);mx+=a;f*=2;a*=.5;}
-  return v/mx;
-}
-
-/* ──────── HERO TERRAIN CANVAS ──────── */
-(()=>{
-  const canvas=document.getElementById('terrain-canvas');
-  const ctx=canvas.getContext('2d');
-  let W,H,t=0;
-
-  function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight;}
-  resize();window.addEventListener('resize',()=>{resize();},{ passive:true});
-
-  // star field
-  const STARS=Array.from({length:220},()=>({
-    x:Math.random(),y:Math.random()*.5,r:Math.random()*.9+.1,a:Math.random()
-  }));
-
-  function draw(){
-    t+=.0004;
-    ctx.clearRect(0,0,W,H);
-
-    // SKY gradient — deep indigo twilight
-    const sky=ctx.createLinearGradient(0,0,0,H*.75);
-    sky.addColorStop(0,'#050810');
-    sky.addColorStop(.35,'#0a1220');
-    sky.addColorStop(.65,'#12201a');
-    sky.addColorStop(1,'#1a2e18');
-    ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
-
-    // Stars
-    STARS.forEach(s=>{
-      const twinkle=.5+.5*Math.sin(t*800+s.a*100);
-      ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(220,215,200,${twinkle*0.7})`;ctx.fill();
-    });
-
-    // Atmospheric glow near horizon
-    const glow=ctx.createRadialGradient(W*.45,H*.54,0,W*.45,H*.54,W*.45);
-    glow.addColorStop(0,'rgba(40,60,30,.18)');
-    glow.addColorStop(.5,'rgba(20,35,15,.08)');
-    glow.addColorStop(1,'transparent');
-    ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
-
-    // Moon
-    const mx=W*.78,my=H*.14;
-    const moonGlow=ctx.createRadialGradient(mx,my,0,mx,my,60);
-    moonGlow.addColorStop(0,'rgba(215,210,190,.15)');
-    moonGlow.addColorStop(.4,'rgba(215,210,190,.05)');
-    moonGlow.addColorStop(1,'transparent');
-    ctx.fillStyle=moonGlow;ctx.fillRect(0,0,W,H);
-    ctx.beginPath();ctx.arc(mx,my,14,0,Math.PI*2);
-    ctx.fillStyle='rgba(220,215,195,.85)';ctx.fill();
-
-    // TERRAIN LAYERS — 4 ridgelines at different depths
-    const layers=[
-      {yOff:.72,amp:.12,scl:.8,spd:.00008,col:[15,28,12],opa:.95},
-      {yOff:.65,amp:.09,scl:1.2,spd:.00013,col:[20,38,16],opa:.88},
-      {yOff:.58,amp:.07,scl:1.8,spd:.00018,col:[30,52,24],opa:.82},
-      {yOff:.52,amp:.05,scl:2.8,spd:.00022,col:[42,68,34],opa:.7},
-    ];
-
-    layers.forEach(l=>{
-      const pts=[];
-      const STEPS=W+1;
-      for(let px=0;px<=STEPS;px++){
-        const nx=px/W*3+t*l.spd*W*0.1;
-        const ny=t*l.spd*0.5;
-        const h=fbm(nx*l.scl,ny*l.scl+l.yOff,6);
-        pts.push({x:px,y:H*(l.yOff-h*l.amp)});
-      }
-      ctx.beginPath();
-      ctx.moveTo(0,H);
-      pts.forEach(p=>ctx.lineTo(p.x,p.y));
-      ctx.lineTo(W,H);ctx.closePath();
-      ctx.fillStyle=`rgba(${l.col[0]},${l.col[1]},${l.col[2]},${l.opa})`;
-      ctx.fill();
-
-      // Ridge highlight
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x,pts[0].y);
-      pts.forEach(p=>ctx.lineTo(p.x,p.y));
-      ctx.strokeStyle=`rgba(${l.col[0]+20},${l.col[1]+26},${l.col[2]+16},.35)`;
-      ctx.lineWidth=1;ctx.stroke();
-    });
-
-    // Foreground fog band
-    const fog=ctx.createLinearGradient(0,H*.68,0,H*.78);
-    fog.addColorStop(0,'transparent');
-    fog.addColorStop(.5,'rgba(20,35,18,.4)');
-    fog.addColorStop(1,'transparent');
-    ctx.fillStyle=fog;ctx.fillRect(0,0,W,H);
-
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-/* ──────── FEATURE CANVAS — close-up rock texture ──────── */
-(()=>{
-  const canvas=document.getElementById('feature-canvas');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  let W,H,t=0;
-  function resize(){W=canvas.width=canvas.offsetWidth||600;H=canvas.height=canvas.offsetHeight||600;}
-  resize();window.addEventListener('resize',resize,{passive:true});
-
-  function draw(){
-    t+=.0006;
-    ctx.clearRect(0,0,W,H);
-    // Base rock color
-    ctx.fillStyle='#0e140a';ctx.fillRect(0,0,W,H);
-    // Layered rock strata
-    for(let y=0;y<=H;y+=1){
-      const nx=t*.3,ny=y/H*4+t*.05;
-      const n=fbm(nx+.5,ny,6);
-      const n2=fbm(nx+2,ny+.5,4);
-      const lum=Math.floor(10+n*22+n2*10);
-      const r=lum+4,g=lum+2,b=lum-2;
-      ctx.strokeStyle=`rgb(${r},${g},${b})`;
-      ctx.lineWidth=1;
-      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
-    }
-    // Crack lines
-    ctx.strokeStyle='rgba(8,12,6,.6)';ctx.lineWidth=1.5;
-    for(let i=0;i<6;i++){
-      ctx.beginPath();
-      let cx=W*((.15+i*.14)+Math.sin(t*.3+i)*.04),cy=0;
-      ctx.moveTo(cx,cy);
-      for(let y=0;y<H;y+=6){
-        cx+=noise1d(y*.05+i*2+t*.1)*4;
-        ctx.lineTo(cx,y);
-      }
-      ctx.stroke();
-    }
-    // Moss patches
-    for(let i=0;i<5;i++){
-      const mx=W*(.1+i*.18+Math.sin(t*.2+i)*.02);
-      const my=H*(.3+Math.sin(i*1.3)*.25);
-      const mg=ctx.createRadialGradient(mx,my,0,mx,my,W*.12);
-      mg.addColorStop(0,'rgba(44,70,28,.35)');
-      mg.addColorStop(.6,'rgba(30,50,18,.12)');
-      mg.addColorStop(1,'transparent');
-      ctx.fillStyle=mg;ctx.fillRect(0,0,W,H);
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-/* ──────── PRODUCT CARD MINI-CANVASES ──────── */
-document.querySelectorAll('.prod-canvas').forEach(cv=>{
-  const hue=+cv.dataset.hue||120;
-  const variant=+cv.dataset.variant||1;
-  const ctx=cv.getContext('2d');
-  cv.style.position='absolute';cv.style.inset='0';cv.style.width='100%';cv.style.height='100%';cv.style.opacity='.55';
-  function rs(){cv.width=cv.offsetWidth||300;cv.height=cv.offsetHeight||280;}
-  rs();
-  window.addEventListener('resize',rs,{passive:true});
-  let t=0;
-  (function draw(){
-    t+=.0008;
-    const W=cv.width,H=cv.height;
-    ctx.clearRect(0,0,W,H);
-    // Painterly texture
-    for(let y=0;y<H;y+=2){
-      const n=fbm(y*.02+variant,t*.1,4);
-      const n2=fbm(y*.04+variant+1,t*.08+.5,3);
-      const lum=18+n*28;
-      const sat=30+n2*20;
-      ctx.strokeStyle=`hsla(${hue+n2*20},${sat}%,${lum}%,.6)`;
-      ctx.lineWidth=2;
-      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
-    }
-    requestAnimationFrame(draw);
-  })();
+const clothMat=new THREE.ShaderMaterial({
+  uniforms:clothUniforms,
+  vertexShader:`
+    uniform float uTime;uniform vec2 uMouse;uniform float uScroll;uniform float uIntro;
+    varying vec2 vUv;varying float vH;
+    // simplex-ish cheap noise
+    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+      return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+    void main(){
+      vUv=uv;
+      vec3 p=position;
+      float t=uTime*.55;
+      float w=0.0;
+      w+=noise(uv*3.0+vec2(t*.6,t*.3))*.55;
+      w+=noise(uv*7.0-vec2(t*.4,t*.7))*.22;
+      w+=sin(uv.x*6.283+t*1.4)*.18*sin(uv.y*3.14);
+      // mouse ripple
+      float md=distance(uv,uMouse*.5+.5);
+      w+=smoothstep(.45,.0,md)*sin(md*28.0-uTime*5.0)*.28;
+      // scroll pulls the cloth apart
+      w*= (1.0-uScroll*.4);
+      p.z+=w*uIntro;
+      p.y+=sin(uv.x*3.14)*w*.15;
+      vH=w;
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+    }`,
+  fragmentShader:`
+    uniform sampler2D uMap;uniform float uTime;
+    varying vec2 vUv;varying float vH;
+    void main(){
+      vec2 uv=vUv;
+      uv.x+=vH*.012;
+      vec3 col=texture2D(uMap,uv).rgb;
+      // sculpt light across the folds
+      float l=vH*.9+.55;
+      col*=l;
+      col+=vec3(.85,.12,.10)*smoothstep(.55,1.0,vH)*.25; // blood rim on high folds
+      gl_FragColor=vec4(col,1.0);
+    }`,
+  side:THREE.DoubleSide
 });
+const cloth=new THREE.Mesh(clothGeo,clothMat);
+cloth.rotation.x=-.28;
+scene.add(cloth);
+
+// dust particles behind
+const pn=400,pp=new Float32Array(pn*3);
+for(let i=0;i<pn;i++){pp[i*3]=(Math.random()-.5)*14;pp[i*3+1]=(Math.random()-.5)*9;pp[i*3+2]=-2-Math.random()*4;}
+const pgeo=new THREE.BufferGeometry();pgeo.setAttribute('position',new THREE.BufferAttribute(pp,3));
+const parts=new THREE.Points(pgeo,new THREE.PointsMaterial({color:0x8e8e96,size:.02,transparent:true,opacity:.5}));
+scene.add(parts);
+
+let mx=0,my=0;
+addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth)*2-1;my=-((e.clientY/innerHeight)*2-1);});
+function sizeGL(){renderer.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();}
+sizeGL();addEventListener('resize',sizeGL);
+
+const clock=new THREE.Clock();
+function tick(){
+  const t=clock.getElapsedTime();
+  clothUniforms.uTime.value=t;
+  clothUniforms.uMouse.value.lerp(new THREE.Vector2(mx,my),.06);
+  clothUniforms.uIntro.value=Math.min(1,clothUniforms.uIntro.value+.008);
+  const sp=Math.min(1,cur/innerHeight);
+  clothUniforms.uScroll.value=sp;
+  cloth.position.y=sp*2.2;         // cloth lifts away as you scroll
+  cloth.rotation.z=sp*.12;
+  glc.style.opacity=String(1-sp*1.05);
+  cam.position.x+=(mx*.35-cam.position.x)*.04;
+  cam.position.y+=(my*.2-cam.position.y)*.04;
+  cam.lookAt(0,0,0);
+  parts.rotation.y=t*.02;
+  renderer.render(scene,cam);
+  requestAnimationFrame(tick);
+}
+if(!reduced)tick();else{clothUniforms.uIntro.value=1;renderer.render(scene,cam);}
+
+/* ============ PRODUCTS (real Carnage catalogue) ============ */
+const products=[
+  {n:'Oversized Training Tee',c:'Men · DryCore cotton-blend',p:'LKR 4,950',o:null,b:'New drop',hue:'#1C1C21',ink:'#F2F0EB'},
+  {n:'Seamless High-Rise Leggings',c:'Women · 4-way FlexKnit',p:'LKR 7,450',o:null,b:'Best seller',hue:'#17171B',ink:'#E2201C'},
+  {n:'Premium Tapered Joggers',c:'Unisex · brushed fleece',p:'LKR 8,950',o:'LKR 10,500',b:'Sale',hue:'#14181C',ink:'#F2F0EB'},
+  {n:'Racerback Sports Bra',c:'Women · nylon-spandex',p:'LKR 5,450',o:null,b:null,hue:'#1B1518',ink:'#F2F0EB'},
+  {n:'Muscle Fit Tank',c:'Men · quick-dry knit',p:'LKR 3,950',o:null,b:null,hue:'#101014',ink:'#E2201C'},
+  {n:'Pro Lifting Straps',c:'Accessories · reinforced weave',p:'LKR 2,450',o:null,b:'Restocked',hue:'#181414',ink:'#F2F0EB'},
+];
+const grid=document.getElementById('prodgrid');
+products.forEach((pr,i)=>{
+  const el=document.createElement('article');el.className='card rv';el.style.transitionDelay=(i%3*80)+'ms';
+  el.innerHTML=`<div class="card-visual">${pr.b?`<span class="card-badge">${pr.b}</span>`:''}<canvas></canvas><div class="card-cta">Add to cart</div></div>
+  <div class="card-info"><div><h3>${pr.n}</h3><small>${pr.c}</small></div><span class="price">${pr.o?`<s>${pr.o}</s>`:''}${pr.p}</span></div>`;
+  grid.appendChild(el);io.observe(el);
+  drawGarment(el.querySelector('canvas'),pr,i);
+});
+
+/* draw a stylised garment on canvas — knit texture + silhouette */
+function drawGarment(cv,pr,seed){
+  const s=560;cv.width=s;cv.height=s*1.15;const x=cv.getContext('2d');
+  // bg
+  const g=x.createLinearGradient(0,0,0,cv.height);
+  g.addColorStop(0,'#0D0D10');g.addColorStop(1,pr.hue);
+  x.fillStyle=g;x.fillRect(0,0,s,cv.height);
+  // floor glow
+  const rg=x.createRadialGradient(s/2,cv.height*.62,20,s/2,cv.height*.62,s*.55);
+  rg.addColorStop(0,'rgba(226,32,28,.14)');rg.addColorStop(1,'transparent');
+  x.fillStyle=rg;x.fillRect(0,0,s,cv.height);
+  // garment silhouette by index
+  x.save();x.translate(s/2,cv.height*.52);
+  x.fillStyle=pr.hue==='#1C1C21'?'#26262c':'#222228';
+  x.strokeStyle='rgba(242,240,235,.15)';x.lineWidth=2;
+  const kind=seed%3; // 0 tee/tank, 1 leggings/joggers, 2 accessory strap
+  x.beginPath();
+  if(kind===0){ // tee
+    x.moveTo(-120,-150);x.quadraticCurveTo(-40,-185,0,-182);x.quadraticCurveTo(40,-185,120,-150);
+    x.lineTo(170,-90);x.lineTo(130,-45);x.lineTo(105,-80);
+    x.lineTo(105,160);x.quadraticCurveTo(0,180,-105,160);x.lineTo(-105,-80);
+    x.lineTo(-130,-45);x.lineTo(-170,-90);x.closePath();
+  }else if(kind===1){ // joggers/leggings
+    x.moveTo(-95,-170);x.lineTo(95,-170);x.lineTo(100,-40);
+    x.lineTo(70,180);x.lineTo(20,180);x.lineTo(8,-20);x.lineTo(-8,-20);
+    x.lineTo(-20,180);x.lineTo(-70,180);x.lineTo(-100,-40);x.closePath();
+  }else{ // strap coil
+    x.arc(0,0,120,0,Math.PI*2);
+  }
+  x.fill();x.stroke();
+  // knit texture inside silhouette
+  x.clip();
+  for(let i=-200;i<220;i+=7){
+    x.strokeStyle=`rgba(255,255,255,${.02+(i%14===0?.03:0)})`;x.lineWidth=2;
+    x.beginPath();
+    for(let j=-200;j<=200;j+=10)x.lineTo(j,i+Math.sin(j*.06+seed)*3);
+    x.stroke();
+  }
+  // logo hit
+  x.fillStyle=pr.ink;x.font='400 34px Anton, sans-serif';x.textAlign='center';
+  x.fillText(kind===2?'CRNG':'CARNAGE',0,kind===1?-120:10);
+  if(kind!==2){x.fillStyle='#E2201C';x.fillRect(-24,kind===1?-108:26,48,4);}
+  x.restore();
+  // fold shadows
+  for(let i=0;i<5;i++){
+    const fx=s*.2+Math.abs(Math.sin(seed*3+i*7))*s*.6;
+    const fg=x.createLinearGradient(fx-30,0,fx+30,0);
+    fg.addColorStop(0,'transparent');fg.addColorStop(.5,'rgba(0,0,0,.22)');fg.addColorStop(1,'transparent');
+    x.fillStyle=fg;x.fillRect(fx-30,cv.height*.2,60,cv.height*.62);
+  }
+}
+
+/* ============ COLLECTION CANVASES ============ */
+document.querySelectorAll('.coll').forEach((c,ci)=>{
+  const cv=c.querySelector('canvas');const w=800,h=1000;cv.width=w;cv.height=h;
+  const x=cv.getContext('2d');
+  const g=x.createLinearGradient(0,0,w,h);
+  g.addColorStop(0,ci?'#1B1216':'#101318');g.addColorStop(1,'#0A0A0B');
+  x.fillStyle=g;x.fillRect(0,0,w,h);
+  // diagonal speed lines
+  for(let i=-h;i<w+h;i+=26){
+    x.strokeStyle=`rgba(242,240,235,${i%78===0?.07:.025})`;x.lineWidth=i%78===0?2:1;
+    x.beginPath();x.moveTo(i,0);x.lineTo(i+h*.6,h);x.stroke();
+  }
+  // giant ghost letter
+  x.font='400 640px Anton, sans-serif';x.textAlign='center';x.textBaseline='middle';
+  x.fillStyle='rgba(226,32,28,.12)';x.fillText(ci?'W':'M',w/2,h*.46);
+  x.strokeStyle='rgba(242,240,235,.18)';x.lineWidth=2;x.strokeText(ci?'W':'M',w/2,h*.46);
+});
+
+/* ============ FABRIC ZOOM canvas (animated weave macro) ============ */
+const fz=document.getElementById('fabric-zoom');
+const fzx=fz.getContext('2d');let fzT=0;
+function sizeFZ(){const r=fz.getBoundingClientRect();fz.width=r.width*2;fz.height=r.height*2;}
+sizeFZ();addEventListener('resize',sizeFZ);
+function drawFZ(){
+  fzT+=reduced?0:.008;
+  const w=fz.width,h=fz.height;
+  fzx.fillStyle='#0D0D10';fzx.fillRect(0,0,w,h);
+  const cell=Math.max(26,w/26);
+  for(let yy=0;yy<h+cell;yy+=cell){
+    for(let xx=0;xx<w+cell;xx+=cell){
+      const ph=Math.sin(xx*.008+yy*.006+fzT*2);
+      const lift=ph*cell*.14;
+      fzx.strokeStyle=`rgba(242,240,235,${.10+ph*.05})`;
+      fzx.lineWidth=cell*.32;
+      fzx.lineCap='round';
+      // over-under weave
+      fzx.beginPath();fzx.moveTo(xx-cell*.4,yy+lift);fzx.quadraticCurveTo(xx,yy-cell*.3+lift,xx+cell*.4,yy+lift);fzx.stroke();
+      fzx.strokeStyle=`rgba(142,142,150,${.08-ph*.03})`;
+      fzx.beginPath();fzx.moveTo(xx,yy-cell*.4-lift);fzx.quadraticCurveTo(xx+cell*.3,yy,xx,yy+cell*.4-lift);fzx.stroke();
+    }
+  }
+  // red thread running through
+  fzx.strokeStyle='rgba(226,32,28,.65)';fzx.lineWidth=cell*.14;
+  fzx.beginPath();
+  for(let xx=0;xx<=w;xx+=8)fzx.lineTo(xx,h*.5+Math.sin(xx*.01+fzT*3)*cell*1.2);
+  fzx.stroke();
+  requestAnimationFrame(drawFZ);
+}
+drawFZ();
+
+/* ============ hero title chars already animate via CSS; kick 'ready' after load ============ */
+addEventListener('load',()=>document.body.classList.add('ready'));
+setTimeout(()=>document.body.classList.add('ready'),2600);
 </script>
 </body>
 </html>
