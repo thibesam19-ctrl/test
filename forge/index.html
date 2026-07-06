@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE® — Premium Performance Supplements</title>
+<meta name="description" content="FORGE® — luxury performance supplements. Whey, Isolate, Creatine, Pre-Workout and more. Built through discipline.">
+<meta property="og:title" content="FORGE® — Premium Performance Supplements">
+<meta property="og:description" content="Your limits are optional. Lab-grade supplements for athletes who show up.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#070708;--carbon:#0E0E10;--graphite:#17171A;--steel:#212126;
+  --smoke:#2B2B31;--silver:#9A9AA2;--white:#F4F3F0;
+  --crimson:#D31E2C;--crimson-hot:#FF3B49;--gold:#C9A227;
+  --line:rgba(244,243,240,.09);
+  --font-d:'Anton',sans-serif;--font-b:'Archivo',sans-serif;--font-m:'Space Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--void);color:var(--white);font-family:var(--font-b);overflow-x:hidden;line-height:1.65;-webkit-font-smoothing:antialiased}
+::selection{background:var(--crimson);color:#fff}
+h1,h2,h3{font-family:var(--font-d);font-weight:400;text-transform:uppercase;line-height:.93;letter-spacing:.01em}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+.mono{font-family:var(--font-m);font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--silver)}
+.crimson{color:var(--crimson)}
+.gold{color:var(--gold)}
+
+/* ---------- loader ---------- */
+#loader{position:fixed;inset:0;background:var(--void);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6rem;transition:opacity .9s cubic-bezier(.77,0,.18,1),visibility .9s}
+#loader.done{opacity:0;visibility:hidden}
+#loader .word{font-family:var(--font-d);font-size:clamp(3rem,10vw,7rem);overflow:hidden;height:1.05em;display:flex}
+#loader .word span{transform:translateY(110%);animation:rise 1s cubic-bezier(.16,1,.3,1) .15s forwards}
+@keyframes rise{to{transform:translateY(0)}}
+#loadbar{width:min(300px,62vw);height:2px;background:var(--line);position:relative;overflow:hidden}
+#loadbar i{position:absolute;inset:0;background:linear-gradient(90deg,var(--crimson),var(--gold));transform-origin:left;transform:scaleX(0);transition:transform .3s ease}
+#loadpct{font-family:var(--font-m);font-size:.68rem;letter-spacing:.3em;color:var(--silver)}
+
+/* ---------- cursor ---------- */
+#cursor{position:fixed;width:12px;height:12px;background:var(--white);border-radius:50%;pointer-events:none;z-index:9500;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .3s,height .3s,background .3s}
+#cursor.hot{width:64px;height:64px;background:var(--crimson);mix-blend-mode:normal;opacity:.85}
+#cursor .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-m);font-size:.55rem;letter-spacing:.1em;color:#fff;opacity:0;transition:opacity .2s}
+#cursor.hot .lbl{opacity:1}
+#glow{position:fixed;width:520px;height:520px;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(211,30,44,.07),transparent 65%);transform:translate(-50%,-50%)}
+@media(pointer:coarse){#cursor,#glow{display:none}}
+
+/* ---------- nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:1.15rem clamp(1.2rem,4vw,3.2rem);mix-blend-mode:difference}
+.logo{font-family:var(--font-d);font-size:1.4rem;letter-spacing:.08em;color:#fff}
+.logo em{color:var(--crimson);font-style:normal}
+.nav-links{display:flex;gap:2rem}
+.nav-links a{font-family:var(--font-m);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:#fff;position:relative;padding:.3rem 0}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:#fff;transform:scaleX(0);transform-origin:right;transition:transform .4s cubic-bezier(.77,0,.18,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+.cart-btn{font-family:var(--font-m);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:#fff;border:1px solid rgba(255,255,255,.35);padding:.6rem 1.2rem;border-radius:99px;background:none;cursor:pointer;transition:background .3s,color .3s}
+.cart-btn:hover{background:#fff;color:#000}
+@media(max-width:820px){.nav-links{display:none}}
+
+#scroll-wrap{position:fixed;top:0;left:0;width:100%;will-change:transform;z-index:2}
+#spacer{width:1px}
+
+/* ---------- hero ---------- */
+#hero-gl{position:fixed;inset:0;z-index:0;pointer-events:none}
+.hero{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 clamp(1.2rem,4vw,3.2rem) 7vh;position:relative}
+.hero-kicker{font-family:var(--font-m);font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:var(--silver);margin-bottom:1.2rem;display:flex;align-items:center;gap:.9rem}
+.hero-kicker::before{content:"";width:38px;height:1px;background:var(--crimson)}
+.hero h1{font-size:clamp(3.6rem,14.5vw,13rem);mix-blend-mode:difference}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line span{display:inline-block;transform:translateY(112%);transition:transform 1.25s cubic-bezier(.16,1,.3,1)}
+body.ready .hero h1 .line span{transform:translateY(0)}
+.hero h1 .line:nth-child(2) span{transition-delay:.12s;color:transparent;-webkit-text-stroke:1.5px #fff}
+.hero-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-top:2.4rem;flex-wrap:wrap}
+.hero-foot p{max-width:36ch;color:var(--silver);font-size:.95rem}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{position:relative;display:inline-flex;align-items:center;gap:.7rem;padding:1.05rem 2.3rem;border-radius:99px;font-family:var(--font-m);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;overflow:hidden;border:none;transition:transform .25s}
+.btn span{position:relative;z-index:2;transition:color .35s}
+.btn::before{content:"";position:absolute;inset:0;border-radius:99px;transform:translateY(102%);transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.btn:hover::before{transform:none}
+.btn:active{transform:scale(.95)}
+.btn-fill{background:var(--crimson);color:#fff}
+.btn-fill::before{background:var(--white)}
+.btn-fill:hover span{color:var(--void)}
+.btn-ghost{background:transparent;color:var(--white);box-shadow:inset 0 0 0 1px var(--line)}
+.btn-ghost::before{background:var(--crimson)}
+.btn-ghost:hover span{color:#fff}
+.scroll-hint{position:absolute;right:clamp(1.2rem,4vw,3.2rem);bottom:7vh;writing-mode:vertical-rl;font-family:var(--font-m);font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--silver);display:flex;align-items:center;gap:.8rem}
+.scroll-hint::after{content:"";width:1px;height:60px;background:linear-gradient(var(--crimson),transparent);animation:drip 2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media(max-width:760px){.scroll-hint{display:none}}
+
+/* ---------- marquee ---------- */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.1rem 0;overflow:hidden;white-space:nowrap;background:var(--void);position:relative;z-index:2}
+.mq-track{display:inline-flex;gap:3rem;animation:mq 30s linear infinite}
+.mq-track span{font-family:var(--font-d);font-size:1.1rem;text-transform:uppercase;color:var(--silver);display:inline-flex;align-items:center;gap:3rem}
+.mq-track span i{width:6px;height:6px;background:var(--crimson);border-radius:50%;font-style:normal}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+section{position:relative;padding:clamp(5rem,12vh,9.5rem) clamp(1.2rem,4vw,3.2rem);background:var(--void);z-index:2}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:3.4rem;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(2.6rem,7vw,5.6rem)}
+.sec-head h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1px var(--white)}
+.counter{font-family:var(--font-m);font-size:.7rem;color:var(--silver);letter-spacing:.2em}
+.rv{opacity:0;transform:translateY(48px);transition:opacity .95s cubic-bezier(.16,1,.3,1),transform .95s cubic-bezier(.16,1,.3,1)}
+.rv.on{opacity:1;transform:none}
+
+/* ---------- story chapters ---------- */
+.story{max-width:1200px}
+.chapter{display:grid;grid-template-columns:110px 1fr;gap:2.2rem;padding:2.6rem 0;border-bottom:1px solid var(--line);align-items:start}
+.chapter:first-of-type{border-top:1px solid var(--line)}
+.chapter .num{font-family:var(--font-d);font-size:2.4rem;color:transparent;-webkit-text-stroke:1px var(--smoke);transition:color .5s,-webkit-text-stroke .5s}
+.chapter:hover .num{color:var(--crimson);-webkit-text-stroke:1px var(--crimson)}
+.chapter h3{font-size:clamp(1.6rem,3.4vw,2.6rem);margin-bottom:.5rem}
+.chapter p{color:var(--silver);max-width:52ch;font-size:.94rem}
+.chapter .tagline{font-family:var(--font-m);font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--crimson);display:block;margin-bottom:.6rem}
+@media(max-width:700px){.chapter{grid-template-columns:1fr;gap:.8rem}}
+
+/* ---------- lab configurator ---------- */
+.lab{background:var(--carbon);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.lab-wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:3rem;align-items:center}
+@media(max-width:960px){.lab-wrap{grid-template-columns:1fr}}
+#lab-gl{width:100%;aspect-ratio:1/1.05;display:block;border-radius:8px;cursor:grab}
+#lab-gl:active{cursor:grabbing}
+.lab-stage{position:relative}
+.hotspot{position:absolute;width:30px;height:30px;border-radius:50%;border:1px solid rgba(244,243,240,.4);background:rgba(14,14,16,.6);backdrop-filter:blur(4px);color:var(--white);font-family:var(--font-m);font-size:.7rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .3s,transform .3s;z-index:5}
+.hotspot:hover{background:var(--crimson);transform:scale(1.15)}
+.hotspot .tip{position:absolute;left:130%;top:50%;transform:translateY(-50%);background:var(--graphite);border:1px solid var(--line);border-radius:6px;padding:.7rem .9rem;width:210px;font-family:var(--font-b);font-size:.74rem;color:var(--silver);opacity:0;pointer-events:none;transition:opacity .3s;text-align:left;line-height:1.5}
+.hotspot .tip b{display:block;color:var(--white);font-size:.78rem;margin-bottom:.15rem}
+.hotspot:hover .tip{opacity:1}
+.hs-1{top:26%;left:12%}.hs-2{top:48%;right:10%}.hs-3{bottom:18%;left:18%}
+.lab-info .mono{display:block;margin-bottom:1rem}
+.lab-info h2{font-size:clamp(2.2rem,5vw,4rem);margin-bottom:1rem}
+.lab-info h2 em{font-style:normal;color:var(--crimson)}
+.lab-desc{color:var(--silver);font-size:.93rem;max-width:46ch;min-height:4.2em}
+.lab-picker{display:flex;gap:.55rem;flex-wrap:wrap;margin:1.6rem 0}
+.pick{font-family:var(--font-m);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;padding:.6rem 1.05rem;border-radius:99px;border:1px solid var(--line);background:none;color:var(--silver);cursor:pointer;transition:all .3s}
+.pick:hover{border-color:var(--white);color:var(--white)}
+.pick.on{background:var(--white);color:var(--void);border-color:var(--white)}
+.lab-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:1.6rem}
+.lab-facts div{background:var(--carbon);padding:1rem .9rem;text-align:center}
+.lab-facts b{font-family:var(--font-d);font-size:1.5rem;display:block;font-weight:400}
+.lab-facts span{font-family:var(--font-m);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--silver)}
+.lab-price{display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap}
+.lab-price .p{font-family:var(--font-d);font-size:2rem}
+.lab-price .p small{font-family:var(--font-m);font-size:.62rem;letter-spacing:.16em;color:var(--silver);display:block}
+
+/* ---------- shop ---------- */
+.filters{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:2.4rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:1.3rem}
+.card{background:var(--graphite);border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;position:relative;transition:transform .5s cubic-bezier(.16,1,.3,1),border-color .4s,box-shadow .5s}
+.card:hover{transform:translateY(-7px);border-color:rgba(211,30,44,.55);box-shadow:0 24px 60px -18px rgba(211,30,44,.22)}
+.card.hide{display:none}
+.card-visual{aspect-ratio:1/1.06;position:relative;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#1d1d22,#0b0b0d)}
+.card-visual canvas{width:100%;height:100%;display:block;transition:transform .7s cubic-bezier(.16,1,.3,1)}
+.card:hover .card-visual canvas{transform:scale(1.07) rotate(-2deg)}
+.card-badge{position:absolute;top:.85rem;left:.85rem;font-family:var(--font-m);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;background:var(--crimson);color:#fff;padding:.32rem .7rem;border-radius:3px;z-index:3}
+.card-badge.gold{background:var(--gold);color:#141414}
+.card-info{padding:1.1rem 1.2rem 1.3rem;display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}
+.card-info h3{font-family:var(--font-b);font-weight:700;text-transform:none;font-size:1rem;line-height:1.3}
+.card-info small{display:block;color:var(--silver);font-size:.76rem;margin-top:.25rem;font-weight:400}
+.price{font-family:var(--font-m);font-size:.82rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.price s{color:var(--silver);margin-right:.4rem}
+.card-cta{position:absolute;inset:auto 0 0 0;background:var(--white);color:var(--void);font-family:var(--font-m);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;text-align:center;padding:.9rem;transform:translateY(100%);transition:transform .45s cubic-bezier(.16,1,.3,1);z-index:3}
+.card:hover .card-cta{transform:none}
+
+/* ---------- stats band ---------- */
+.band{background:var(--carbon);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.band-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.band-grid div{background:var(--carbon);padding:2.4rem 1.8rem}
+.band-grid b{font-family:var(--font-d);font-size:clamp(2.2rem,5vw,3.6rem);display:block;font-weight:400}
+.band-grid b i{color:var(--crimson);font-style:normal}
+.band-grid span{font-family:var(--font-m);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--silver)}
+
+/* ---------- transformations ---------- */
+.tf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.3rem}
+.tf{background:var(--graphite);border:1px solid var(--line);border-radius:10px;padding:1.8rem;transition:border-color .4s,transform .5s cubic-bezier(.16,1,.3,1)}
+.tf:hover{border-color:rgba(201,162,39,.5);transform:translateY(-5px)}
+.tf .quote{font-size:1.02rem;font-weight:500;line-height:1.55;margin-bottom:1.4rem}
+.tf .quote::before{content:"“";color:var(--crimson);font-family:var(--font-d);font-size:1.6rem;margin-right:.2rem}
+.tf .who{display:flex;align-items:center;gap:.9rem}
+.tf .av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--crimson),var(--gold));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:1rem;color:#fff}
+.tf .who b{font-size:.86rem;display:block}
+.tf .who span{font-family:var(--font-m);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--silver)}
+.tf .delta{margin-top:1.2rem;padding-top:1.1rem;border-top:1px solid var(--line);display:flex;gap:1.6rem}
+.tf .delta div b{font-family:var(--font-d);font-size:1.3rem;color:var(--gold)}
+.tf .delta div span{font-family:var(--font-m);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--silver);display:block}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:860px}
+.qa{border-bottom:1px solid var(--line)}
+.qa:first-of-type{border-top:1px solid var(--line)}
+.qa button{width:100%;background:none;border:none;color:var(--white);display:flex;justify-content:space-between;align-items:center;gap:1.5rem;padding:1.5rem .2rem;cursor:pointer;text-align:left;font-family:var(--font-b);font-weight:600;font-size:1.02rem}
+.qa button i{font-style:normal;font-family:var(--font-m);color:var(--crimson);transition:transform .4s;font-size:1.1rem}
+.qa.open button i{transform:rotate(45deg)}
+.qa .ans{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.16,1,.3,1)}
+.qa .ans p{padding:0 .2rem 1.5rem;color:var(--silver);font-size:.92rem;max-width:64ch}
+
+/* ---------- CTA ---------- */
+.cta-final{text-align:center;padding-top:clamp(7rem,15vh,11rem);padding-bottom:clamp(7rem,15vh,11rem);position:relative;overflow:hidden}
+.cta-final h2{font-size:clamp(3rem,10.5vw,9.5rem);position:relative;z-index:2}
+.cta-final h2 .stroke{color:transparent;-webkit-text-stroke:1.5px var(--white)}
+.cta-final h2 .fill{color:var(--crimson)}
+.cta-final p{color:var(--silver);max-width:44ch;margin:1.6rem auto 2.4rem;position:relative;z-index:2}
+.cta-final .btn{position:relative;z-index:2}
+.cta-final .ghostword{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-d);font-size:clamp(10rem,30vw,26rem);color:transparent;-webkit-text-stroke:1px rgba(244,243,240,.05);white-space:nowrap;pointer-events:none}
+
+/* ---------- newsletter + footer ---------- */
+.news{background:var(--carbon);border-top:1px solid var(--line);text-align:center}
+.news h2{font-size:clamp(1.9rem,4.6vw,3.2rem)}
+.news p{color:var(--silver);max-width:46ch;margin:.9rem auto 2rem}
+.news form{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap}
+.news input{padding:1.05rem 1.3rem;border:1px solid var(--line);background:var(--graphite);color:var(--white);font-family:var(--font-b);font-size:.9rem;min-width:min(330px,74vw);border-radius:99px;outline:none;transition:border-color .3s}
+.news input:focus{border-color:var(--crimson)}
+footer{border-top:1px solid var(--line);padding:3.6rem clamp(1.2rem,4vw,3.2rem) 2rem;background:var(--void);position:relative;z-index:2}
+.foot-grid{display:flex;justify-content:space-between;gap:3rem;flex-wrap:wrap;margin-bottom:3rem}
+.foot-grid .logo{font-size:2.1rem}
+.foot-col{display:flex;flex-direction:column;gap:.7rem}
+.foot-col b{font-family:var(--font-m);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);margin-bottom:.4rem}
+.foot-col a{font-size:.9rem;opacity:.82;transition:opacity .3s,color .3s}
+.foot-col a:hover{opacity:1;color:var(--crimson-hot)}
+.foot-base{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:1.6rem}
+.foot-base span{font-family:var(--font-m);font-size:.6rem;letter-spacing:.16em;color:var(--silver);text-transform:uppercase}
+
+:focus-visible{outline:2px solid var(--crimson);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+</style>
+</head>
+<body>
+
+<div id="loader" aria-hidden="true">
+  <div class="word"><span>FORGE<em style="color:var(--crimson);font-style:normal">.</em></span></div>
+  <div id="loadbar"><i></i></div>
+  <div id="loadpct">00</div>
+</div>
+
+<canvas id="hero-gl" aria-hidden="true"></canvas>
+<div id="glow" aria-hidden="true"></div>
+<div id="cursor" aria-hidden="true"><span class="lbl">VIEW</span></div>
+
+<nav aria-label="Main">
+  <a class="logo" href="#top">FORGE<em>.</em></a>
+  <div class="nav-links">
+    <a href="#lab" data-hot>The Lab</a>
+    <a href="#shop" data-hot>Shop</a>
+    <a href="#story" data-hot>The Ritual</a>
+    <a href="#proof" data-hot>Proof</a>
+  </div>
+  <button class="cart-btn" data-hot aria-label="Cart, 0 items">Cart — 0</button>
+</nav>
+
+<div id="scroll-wrap">
+<main id="top">
+
+  <header class="hero">
+    <div class="hero-kicker">Lab-grade performance nutrition — Est. 2021</div>
+    <h1>
+      <span class="line"><span>BUILT THROUGH</span></span>
+      <span class="line"><span>DISCIPLINE</span></span>
+    </h1>
+    <div class="hero-foot">
+      <p>Whey. Creatine. Pre-workout. Every scoop third-party tested, zero filler, engineered for the athletes who show up before the sun does.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-fill magnetic" data-hot><span>Shop the range</span></button>
+        <button class="btn btn-ghost magnetic" data-hot><span>Explore the lab</span></button>
+      </div>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </header>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="mq-track">
+      <span>Whey Protein <i></i> Isolate <i></i> Creatine <i></i> Pre-Workout <i></i> Mass Gainer <i></i> BCAA <i></i> EAA <i></i> Fat Burner <i></i> Electrolytes <i></i> Collagen <i></i></span>
+      <span>Whey Protein <i></i> Isolate <i></i> Creatine <i></i> Pre-Workout <i></i> Mass Gainer <i></i> BCAA <i></i> EAA <i></i> Fat Burner <i></i> Electrolytes <i></i> Collagen <i></i></span>
+    </div>
+  </div>
+
+  <!-- ============ STORY / RITUAL ============ -->
+  <section class="story" id="story">
+    <div class="sec-head rv">
+      <h2>The <em>Ritual</em></h2>
+      <span class="counter">( 01 — Arrival to achievement )</span>
+    </div>
+    <div class="chapter rv"><span class="num">01</span><div><span class="tagline">Arrival — 04:50</span><h3>The door is heavy on purpose</h3><p>Nobody claps when you show up. That's the point. The city is asleep and the plates are cold and you chose this anyway.</p></div></div>
+    <div class="chapter rv"><span class="num">02</span><div><span class="tagline">Preparation</span><h3>Wrists wrapped. Mind quiet.</h3><p>One scoop of IGNITE pre-workout in cold water. Chalk on the hands. The ritual isn't superstition — it's the switch that tells your nervous system it's time.</p></div></div>
+    <div class="chapter rv"><span class="num">03</span><div><span class="tagline">Training</span><h3>The set that decides everything</h3><p>Rep one through nine are rehearsal. Rep ten is the negotiation. Rep eleven — the one you didn't have — is where the body you asked for gets built.</p></div></div>
+    <div class="chapter rv"><span class="num">04</span><div><span class="tagline">Nutrition</span><h3>You don't grow in the gym</h3><p>Thirty grams of FORGE Isolate within the hour. Five grams of creatine, every day, no exceptions. Boring, repeatable, undefeated.</p></div></div>
+    <div class="chapter rv"><span class="num">05</span><div><span class="tagline">Recovery</span><h3>Sleep is a training day</h3><p>Electrolytes, collagen, fish oil, lights out. The athletes who last decades treat recovery with the same violence they train with.</p></div></div>
+    <div class="chapter rv"><span class="num">06</span><div><span class="tagline">Transformation</span><h3>Twelve weeks later, the mirror blinks first</h3><p>Not luck. Not genetics. Just four hundred quiet decisions stacked in a row. This is what we bottle.</p></div></div>
+  </section>
+
+  <!-- ============ LAB / 3D CONFIGURATOR ============ -->
+  <section class="lab" id="lab">
+    <div class="lab-wrap">
+      <div class="lab-stage rv">
+        <canvas id="lab-gl" aria-label="Interactive 3D supplement container — drag to rotate"></canvas>
+        <button class="hotspot hs-1" data-hot aria-label="Ingredient detail">+<span class="tip"><b id="tip1b">27g protein</b><span id="tip1t">Cold-filtered whey isolate per 33g scoop. 90%+ purity.</span></span></button>
+        <button class="hotspot hs-2" data-hot aria-label="Ingredient detail">+<span class="tip"><b>Third-party tested</b>Every batch screened for heavy metals and banned substances.</span></button>
+        <button class="hotspot hs-3" data-hot aria-label="Ingredient detail">+<span class="tip"><b>Zero filler</b>No maltodextrin padding, no amino spiking, no proprietary blends.</span></button>
+      </div>
+      <div class="lab-info">
+        <span class="mono rv">( 02 — The Lab · drag to rotate )</span>
+        <h2 class="rv" id="lab-title">FORGE <em>WHEY</em></h2>
+        <p class="lab-desc rv" id="lab-desc">Cold-filtered whey protein concentrate. 24g protein, 5.5g BCAAs per scoop. Dutch cocoa, real vanilla — flavours built by chefs, not chemists.</p>
+        <div class="lab-picker rv" id="lab-picker" role="tablist" aria-label="Choose product"></div>
+        <div class="lab-facts rv">
+          <div><b id="f1">24g</b><span id="f1l">Protein</span></div>
+          <div><b id="f2">5.5g</b><span id="f2l">BCAAs</span></div>
+          <div><b id="f3">1.9g</b><span id="f3l">Sugar</span></div>
+        </div>
+        <div class="lab-price rv">
+          <div class="p"><span id="lab-price">$54</span><small id="lab-size">2kg · 60 servings</small></div>
+          <button class="btn btn-fill magnetic" data-hot><span id="lab-atc">Add to cart</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SHOP ============ -->
+  <section id="shop">
+    <div class="sec-head rv">
+      <h2>The <em>Arsenal</em></h2>
+      <span class="counter">( 03 — 14 weapons )</span>
+    </div>
+    <div class="filters rv" id="filters" role="tablist" aria-label="Filter products">
+      <button class="pick on" data-f="all" data-hot>All</button>
+      <button class="pick" data-f="protein" data-hot>Protein</button>
+      <button class="pick" data-f="performance" data-hot>Performance</button>
+      <button class="pick" data-f="health" data-hot>Health</button>
+      <button class="pick" data-f="gear" data-hot>Gear</button>
+    </div>
+    <div class="grid" id="prodgrid"></div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section class="band">
+    <div class="band-grid rv">
+      <div><b>1.2<i>M</i></b><span>Scoops shipped</span></div>
+      <div><b>93<i>%</i></b><span>Isolate purity</span></div>
+      <div><b>0</b><span>Banned substances — ever</span></div>
+      <div><b>4.9<i>★</i></b><span>41,000+ verified reviews</span></div>
+    </div>
+  </section>
+
+  <!-- ============ TRANSFORMATIONS ============ -->
+  <section id="proof">
+    <div class="sec-head rv">
+      <h2>The <em>Proof</em></h2>
+      <span class="counter">( 04 — Transformations )</span>
+    </div>
+    <div class="tf-grid">
+      <article class="tf rv"><p class="quote">Twenty-two years old, 61kg, scared of the squat rack. Fourteen months of FORGE Whey and showing up. Nobody calls me small anymore.</p><div class="who"><span class="av">DK</span><div><b>Dinuka K.</b><span>Powerlifter — 14 months</span></div></div><div class="delta"><div><b>+19kg</b><span>Bodyweight</span></div><div><b>+85kg</b><span>Squat</span></div></div></article>
+      <article class="tf rv"><p class="quote">Post-partum, zero energy, hated mirrors. IGNITE before every session and the discipline came back before the strength did. Then the strength came back too.</p><div class="who"><span class="av">AM</span><div><b>Amara M.</b><span>CrossFit — 9 months</span></div></div><div class="delta"><div><b>-14kg</b><span>Fat mass</span></div><div><b>2×</b><span>BW deadlift</span></div></div></article>
+      <article class="tf rv"><p class="quote">Forty-six. Two kids. Desk job. Everyone said slow down. FORGE Creatine, five grams a day for a year — my bloodwork looks better than my brother's, and he's thirty.</p><div class="who"><span class="av">RS</span><div><b>Rob S.</b><span>Masters athlete — 12 months</span></div></div><div class="delta"><div><b>+11%</b><span>Lean mass</span></div><div><b>-8yr</b><span>Metabolic age</span></div></div></article>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="faq">
+    <div class="sec-head rv">
+      <h2>Questions</h2>
+      <span class="counter">( 05 — Straight answers )</span>
+    </div>
+    <div class="qa rv"><button data-hot aria-expanded="false">When should I take whey vs isolate?<i>+</i></button><div class="ans"><p>Whey concentrate after training or as a meal supplement. Isolate if you're cutting, lactose-sensitive, or want maximum protein per calorie — 93% purity, near-zero lactose.</p></div></div>
+    <div class="qa rv"><button data-hot aria-expanded="false">Do I need to cycle creatine?<i>+</i></button><div class="ans"><p>No. Five grams daily, indefinitely, is the most-studied protocol in sports science. No loading phase required — saturation just takes ~3 weeks instead of one.</p></div></div>
+    <div class="qa rv"><button data-hot aria-expanded="false">Is IGNITE pre-workout banned-substance tested?<i>+</i></button><div class="ans"><p>Every batch of every product is third-party screened. Certificates ship in the box and live on each product page. Competing athletes are safe with the full range.</p></div></div>
+    <div class="qa rv"><button data-hot aria-expanded="false">What's your shipping and return policy?<i>+</i></button><div class="ans"><p>Free 48-hour shipping over $60. Unopened products return free within 30 days. Opened tub you don't love? We refund the first one, no questions — that's the FORGE guarantee.</p></div></div>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="cta-final">
+    <span class="ghostword" aria-hidden="true">NO SHORTCUTS</span>
+    <h2 class="rv"><span class="stroke">YOUR LIMITS</span><br><span class="fill">ARE OPTIONAL</span></h2>
+    <p class="rv">Join 250,000 athletes who stopped negotiating with the alarm clock.</p>
+    <button class="btn btn-fill magnetic rv" data-hot><span>Start your stack</span></button>
+  </section>
+
+  <section class="news">
+    <h2 class="rv">First scoop is on us</h2>
+    <p class="rv">Drops, restocks and training protocols. One email a week. Unsubscribe whenever.</p>
+    <form class="rv" onsubmit="event.preventDefault();this.querySelector('.btn span').textContent='You’re in ✓'">
+      <label for="em" style="position:absolute;left:-9999px">Email address</label>
+      <input id="em" type="email" placeholder="Email address" required>
+      <button class="btn btn-fill magnetic" type="submit" data-hot><span>Join FORGE</span></button>
+    </form>
+  </section>
+
+  <footer>
+    <div class="foot-grid">
+      <div>
+        <a class="logo" href="#top">FORGE<em>.</em></a>
+        <p style="color:var(--silver);font-size:.85rem;max-width:30ch;margin-top:1rem">Lab-grade performance nutrition. Built through discipline since 2021.</p>
+      </div>
+      <div class="foot-col"><b>Shop</b><a href="#shop" data-hot>Protein</a><a href="#shop" data-hot>Performance</a><a href="#shop" data-hot>Health</a><a href="#shop" data-hot>Gear &amp; shakers</a></div>
+      <div class="foot-col"><b>Brand</b><a href="#story" data-hot>The ritual</a><a href="#lab" data-hot>The lab</a><a href="#proof" data-hot>Transformations</a><a href="#" data-hot>Athletes</a></div>
+      <div class="foot-col"><b>Help</b><a href="#" data-hot>Shipping</a><a href="#" data-hot>Returns</a><a href="#" data-hot>Lab certificates</a><a href="#" data-hot>Contact</a></div>
+    </div>
+    <div class="foot-base">
+      <span>© 2026 FORGE Nutrition</span>
+      <span>Third-party tested · Zero filler</span>
+      <span>Terms · Privacy</span>
+    </div>
+  </footer>
+
+</main>
+</div>
+<div id="spacer"></div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============ LOADER ============ */
+const bar=document.querySelector('#loadbar i'),pct=document.getElementById('loadpct');
+let lp=0;const lt=setInterval(()=>{lp=Math.min(100,lp+Math.random()*20);bar.style.transform=`scaleX(${lp/100})`;pct.textContent=String(Math.floor(lp)).padStart(2,'0');
+if(lp>=100){clearInterval(lt);setTimeout(()=>{document.getElementById('loader').classList.add('done');document.body.classList.add('ready');},380);}},120);
+
+/* ============ SMOOTH SCROLL ============ */
+const wrap=document.getElementById('scroll-wrap'),spacer=document.getElementById('spacer');
+let cur=0,tgt=0;
+function setH(){spacer.style.height=wrap.getBoundingClientRect().height+'px';}
+setH();addEventListener('resize',setH);new ResizeObserver(setH).observe(wrap);
+addEventListener('scroll',()=>{tgt=scrollY;},{passive:true});
+(function smooth(){
+  cur+=(tgt-cur)*(reduced?1:.085);
+  if(Math.abs(tgt-cur)<.05)cur=tgt;
+  wrap.style.transform=`translate3d(0,${-cur}px,0)`;
+  requestAnimationFrame(smooth);
+})();
+
+/* ============ CURSOR + GLOW + MAGNETIC ============ */
+const cursor=document.getElementById('cursor'),glow=document.getElementById('glow');
+let cx=innerWidth/2,cy=innerHeight/2,px=cx,py=cy,gx=cx,gy=cy;
+addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;});
+(function mc(){px+=(cx-px)*.22;py+=(cy-py)*.22;gx+=(cx-gx)*.06;gy+=(cy-gy)*.06;
+cursor.style.left=px+'px';cursor.style.top=py+'px';glow.style.left=gx+'px';glow.style.top=gy+'px';requestAnimationFrame(mc);})();
+document.addEventListener('mouseover',e=>{cursor.classList.toggle('hot',!!e.target.closest('[data-hot],a,button,.card'));});
+/* magnetic buttons */
+document.querySelectorAll('.magnetic').forEach(b=>{
+  b.addEventListener('mousemove',e=>{
+    const r=b.getBoundingClientRect();
+    b.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.22}px,${(e.clientY-r.top-r.height/2)*.3}px)`;
+  });
+  b.addEventListener('mouseleave',()=>{b.style.transform='';b.style.transition='transform .5s cubic-bezier(.16,1,.3,1)';setTimeout(()=>b.style.transition='',500);});
+});
+
+/* ============ REVEALS ============ */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}}),{rootMargin:'0px 0px -8% 0px',threshold:.05});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* ============ PRODUCT LABEL FACTORY (canvas → texture) ============ */
+function makeLabel(name,sub,accent,dark=false){
+  const c=document.createElement('canvas');c.width=1024;c.height=640;const x=c.getContext('2d');
+  const bg=dark?'#E8E4DC':'#101013';
+  x.fillStyle=bg;x.fillRect(0,0,1024,640);
+  /* carbon texture lines */
+  for(let i=0;i<640;i+=5){x.fillStyle=dark?'rgba(0,0,0,.028)':'rgba(255,255,255,.022)';x.fillRect(0,i,1024,2);}
+  /* accent band */
+  x.fillStyle=accent;x.fillRect(0,470,1024,54);
+  const ink=dark?'#101013':'#F4F3F0';
+  x.fillStyle=ink;
+  x.font='400 118px Anton, sans-serif';x.textAlign='center';
+  x.fillText('FORGE',512,205);
+  x.fillStyle=accent;x.fillRect(392,236,240,10);
+  x.fillStyle=ink;x.font='400 86px Anton, sans-serif';
+  x.fillText(name.toUpperCase(),512,352);
+  x.font='400 30px "Space Mono", monospace';
+  x.fillStyle=dark?'rgba(16,16,19,.72)':'rgba(244,243,240,.72)';
+  x.fillText(sub.toUpperCase(),512,420);
+  x.fillStyle=dark?'#E8E4DC':'#101013';
+  x.font='700 26px "Space Mono", monospace';
+  x.fillText('LAB-GRADE · THIRD-PARTY TESTED',512,506);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;
+  return t;
+}
+
+/* build a premium tub: matte body + metallic lid + label wrap */
+function makeTub(labelTex,bodyColor=0x121215){
+  const g=new THREE.Group();
+  const bodyMat=new THREE.MeshPhysicalMaterial({color:bodyColor,roughness:.42,metalness:.1,clearcoat:.6,clearcoatRoughness:.35});
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(1,1,2.15,64),bodyMat);
+  g.add(body);
+  const labelMat=new THREE.MeshPhysicalMaterial({map:labelTex,roughness:.5,metalness:.05,clearcoat:.4,clearcoatRoughness:.4});
+  const label=new THREE.Mesh(new THREE.CylinderGeometry(1.012,1.012,1.5,64,1,true),labelMat);
+  label.position.y=-.08;g.add(label);
+  const lidMat=new THREE.MeshPhysicalMaterial({color:0x2a2a30,roughness:.25,metalness:.95});
+  const lid=new THREE.Mesh(new THREE.CylinderGeometry(1.04,1.04,.34,64),lidMat);
+  lid.position.y=1.24;g.add(lid);
+  const lidTop=new THREE.Mesh(new THREE.CylinderGeometry(.99,1.04,.1,64),lidMat.clone());
+  lidTop.position.y=1.46;g.add(lidTop);
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(1.02,.98,.12,64),bodyMat.clone());
+  base.position.y=-1.12;g.add(base);
+  return g;
+}
+
+/* ============ HERO SCENE ============ */
+const heroC=document.getElementById('hero-gl');
+const hr=new THREE.WebGLRenderer({canvas:heroC,antialias:true,alpha:true});
+hr.setPixelRatio(Math.min(devicePixelRatio,2));
+hr.toneMapping=THREE.ACESFilmicToneMapping;hr.toneMappingExposure=1.05;
+const hs=new THREE.Scene();
+hs.fog=new THREE.Fog(0x070708,9,26);
+const hc=new THREE.PerspectiveCamera(36,innerWidth/innerHeight,.1,60);
+hc.position.set(0,.6,8);
+const pm=new THREE.PMREMGenerator(hr);
+hs.environment=pm.fromScene(new RoomEnvironment(),.05).texture;
+
+hs.add(new THREE.HemisphereLight(0x2c2c34,0x070708,1.1));
+const hkey=new THREE.DirectionalLight(0xf4ede0,2);hkey.position.set(5,7,5);hs.add(hkey);
+const hrim=new THREE.DirectionalLight(0xd31e2c,6);hrim.position.set(-7,3,-5);hs.add(hrim);
+const hgold=new THREE.PointLight(0xc9a227,4,12);hgold.position.set(3,-1,2);hs.add(hgold);
+
+const heroTub=makeTub(makeLabel('Whey','Dutch chocolate · 2kg','#D31E2C'));
+heroTub.position.set(2.1,.2,0);heroTub.rotation.z=.08;
+hs.add(heroTub);
+const heroTub2=makeTub(makeLabel('Ignite','Pre-workout · blood orange','#C9A227'),0x0d0d10);
+heroTub2.scale.setScalar(.62);heroTub2.position.set(-2.6,-.7,-1.6);
+hs.add(heroTub2);
+const heroTub3=makeTub(makeLabel('Creatine','Monohydrate · 500g','#F4F3F0'),0x101014);
+heroTub3.scale.setScalar(.45);heroTub3.position.set(3.6,-1.4,-2.4);
+hs.add(heroTub3);
+
+/* ground + rings */
+const hground=new THREE.Mesh(new THREE.CircleGeometry(10,64),new THREE.MeshStandardMaterial({color:0x0b0b0d,roughness:.3,metalness:.65}));
+hground.rotation.x=-Math.PI/2;hground.position.y=-1.9;hs.add(hground);
+for(let i=1;i<=4;i++){
+  const ring=new THREE.Mesh(new THREE.RingGeometry(i*1.25,i*1.25+.012,128),new THREE.MeshBasicMaterial({color:0xd31e2c,transparent:true,opacity:.2-i*.038,side:THREE.DoubleSide}));
+  ring.rotation.x=-Math.PI/2;ring.position.y=-1.88;hs.add(ring);
+}
+/* dust */
+const dn=600,dp=new Float32Array(dn*3);
+for(let i=0;i<dn;i++){dp[i*3]=(Math.random()-.5)*18;dp[i*3+1]=Math.random()*8-2;dp[i*3+2]=(Math.random()-.5)*12;}
+const dgeo=new THREE.BufferGeometry();dgeo.setAttribute('position',new THREE.BufferAttribute(dp,3));
+const dust=new THREE.Points(dgeo,new THREE.PointsMaterial({color:0x9a9aa2,size:.02,transparent:true,opacity:.5}));
+hs.add(dust);
+
+let mx=0,my=0;
+addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth)*2-1;my=-((e.clientY/innerHeight)*2-1);});
+function sizeHero(){hr.setSize(innerWidth,innerHeight);hc.aspect=innerWidth/innerHeight;hc.updateProjectionMatrix();}
+sizeHero();addEventListener('resize',sizeHero);
+
+/* ============ LAB SCENE (configurator) ============ */
+const labC=document.getElementById('lab-gl');
+const lr=new THREE.WebGLRenderer({canvas:labC,antialias:true,alpha:true});
+lr.setPixelRatio(Math.min(devicePixelRatio,2));
+lr.toneMapping=THREE.ACESFilmicToneMapping;lr.toneMappingExposure=1.1;
+const ls=new THREE.Scene();
+const lc=new THREE.PerspectiveCamera(34,1,.1,50);
+lc.position.set(0,.4,6.2);
+ls.environment=pm.fromScene(new RoomEnvironment(),.05).texture;
+ls.add(new THREE.HemisphereLight(0x2c2c34,0x0e0e10,1.2));
+const lkey=new THREE.DirectionalLight(0xf4ede0,1.8);lkey.position.set(4,6,5);ls.add(lkey);
+const lrim=new THREE.DirectionalLight(0xd31e2c,5);lrim.position.set(-6,2,-4);ls.add(lrim);
+
+const labProducts=[
+  {id:'whey',n:'Whey',t:'FORGE <em>WHEY</em>',sub:'Dutch chocolate · 2kg',acc:'#D31E2C',accHex:0xd31e2c,dark:false,body:0x121215,
+   d:'Cold-filtered whey protein concentrate. 24g protein, 5.5g BCAAs per scoop. Dutch cocoa, real vanilla — flavours built by chefs, not chemists.',
+   f:[['24g','Protein'],['5.5g','BCAAs'],['1.9g','Sugar']],price:'$54',size:'2kg · 60 servings',tip:['27g protein','Cold-filtered whey per 33g scoop.']},
+  {id:'iso',n:'Isolate',t:'FORGE <em>ISOLATE</em>',sub:'93% purity · 1.8kg',acc:'#F4F3F0',accHex:0xf4f3f0,dark:false,body:0x0d0d10,
+   d:'93% pure whey isolate, virtually zero lactose. Maximum protein per calorie for cuts, contests, and sensitive stomachs.',
+   f:[['27g','Protein'],['0.3g','Lactose'],['108','Calories']],price:'$68',size:'1.8kg · 55 servings',tip:['93% purity','Micro-filtered isolate, near-zero lactose.']},
+  {id:'creatine',n:'Creatine',t:'FORGE <em>CREATINE</em>',sub:'Monohydrate · 500g',acc:'#C9A227',accHex:0xc9a227,dark:true,body:0x14141a,
+   d:'Pure micronised creatine monohydrate — the most studied supplement in sports science. 5g daily. Boring, repeatable, undefeated.',
+   f:[['5g','Per dose'],['100','Servings'],['200μ','Micronised']],price:'$29',size:'500g · 100 servings',tip:['Creapure® grade','German-sourced monohydrate, 99.99% pure.']},
+  {id:'ignite',n:'Pre-Workout',t:'FORGE <em>IGNITE</em>',sub:'Blood orange · 400g',acc:'#FF3B49',accHex:0xff3b49,dark:false,body:0x0d0d10,
+   d:'325mg caffeine, 6g citrulline, 3.2g beta-alanine. The switch that tells your nervous system it\'s time. Tingles included.',
+   f:[['325mg','Caffeine'],['6g','Citrulline'],['3.2g','Beta-alanine']],price:'$44',size:'400g · 40 servings',tip:['Full clinical doses','No proprietary blends — every mg on the label.']},
+  {id:'mass',n:'Mass Gainer',t:'FORGE <em>MASS</em>',sub:'Vanilla malt · 4kg',acc:'#8E6FD8',accHex:0x8e6fd8,dark:false,body:0x121215,
+   d:'740 clean calories per serving: 50g protein, oat-based carbs, MCTs. For hardgainers done with being the small one.',
+   f:[['740','Calories'],['50g','Protein'],['98g','Carbs']],price:'$72',size:'4kg · 16 servings',tip:['Oat-first carbs','No maltodextrin dump — slow, clean energy.']},
+  {id:'bcaa',n:'BCAA',t:'FORGE <em>BCAA</em>',sub:'2:1:1 · lime rush',acc:'#3FCB7E',accHex:0x3fcb7e,dark:false,body:0x101014,
+   d:'7g of 2:1:1 branched-chain aminos with coconut water electrolytes. Intra-workout insurance for long sessions and cuts.',
+   f:[['7g','BCAAs'],['2:1:1','Ratio'],['0','Sugar']],price:'$36',size:'390g · 30 servings',tip:['Fermented aminos','Plant-fermented, not feather-derived.']},
+];
+let labTub=null,labIdx=0,labSpin=0,dragging=false,dragX=0,spinVel=0;
+function setLab(i){
+  labIdx=i;
+  const p=labProducts[i];
+  if(labTub)ls.remove(labTub);
+  labTub=makeTub(makeLabel(p.n,p.sub,p.acc,p.dark),p.body);
+  labTub.position.y=-.15;
+  ls.add(labTub);
+  lrim.color.set(p.accHex);
+  document.getElementById('lab-title').innerHTML=p.t;
+  document.getElementById('lab-desc').textContent=p.d;
+  p.f.forEach((f,k)=>{document.getElementById('f'+(k+1)).textContent=f[0];document.getElementById('f'+(k+1)+'l').textContent=f[1];});
+  document.getElementById('lab-price').textContent=p.price;
+  document.getElementById('lab-size').textContent=p.size;
+  document.getElementById('tip1b').textContent=p.tip[0];
+  document.getElementById('tip1t').textContent=p.tip[1];
+  [...document.querySelectorAll('#lab-picker .pick')].forEach((b,k)=>b.classList.toggle('on',k===i));
+}
+const picker=document.getElementById('lab-picker');
+labProducts.forEach((p,i)=>{
+  const b=document.createElement('button');b.className='pick'+(i===0?' on':'');b.textContent=p.n;b.dataset.hot='';
+  b.setAttribute('role','tab');b.addEventListener('click',()=>setLab(i));
+  picker.appendChild(b);
+});
+setLab(0);
+/* drag rotate */
+labC.addEventListener('pointerdown',e=>{dragging=true;dragX=e.clientX;});
+addEventListener('pointermove',e=>{if(dragging){spinVel=(e.clientX-dragX)*.008;labSpin+=spinVel;dragX=e.clientX;}});
+addEventListener('pointerup',()=>dragging=false);
+function sizeLab(){const r=labC.getBoundingClientRect();if(r.width<2)return;lr.setSize(r.width,r.height,false);lc.aspect=r.width/r.height;lc.updateProjectionMatrix();}
+sizeLab();addEventListener('resize',sizeLab);
+
+/* ============ RENDER LOOP ============ */
+const clock=new THREE.Clock();
+(function tick(){
+  const t=clock.getElapsedTime();
+  const sp=Math.min(1,cur/innerHeight);
+  /* hero */
+  heroTub.rotation.y=t*.35+mx*.3;
+  heroTub.position.y=.2+Math.sin(t*1.1)*.12;
+  heroTub2.rotation.y=-t*.28;heroTub2.position.y=-.7+Math.sin(t*.9+2)*.1;
+  heroTub3.rotation.y=t*.4;heroTub3.position.y=-1.4+Math.sin(t*1.3+4)*.08;
+  hc.position.x+=(mx*.7-hc.position.x)*.04;
+  hc.position.y+=(.6+my*.3+sp*2.6-hc.position.y)*.05;
+  hc.lookAt(.6,0,0);
+  hrim.intensity=6+Math.sin(t*2)*1.5;
+  dust.rotation.y=t*.02;
+  heroC.style.opacity=String(Math.max(0,1-sp*1.15));
+  if(sp<1.05)hr.render(hs,hc);
+  /* lab */
+  if(labTub){
+    if(!dragging){spinVel*=.95;labSpin+=spinVel+(reduced?0:.004);}
+    labTub.rotation.y=labSpin;
+    labTub.position.y=-.15+Math.sin(t*1.2)*.05;
+  }
+  const lrect=labC.getBoundingClientRect();
+  if(lrect.bottom>0&&lrect.top<innerHeight){sizeLab();lr.render(ls,lc);}
+  requestAnimationFrame(tick);
+})();
+
+/* ============ SHOP GRID (procedural tub renders) ============ */
+const catalog=[
+  {n:'FORGE Whey',c:'protein',sub:'Dutch chocolate · 2kg',p:'$54',o:null,b:'Best seller',acc:'#D31E2C',dark:false},
+  {n:'FORGE Isolate',c:'protein',sub:'93% purity · 1.8kg',p:'$68',o:null,b:null,acc:'#F4F3F0',dark:false},
+  {n:'FORGE Mass',c:'protein',sub:'Vanilla malt · 4kg',p:'$72',o:'$84',b:'Sale',acc:'#8E6FD8',dark:false},
+  {n:'Collagen Peptides',c:'protein',sub:'Unflavoured · 450g',p:'$39',o:null,b:null,acc:'#E8B4B8',dark:true},
+  {n:'FORGE Creatine',c:'performance',sub:'Monohydrate · 500g',p:'$29',o:null,b:'Best seller',acc:'#C9A227',dark:true},
+  {n:'IGNITE Pre-Workout',c:'performance',sub:'Blood orange · 400g',p:'$44',o:null,b:'New',acc:'#FF3B49',dark:false},
+  {n:'BCAA 2:1:1',c:'performance',sub:'Lime rush · 390g',p:'$36',o:null,b:null,acc:'#3FCB7E',dark:false},
+  {n:'EAA Complete',c:'performance',sub:'Peach ice · 420g',p:'$42',o:null,b:null,acc:'#F79A3E',dark:false},
+  {n:'Shred Fat Burner',c:'performance',sub:'Thermogenic · 90 caps',p:'$46',o:'$58',b:'Sale',acc:'#FF6B35',dark:false},
+  {n:'Electrolyte+ ',c:'health',sub:'Citrus salt · 300g',p:'$26',o:null,b:null,acc:'#4FC3F7',dark:false},
+  {n:'Multivitamin Elite',c:'health',sub:'26 nutrients · 60 caps',p:'$32',o:null,b:null,acc:'#B0BEC5',dark:true},
+  {n:'Omega-3 Fish Oil',c:'health',sub:'3000mg · 90 softgels',p:'$28',o:null,b:null,acc:'#FFD54F',dark:true},
+  {n:'Pro Shaker 700ml',c:'gear',sub:'Insulated steel · leakproof',p:'$24',o:null,b:'Gold edition',acc:'#C9A227',dark:true,gold:true},
+  {n:'Lifting Straps',c:'gear',sub:'Reinforced cotton weave',p:'$18',o:null,b:null,acc:'#9A9AA2',dark:false},
+];
+/* mini tub drawing (2D, premium look) */
+function drawTub(cv,pr){
+  const s=460;cv.width=s;cv.height=s*1.06;const x=cv.getContext('2d');
+  const g=x.createRadialGradient(s/2,s*.2,40,s/2,s*.6,s*.8);
+  g.addColorStop(0,'#232329');g.addColorStop(1,'#0b0b0d');
+  x.fillStyle=g;x.fillRect(0,0,s,cv.height);
+  /* glow */
+  const rg=x.createRadialGradient(s/2,cv.height*.72,10,s/2,cv.height*.72,s*.5);
+  rg.addColorStop(0,pr.acc+'33');rg.addColorStop(1,'transparent');
+  x.fillStyle=rg;x.fillRect(0,0,s,cv.height);
+  const cxx=s/2,top=s*.20,bw=s*.46,bh=s*.60;
+  /* lid */
+  x.fillStyle='#33333b';x.beginPath();x.roundRect(cxx-bw/2-8,top-26,bw+16,34,8);x.fill();
+  x.fillStyle='#44444e';x.beginPath();x.roundRect(cxx-bw/2-2,top-34,bw+4,12,6);x.fill();
+  /* body */
+  const bg2=x.createLinearGradient(cxx-bw/2,0,cxx+bw/2,0);
+  bg2.addColorStop(0,'#0e0e11');bg2.addColorStop(.28,'#26262d');bg2.addColorStop(.5,'#17171b');bg2.addColorStop(.75,'#26262d');bg2.addColorStop(1,'#0c0c0f');
+  x.fillStyle=bg2;x.beginPath();x.roundRect(cxx-bw/2,top,bw,bh,10);x.fill();
+  /* label */
+  const lt=top+bh*.18,lh=bh*.58;
+  x.fillStyle=pr.dark?'#E8E4DC':'#101013';
+  x.fillRect(cxx-bw/2,lt,bw,lh);
+  const lg=x.createLinearGradient(cxx-bw/2,0,cxx+bw/2,0);
+  lg.addColorStop(0,'rgba(0,0,0,.5)');lg.addColorStop(.3,'rgba(0,0,0,0)');lg.addColorStop(.75,'rgba(0,0,0,0)');lg.addColorStop(1,'rgba(0,0,0,.55)');
+  x.fillStyle=lg;x.fillRect(cxx-bw/2,lt,bw,lh);
+  const ink=pr.dark?'#101013':'#F4F3F0';
+  x.fillStyle=ink;x.font='400 34px Anton, sans-serif';x.textAlign='center';
+  x.fillText('FORGE',cxx,lt+lh*.32);
+  x.fillStyle=pr.acc;x.fillRect(cxx-34,lt+lh*.40,68,5);
+  x.fillStyle=ink;x.font='400 24px Anton, sans-serif';
+  const nm=pr.n.replace('FORGE ','').toUpperCase();
+  x.fillText(nm.length>12?nm.slice(0,12):nm,cxx,lt+lh*.62);
+  x.fillStyle=pr.acc;x.fillRect(cxx-bw/2,lt+lh-10,bw,10);
+  /* highlight */
+  x.fillStyle='rgba(255,255,255,.06)';x.beginPath();x.ellipse(cxx-bw*.3,top+bh*.4,14,bh*.42,0,0,Math.PI*2);x.fill();
+  /* floor shadow */
+  x.fillStyle='rgba(0,0,0,.5)';x.beginPath();x.ellipse(cxx,top+bh+16,bw*.55,12,0,0,Math.PI*2);x.fill();
+}
+const grid=document.getElementById('prodgrid');
+catalog.forEach((pr,i)=>{
+  const el=document.createElement('article');el.className='card rv';el.dataset.cat=pr.c;el.style.transitionDelay=(i%4*70)+'ms';
+  el.innerHTML=`<div class="card-visual">${pr.b?`<span class="card-badge ${pr.gold?'gold':''}">${pr.b}</span>`:''}<canvas aria-hidden="true"></canvas><div class="card-cta">Add to cart</div></div>
+  <div class="card-info"><div><h3>${pr.n}</h3><small>${pr.sub}</small></div><span class="price">${pr.o?`<s>${pr.o}</s>`:''}${pr.p}</span></div>`;
+  grid.appendChild(el);io.observe(el);
+  drawTub(el.querySelector('canvas'),pr);
+});
+/* filters */
+document.querySelectorAll('#filters .pick').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#filters .pick').forEach(o=>o.classList.remove('on'));
+    b.classList.add('on');
+    const f=b.dataset.f;
+    document.querySelectorAll('#prodgrid .card').forEach(c=>{
+      c.classList.toggle('hide',f!=='all'&&c.dataset.cat!==f);
+    });
+    setH();
+  });
+});
+
+/* ============ FAQ ============ */
+document.querySelectorAll('.qa button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const qa=b.parentElement,open=qa.classList.toggle('open');
+    b.setAttribute('aria-expanded',open);
+    const ans=qa.querySelector('.ans');
+    ans.style.maxHeight=open?ans.scrollHeight+'px':'0';
+    setTimeout(setH,520);
+  });
+});
+
+addEventListener('load',()=>document.body.classList.add('ready'));
+setTimeout(()=>document.body.classList.add('ready'),2600);
+</script>
+</body>
+</html>
